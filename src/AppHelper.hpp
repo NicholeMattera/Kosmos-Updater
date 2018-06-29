@@ -17,21 +17,7 @@
 
 #pragma once
 
-#include <string>
+#include "DownloadManager.hpp"
 
-#include "Download.hpp"
-
-class DownloadManager {
-    public:
-        DownloadManager(std::string host);
-        ~DownloadManager();
-        Download * getLatestAppVersion();
-        Download * getLatestApp();
-        Download * getLatestVersion(std::string channel);
-        Download * getLatestFiles(std::string launcher, std::string channel);
-
-    private:
-        std::string hostname;
-        std::string userAgent;
-        static size_t writeData(void *contents, size_t size, size_t nmemb, void *userp);
-};
+void checkForNewerApp(DownloadManager * downloadManager, bool * error, bool * appIsUpToDate);
+void downloadLatestApp(DownloadManager * downloadManager, bool * error);

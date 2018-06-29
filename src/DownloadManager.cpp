@@ -20,11 +20,14 @@
 #include <curl/curl.h>
 #include <switch.h>
 
-DownloadManager::DownloadManager(std::string host) {
+using namespace std;
+
+DownloadManager::DownloadManager(string host) {
     socketInitializeDefault();
     curl_global_init(CURL_GLOBAL_ALL);
 
     hostname = host;
+    userAgent = string("sdfile-updater/") + VERSION;
 }
 
 DownloadManager::~DownloadManager() {
@@ -32,7 +35,8 @@ DownloadManager::~DownloadManager() {
     socketExit();
 }
 
-Download * DownloadManager::getLatestVersion(std::string channel) {
+
+Download * DownloadManager::getLatestAppVersion() {
     CURL *curl;
     CURLcode res;
 
@@ -40,10 +44,62 @@ Download * DownloadManager::getLatestVersion(std::string channel) {
     
     curl = curl_easy_init();
     if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, (hostname + "/version-number/" + channel).c_str());
+        curl_easy_setopt(curl, CURLOPT_URL, (hostname + "/" + API_VERSION + "/app-version-number").c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeData);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) download);
-        curl_easy_setopt(curl, CURLOPT_USERAGENT, "sdfile-updater/1.0");
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent.c_str());
+
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK) {
+            printf("! Failed to get latest app version: %s\n", curl_easy_strerror(res));
+            delete download;
+            download = NULL;
+        }
+
+        curl_easy_cleanup(curl);
+    }
+
+    return download;
+}
+
+Download * DownloadManager::getLatestApp() {
+    CURL *curl;
+    CURLcode res;
+
+    Download * download = new Download();
+    
+    curl = curl_easy_init();
+    if (curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, (hostname + "/" + API_VERSION + "/app-download").c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeData);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) download);
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent.c_str());
+
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK) {
+            printf("! Failed to get latest app version: %s\n", curl_easy_strerror(res));
+            delete download;
+            download = NULL;
+        }
+
+        curl_easy_cleanup(curl);
+    }
+
+    return download;
+}
+
+Download * DownloadManager::getLatestVersion(string channel) {
+    CURL *curl;
+    CURLcode res;
+
+    Download * download = new Download();
+    
+    curl = curl_easy_init();
+    if (curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, (hostname + "/" + API_VERSION + "/version-number/" + channel).c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeData);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) download);
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent.c_str());
 
         res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
@@ -58,7 +114,7 @@ Download * DownloadManager::getLatestVersion(std::string channel) {
     return download;
 }
 
-Download * DownloadManager::getLatestFiles(std::string channel) {
+Download * DownloadManager::getLatestFiles(string launcher, string channel) {
     CURL *curl;
     CURLcode res;
 
@@ -66,10 +122,10 @@ Download * DownloadManager::getLatestFiles(std::string channel) {
     
     curl = curl_easy_init();
     if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, (hostname + "/download/" + channel).c_str());
+        curl_easy_setopt(curl, CURLOPT_URL, (hostname + "/" + API_VERSION + "/download/" + launcher + "/" + channel).c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeData);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) download);
-        curl_easy_setopt(curl, CURLOPT_USERAGENT, "sdfile-updater/1.0");
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent.c_str());
 
         res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
