@@ -1,4 +1,4 @@
-// SDFile Updater
+// SDFiles Updater
 // Copyright (C) 2018 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 #include "AppHelper.hpp"
 #include "ConfigManager.hpp"
 #include "DownloadManager.hpp"
-#include "SDFileHelper.hpp"
+#include "SDFilesHelper.hpp"
 
 using namespace std;
 

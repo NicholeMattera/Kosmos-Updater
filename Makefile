@@ -38,10 +38,11 @@ DATA		:=	data
 INCLUDES	:=	include
 EXEFS_SRC	:=	exefs_src
 
-APP_TITLE	:= SD File Updater
+APP_TITLE	:= SDFiles Updater
 APP_AUTHOR	:= Steven Mattera
 APP_VERSION	:= 1.1.0
 API_VERSION := v2
+ICON		:= Icon.jpg
 
 #---------------------------------------------------------------------------------
 # options for code generation

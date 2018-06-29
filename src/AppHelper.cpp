@@ -1,4 +1,4 @@
-// SDFile Updater
+// SDFiles Updater
 // Copyright (C) 2018 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
@@ -45,7 +45,7 @@ void downloadLatestApp(DownloadManager * downloadManager, bool * error) {
         return;
     }
 
-    if (writeFile("SDFileUpdater.nro", latestApp)) {
+    if (writeFile("SDFilesUpdater.nro", latestApp)) {
         printf("- SDFiles Updater has been updated, please restart the app to check for SDFiles Updates.\n");
     }
 }

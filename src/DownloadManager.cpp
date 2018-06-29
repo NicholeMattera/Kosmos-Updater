@@ -1,4 +1,4 @@
-// SDFile Updater
+// SDFiles Updater
 // Copyright (C) 2018 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
@@ -27,7 +27,7 @@ DownloadManager::DownloadManager(string host) {
     curl_global_init(CURL_GLOBAL_ALL);
 
     hostname = host;
-    userAgent = string("sdfile-updater/") + VERSION;
+    userAgent = string("sdfiles-updater/") + VERSION;
 }
 
 DownloadManager::~DownloadManager() {

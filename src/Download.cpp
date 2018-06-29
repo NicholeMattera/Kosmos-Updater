@@ -1,4 +1,4 @@
-// SDFile Updater
+// SDFiles Updater
 // Copyright (C) 2018 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
