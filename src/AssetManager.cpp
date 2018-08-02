@@ -32,27 +32,6 @@ AssetManager::AssetManager() {
 }
 
 AssetManager::~AssetManager() {
-    if (a_button != NULL)
-        SDL_DestroyTexture(a_button);
-
-    if (right_button != NULL)
-        SDL_DestroyTexture(right_button);
-
-    if (free_controller != NULL)
-        SDL_DestroyTexture(free_controller);
-
-    if (handheld_controller != NULL)
-        SDL_DestroyTexture(handheld_controller);
-
-    if (left_landscape_controller != NULL)
-        SDL_DestroyTexture(left_landscape_controller);
-
-    if (right_landscape_controller != NULL)
-        SDL_DestroyTexture(right_landscape_controller);
-
-    if (pro_controller != NULL)
-        SDL_DestroyTexture(pro_controller);
-
     if (downloading != NULL) 
         SDL_DestroyTexture(downloading);
 
@@ -62,8 +41,11 @@ AssetManager::~AssetManager() {
     if (header_font != NULL)
         TTF_CloseFont(header_font);
 
-    if (action_font != NULL)
-        TTF_CloseFont(action_font);
+    if (footer_font != NULL)
+        TTF_CloseFont(footer_font);
+
+    if (button_font != NULL)
+        TTF_CloseFont(button_font);
 
     TTF_Quit();
 
@@ -76,13 +58,17 @@ AssetManager::~AssetManager() {
     IMG_Quit();
     SDL_Quit();
 
+    plExit();
     setsysExit();
     romfsExit();
 };
 
 bool AssetManager::initialize() {
+    Result rc;
+
     romfsInit();
     setsysInitialize();
+    plInitialize();
 
     SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO);
 
@@ -98,18 +84,11 @@ bool AssetManager::initialize() {
         return false;
 
     TTF_Init();
-    
+
     ColorSetId theme;
     setsysGetColorSetId(&theme);
     string folderName = _getFolderName(theme);
 
-    a_button = _loadAsset("romfs:/" + folderName + "/button_a.png");
-    right_button = _loadAsset("romfs:/" + folderName + "/button_landscape_a.png");
-    free_controller = _loadAsset("romfs:/" + folderName + "/controller_free.png");
-    handheld_controller = _loadAsset("romfs:/" + folderName + "/controller_handheld.png");
-    left_landscape_controller = _loadAsset("romfs:/" + folderName + "/controller_landscape_left.png");
-    right_landscape_controller = _loadAsset("romfs:/" + folderName + "/controller_landscape_right.png");
-    pro_controller = _loadAsset("romfs:/" + folderName + "/controller_pro.png");
     downloading = _loadAsset("romfs:/" + folderName + "/downloading.png");
     icon = _loadAsset("romfs:/" + folderName + "/icon.png");
 
@@ -145,8 +124,26 @@ bool AssetManager::initialize() {
         disabled_text = { 125, 125, 125, 255 };
     }
 
-    header_font = TTF_OpenFont("romfs:/switch.ttf", 28);
-    action_font = TTF_OpenFont("romfs:/switch.ttf", 23);
+    rc = plGetSharedFontByType(&standardFontData, PlSharedFontType_Standard);
+    if (R_FAILED(rc)) {
+        return false;
+    }
+
+    header_font = TTF_OpenFontRW(SDL_RWFromMem(standardFontData.address, standardFontData.size), 1, 28);
+    footer_font = TTF_OpenFontRW(SDL_RWFromMem(standardFontData.address, standardFontData.size), 1, 23);
+
+    if (!header_font || !footer_font)
+        return false;
+
+    rc = plGetSharedFontByType(&extendedFontData, PlSharedFontType_NintendoExt);
+    if (R_FAILED(rc)) {
+        return false;
+    }
+    
+    button_font = TTF_OpenFontRW(SDL_RWFromMem(extendedFontData.address, extendedFontData.size), 1, 25);
+
+    if (!button_font)
+        return false;
 
     return true;
 };

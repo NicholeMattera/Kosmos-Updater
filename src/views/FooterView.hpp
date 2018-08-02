@@ -28,4 +28,12 @@ class FooterView : public View {
         FooterView(AssetManager * assetManager);
         ~FooterView();
         void render(SDL_Rect rect);
+
+    private:
+        SDL_Texture * _aButtonTexture;
+        SDL_Texture * _bButtonTexture;
+        SDL_Texture * _xButtonTexture;
+        SDL_Texture * _yButtonTexture;
+
+        void _renderButton(ActionButton button, SDL_Texture * texture, SDL_Rect frame);
 };

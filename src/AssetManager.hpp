@@ -58,8 +58,11 @@ class AssetManager {
         SDL_Color disabled_text;
 
         /* Fonts */
+        PlFontData standardFontData;
         TTF_Font * header_font;
-        TTF_Font * action_font;
+        TTF_Font * footer_font;
+        PlFontData extendedFontData;
+        TTF_Font * button_font;
 
         AssetManager();
         ~AssetManager();

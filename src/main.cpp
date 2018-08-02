@@ -31,7 +31,8 @@ int main(int argc, char **argv)
 
     AssetManager * assetManager = new AssetManager();
     if(!assetManager->initialize()) {
-        return -1;
+        delete assetManager;
+        return 0;
     }
 
     SceneDirector * sceneDirector = new SceneDirector(assetManager);

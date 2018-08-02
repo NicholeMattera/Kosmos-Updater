@@ -58,6 +58,9 @@ bool SceneDirector::direct() {
     if (_footerView == NULL) {
         _footerView = new FooterView(_assetManager);
         _footerView->actions.push_front(new Action(A_BUTTON, "OK"));
+        _footerView->actions.push_front(new Action(B_BUTTON, "Cancel"));
+        _footerView->actions.push_front(new Action(X_BUTTON, "View Something?"));
+        _footerView->actions.push_front(new Action(Y_BUTTON, "Wut?"));
     }
 
     _headerView->render({ 0, 0, 1280, 88 });
