@@ -15,15 +15,25 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#pragma once
+#include "View.hpp"
 
-#include <string.h>
+View::View(AssetManager * assetManager) {
+    _assetManager = assetManager;
+}
 
-class Download {
-    public:
-        size_t size;
-        char * data;
+View::~View() {}
 
-        Download();
-        ~Download();
-};
+void View::render(SDL_Rect rect) {
+    for (list<View *>::iterator it = subviews.begin(); it != subviews.end(); it++) {
+        SDL_Rect subviewFrame = (*it)->frame;
+        (*it)->render({ rect.x + subviewFrame.x, rect.y + subviewFrame.y, subviewFrame.w, subviewFrame.h });
+    }
+}
+
+void View::addSubView(View * view) {
+    subviews.push_back(view);
+}
+
+void View::removeSubView(View * view) {
+    subviews.remove(view);
+}

@@ -17,18 +17,26 @@
 
 #pragma once
 
-#include <libconfig.h>
-#include <string>
+#include "../View.hpp"
 
-class ConfigManager {
+class TextView : public View {
     public:
-        config_t cfg;
+        TTF_Font * font;
+        string text;
+        SDL_Color textColor;
 
-        ConfigManager();
-        ~ConfigManager();
-        std::string getHost();
-        std::string getChannel();
-        std::string getCurrentVersion();
-        std::string getLauncherPreference();
-        bool writeCurrentVersion(std::string version);
+        TextView(AssetManager * assetManager, TTF_Font * theFont, string theText, SDL_Color theTextColor);
+        ~TextView();
+
+        void render(SDL_Rect rect);
+        void setFont(TTF_Font * theFont);
+        void setText(string theText);
+        void setTextColor(SDL_Color theTextColor);
+
+    private:
+        SDL_Texture * _textTexture;
+        int _textWidth;
+        int _textHeight;
+
+        void _reset();
 };

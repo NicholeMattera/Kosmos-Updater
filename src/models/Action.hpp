@@ -17,9 +17,26 @@
 
 #pragma once
 
-#include "ConfigManager.hpp"
-#include "Download.hpp"
-#include "DownloadManager.hpp"
+#include <SDL2/SDL.h>
+#include <string>
 
-Download * checkForNewerSDFiles(ConfigManager * configManager, DownloadManager * downloadManager, bool * error, bool * downloadSDFiles);
-void downloadLatestSDFiles(ConfigManager * configManager, DownloadManager * downloadManager, bool * error);
+using namespace std;
+
+typedef enum {
+    A_BUTTON,
+    B_BUTTON,
+    Y_BUTTON,
+    X_BUTTON
+} ActionButton;
+
+class Action {
+    public:
+        ActionButton button;
+
+        string text;
+        SDL_Texture * textTexture;
+        int textWidth;
+        int textHeight;
+
+        Action(ActionButton actionButton, string actionText);
+};

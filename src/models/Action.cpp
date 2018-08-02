@@ -15,14 +15,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "Download.hpp"
-#include <stdlib.h>
+#include "Action.hpp"
 
-Download::Download() {
-    size = 0;
-    data = (char *) malloc(1);
-}
-
-Download::~Download() {
-    free(data);
+Action::Action(ActionButton actionButton, string actionText) {
+    button = actionButton;
+    text = actionText;
+    textTexture = NULL;
+    textWidth = 0;
+    textHeight = 0;
 }

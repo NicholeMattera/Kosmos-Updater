@@ -33,15 +33,17 @@ include $(DEVKITPRO)/libnx/switch_rules
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
 DIST		:=	dist
-SOURCES		:=	src src/minizip
+SOURCES		:=	src src/models src/views src/scenes
 DATA		:=	data
 INCLUDES	:=	include
 EXEFS_SRC	:=	exefs_src
+ROMFS		:=	romfs
 
 APP_TITLE	:= SDFiles Updater
 APP_AUTHOR	:= Steven Mattera
-APP_VERSION	:= 1.1.0
+APP_VERSION := 2.0.0
 API_VERSION := v2
+
 ICON		:= Icon.jpg
 
 #---------------------------------------------------------------------------------
@@ -53,14 +55,14 @@ ARCH	:=	-march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIE
 CFLAGS	:=	-g -Wall -O2 -ffunction-sections \
 			$(ARCH) $(DEFINES)
 
-CFLAGS	+=	$(INCLUDE) -D__SWITCH__ -DUSE_FILE32API -DVERSION=\"$(APP_VERSION)\" -DAPI_VERSION=\"$(API_VERSION)\"
+CFLAGS	+=	$(INCLUDE) -D__SWITCH__ -DVERSION=\"$(APP_VERSION)\" -DAPI_VERSION=\"$(API_VERSION)\"
 
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= -lconfig -lcurl -lz -lnx
+LIBS	:= -lSDL2_ttf -lSDL2_image -lpng -lturbojpeg -lnx `sdl2-config --libs` `freetype-config --libs`
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

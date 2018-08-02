@@ -15,38 +15,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <switch.h>
+#pragma once
 
-#include "AssetManager.hpp"
-#include "SceneDirector.hpp"
+#include <list>
+#include "../View.hpp"
+#include "../models/Action.hpp"
 
-using namespace std;
+class FooterView : public View {
+    public:
+        list<Action *> actions;
 
-int main(int argc, char **argv)
-{
-    socketInitializeDefault();
-    nxlinkStdio();
-
-    AssetManager * assetManager = new AssetManager();
-    if(!assetManager->initialize()) {
-        return -1;
-    }
-
-    SceneDirector * sceneDirector = new SceneDirector(assetManager);
-
-    // Main Game Loop
-    while(appletMainLoop())
-    {
-        if (!sceneDirector->direct())
-            break;
-    }
-
-    delete sceneDirector;
-    delete assetManager;
-
-    socketExit();
-
-    return 0;
-}
+        FooterView(AssetManager * assetManager);
+        ~FooterView();
+        void render(SDL_Rect rect);
+};

@@ -15,38 +15,26 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#pragma once
+
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <switch.h>
-
 #include "AssetManager.hpp"
-#include "SceneDirector.hpp"
+#include "views/HeaderView.hpp"
+#include "views/FooterView.hpp"
 
-using namespace std;
+class SceneDirector {
+    public:
+        SceneDirector(AssetManager * assetManager);
+        ~SceneDirector();
 
-int main(int argc, char **argv)
-{
-    socketInitializeDefault();
-    nxlinkStdio();
+        bool direct();
 
-    AssetManager * assetManager = new AssetManager();
-    if(!assetManager->initialize()) {
-        return -1;
-    }
-
-    SceneDirector * sceneDirector = new SceneDirector(assetManager);
-
-    // Main Game Loop
-    while(appletMainLoop())
-    {
-        if (!sceneDirector->direct())
-            break;
-    }
-
-    delete sceneDirector;
-    delete assetManager;
-
-    socketExit();
-
-    return 0;
-}
+    private:
+        Uint64 _now;
+        Uint64 _last;
+        AssetManager * _assetManager;
+        /* Temporary for testing. Views belong in scenes. */
+        HeaderView * _headerView;
+        FooterView * _footerView;
+        /* End of temporary for testing. */
+};

@@ -17,21 +17,25 @@
 
 #pragma once
 
-#include <string>
+#include <list>
+#include <SDL2/SDL.h>
+#include "AssetManager.hpp"
 
-#include "Download.hpp"
+using namespace std;
 
-class DownloadManager {
+class View {
     public:
-        DownloadManager(std::string host);
-        ~DownloadManager();
-        Download * getLatestAppVersion();
-        Download * getLatestApp();
-        Download * getLatestVersion(std::string channel);
-        Download * getLatestFiles(std::string launcher, std::string channel);
+        SDL_Rect frame;
+        list<View *> subviews;
 
-    private:
-        std::string hostname;
-        std::string userAgent;
-        static size_t writeData(void *contents, size_t size, size_t nmemb, void *userp);
+        View(AssetManager * assetManager);
+        virtual ~View();
+
+        virtual void render(SDL_Rect rect)=0;
+        void renderSubviews(SDL_Rect rect);
+        void addSubView(View * view);
+        void removeSubView(View * view);
+    
+    protected:
+        AssetManager * _assetManager;
 };

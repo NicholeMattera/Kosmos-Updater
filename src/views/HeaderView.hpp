@@ -17,7 +17,15 @@
 
 #pragma once
 
-#include "DownloadManager.hpp"
+#include "../View.hpp"
+#include "TextView.hpp"
 
-void checkForNewerApp(DownloadManager * downloadManager, bool * error, bool * appIsUpToDate);
-void downloadLatestApp(DownloadManager * downloadManager, bool * error);
+class HeaderView : public View {
+    public:
+        HeaderView(AssetManager * assetManager);
+        ~HeaderView();
+        void render(SDL_Rect rect);
+
+    private:
+        TextView * title;
+};
