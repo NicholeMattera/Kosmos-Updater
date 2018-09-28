@@ -19,6 +19,7 @@
 #include "../SceneDirector.hpp"
 
 AppUpdateScene::AppUpdateScene() {
+    _downloadProgress = 0;
 
     _headerView = new HeaderView();
     _headerView->frame = { 0, 0, 1280, 88 };
@@ -29,12 +30,16 @@ AppUpdateScene::AppUpdateScene() {
     _downloadImageView = new ImageView(AssetManager::downloading);
     _downloadImageView->frame = { 400, 200, 479, 197 };
 
+    _progressBarView = new ProgressBarView();
+    _progressBarView->frame = { 437, 457, 411, 10 };
+
     _footerView = new FooterView();
     _footerView->frame = { 0, 647, 1280, 73 };
     _footerView->actions.push_back(new Action(A_BUTTON, "Package Select"));
 
     addSubView(_headerView);
     addSubView(_downloadImageView);
+    addSubView(_progressBarView);
     addSubView(_footerView);
 }
 
@@ -52,6 +57,16 @@ AppUpdateScene::~AppUpdateScene() {
 void AppUpdateScene::handleButton(u32 buttons) {
     if (buttons & KEY_A) {
         SceneDirector::currentScene = SCENE_PACKAGE_SELECT;
+    }
+    
+    if (buttons & KEY_X) {
+        _downloadProgress++;
+        _progressBarView->progress = _downloadProgress;
+    }
+    
+    if (buttons & KEY_B) {
+        _downloadProgress--;
+        _progressBarView->progress = _downloadProgress;
     }
 }
 
