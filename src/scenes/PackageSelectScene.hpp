@@ -24,5 +24,7 @@ class PackageSelectScene : public Scene {
         PackageSelectScene();
         ~PackageSelectScene();
 
+        void render(SDL_Rect rect, double dTime);
+
     private:
 };

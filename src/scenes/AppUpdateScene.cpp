@@ -20,3 +20,7 @@
 AppUpdateScene::AppUpdateScene() {}
 
 AppUpdateScene::~AppUpdateScene() {}
+
+void AppUpdateScene::render(SDL_Rect rect, double dTime) {
+
+}

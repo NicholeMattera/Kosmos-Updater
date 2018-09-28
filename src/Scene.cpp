@@ -20,3 +20,5 @@
 Scene::Scene() {}
 
 Scene::~Scene() {}
+
+void Scene::render(SDL_Rect rect, double dTime) {}

@@ -17,10 +17,14 @@
 
 #pragma once
 
+#include <SDL2/SDL.h>
+
 using namespace std;
 
 class Scene {
     public:
         Scene();
-        ~Scene();
+        virtual ~Scene();
+
+        virtual void render(SDL_Rect rect, double dTime);
 };

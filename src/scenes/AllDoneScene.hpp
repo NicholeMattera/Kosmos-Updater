@@ -23,6 +23,8 @@ class AllDoneScene : public Scene {
     public:
         AllDoneScene();
         ~AllDoneScene();
+        
+        void render(SDL_Rect rect, double dTime);
 
     private:
 };

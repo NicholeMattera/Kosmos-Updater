@@ -20,3 +20,7 @@
 DownloadingPackageScene::DownloadingPackageScene() {}
 
 DownloadingPackageScene::~DownloadingPackageScene() {}
+
+void DownloadingPackageScene::render(SDL_Rect rect, double dTime) {
+
+}

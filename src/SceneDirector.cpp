@@ -48,9 +48,29 @@ SceneDirector::SceneDirector() {
 
     _now = SDL_GetPerformanceCounter();
     _last = 0;
+    _allDoneScene = NULL;
+    _appUpdateScene = NULL;
+    _downloadingAppScene = NULL;
+    _downloadingPackageScene = NULL;
+    _packageSelectScene = NULL;
 }
 
 SceneDirector::~SceneDirector() {
+    if (_allDoneScene != NULL)
+        delete _allDoneScene;
+
+    if (_appUpdateScene != NULL)
+        delete _appUpdateScene;
+
+    if (_downloadingAppScene != NULL)
+        delete _downloadingAppScene;
+
+    if (_downloadingPackageScene != NULL)
+        delete _downloadingPackageScene;
+
+    if (_packageSelectScene != NULL)
+        delete _packageSelectScene;
+
     if (SceneDirector::renderer != NULL)
         SDL_DestroyRenderer(SceneDirector::renderer);
 
@@ -73,28 +93,93 @@ bool SceneDirector::direct() {
 
     hidScanInput();
     u32 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
-    if (kDown & KEY_A)
-        return false;
+
+    // TODO: Handle touch controls
 
     AssetManager::setRenderColor(AssetManager::background);
     SDL_RenderClear(SceneDirector::renderer);
 
+    // Unload previous scenes
     switch(SceneDirector::currentScene) {
-        case SCENE_APP_UPDATE:
-            break;
-
-        case SCENE_DOWNLOADING_APP:
-            break;
-
         case SCENE_PACKAGE_SELECT:
-            break;
-
         case SCENE_DOWNLOADING_PACKAGE:
+            if (_appUpdateScene != NULL) {
+                delete _appUpdateScene;
+                _appUpdateScene = NULL;
+            }
+
+            if (_downloadingAppScene != NULL) {
+                delete _downloadingAppScene;
+                _downloadingAppScene = NULL;
+            }
             break;
 
         case SCENE_ALL_DONE:
+            if (_appUpdateScene != NULL) {
+                delete _appUpdateScene;
+                _appUpdateScene = NULL;
+            }
+
+            if (_downloadingAppScene != NULL) {
+                delete _downloadingAppScene;
+                _downloadingAppScene = NULL;
+            }
+
+            if (_packageSelectScene != NULL) {
+                delete _packageSelectScene;
+                _packageSelectScene = NULL;
+            }
+
+            if (_downloadingPackageScene != NULL) {
+                delete _downloadingPackageScene;
+                _downloadingPackageScene = NULL;
+            }
+            break;
+
+        default:
+            /* Do Nothing */
             break;
     }
+
+    // Load new scenes
+    switch(SceneDirector::currentScene) {
+        case SCENE_APP_UPDATE:
+            if (_appUpdateScene == NULL)
+                _appUpdateScene = new AppUpdateScene();
+            
+            _currentScene = _appUpdateScene;
+            break;
+
+        case SCENE_DOWNLOADING_APP:
+            if (_downloadingAppScene == NULL)
+                _downloadingAppScene = new DownloadingAppScene();
+            
+            _currentScene = _downloadingAppScene;
+            break;
+
+        case SCENE_PACKAGE_SELECT:
+            if (_packageSelectScene == NULL)
+                _packageSelectScene = new PackageSelectScene();
+            
+            _currentScene = _packageSelectScene;
+            break;
+
+        case SCENE_DOWNLOADING_PACKAGE:
+            if (_downloadingPackageScene == NULL)
+                _downloadingPackageScene = new DownloadingPackageScene();
+            
+            _currentScene = _downloadingPackageScene;
+            break;
+
+        case SCENE_ALL_DONE:
+            if (_allDoneScene == NULL)
+                _allDoneScene = new AllDoneScene();
+            
+            _currentScene = _allDoneScene;
+            break;
+    }
+
+    _currentScene->render({ 0, 0, 1280, 720 }, dTime);
 
     SDL_RenderPresent(SceneDirector::renderer);
 

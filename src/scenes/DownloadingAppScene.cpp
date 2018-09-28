@@ -20,3 +20,7 @@
 DownloadingAppScene::DownloadingAppScene() {}
 
 DownloadingAppScene::~DownloadingAppScene() {}
+
+void DownloadingAppScene::render(SDL_Rect rect, double dTime) {
+
+}

@@ -20,3 +20,7 @@
 AllDoneScene::AllDoneScene() {}
 
 AllDoneScene::~AllDoneScene() {}
+
+void AllDoneScene::render(SDL_Rect rect, double dTime) {
+
+}

@@ -19,8 +19,13 @@
 
 #include <SDL2/SDL.h>
 #include "AssetManager.hpp"
-#include "views/HeaderView.hpp"
-#include "views/FooterView.hpp"
+#include "Scene.hpp"
+
+#include "scenes/AllDoneScene.hpp"
+#include "scenes/AppUpdateScene.hpp"
+#include "scenes/DownloadingAppScene.hpp"
+#include "scenes/DownloadingPackageScene.hpp"
+#include "scenes/PackageSelectScene.hpp"
 
 typedef enum {
     SCENE_APP_UPDATE,
@@ -47,4 +52,11 @@ class SceneDirector {
     private:
         Uint64 _now;
         Uint64 _last;
+
+        Scene * _currentScene;
+        AllDoneScene * _allDoneScene;
+        AppUpdateScene * _appUpdateScene;
+        DownloadingAppScene * _downloadingAppScene;
+        DownloadingPackageScene * _downloadingPackageScene;
+        PackageSelectScene * _packageSelectScene;
 };

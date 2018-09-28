@@ -23,6 +23,8 @@ class AppUpdateScene : public Scene {
     public:
         AppUpdateScene();
         ~AppUpdateScene();
+        
+        void render(SDL_Rect rect, double dTime);
 
     private:
 };

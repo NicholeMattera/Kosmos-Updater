@@ -23,6 +23,8 @@ class DownloadingAppScene : public Scene {
     public:
         DownloadingAppScene();
         ~DownloadingAppScene();
+        
+        void render(SDL_Rect rect, double dTime);
 
     private:
 };

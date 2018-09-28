@@ -20,3 +20,7 @@
 PackageSelectScene::PackageSelectScene() {}
 
 PackageSelectScene::~PackageSelectScene() {}
+
+void PackageSelectScene::render(SDL_Rect rect, double dTime) {
+
+}
