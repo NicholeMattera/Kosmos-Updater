@@ -15,23 +15,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#pragma once
+#include "ImageView.hpp"
+#include "../SceneDirector.hpp"
 
-#include "../Scene.hpp"
-#include "../views/HeaderView.hpp"
-#include "../views/ImageView.hpp"
-#include "../views/FooterView.hpp"
+ImageView::ImageView(SDL_Texture * image) : View() {
+    _image = image;
+}
 
-class AppUpdateScene : public Scene {
-    public:
-        AppUpdateScene();
-        ~AppUpdateScene();
-        
-        void handleButton(u32 buttons);
-        void render(SDL_Rect rect, double dTime);
+ImageView::~ImageView() {}
 
-    private:
-        HeaderView * _headerView;
-        ImageView * _downloadImageView;
-        FooterView * _footerView;
-};
+void ImageView::render(SDL_Rect rect) {
+    SDL_RenderCopy(SceneDirector::renderer, _image, NULL, &rect);
+    View::render(rect);
+}

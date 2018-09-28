@@ -19,20 +19,31 @@
 #include "../SceneDirector.hpp"
 
 AppUpdateScene::AppUpdateScene() {
+
     _headerView = new HeaderView();
     _headerView->frame = { 0, 0, 1280, 88 };
 
+    if (AssetManager::downloading == NULL) {
+        AssetManager::downloading = AssetManager::loadAsset("downloading.png");
+    }
+    _downloadImageView = new ImageView(AssetManager::downloading);
+    _downloadImageView->frame = { 400, 200, 479, 197 };
+
     _footerView = new FooterView();
     _footerView->frame = { 0, 647, 1280, 73 };
-    _footerView->actions.push_back(new Action(A_BUTTON, "Next"));
+    _footerView->actions.push_back(new Action(A_BUTTON, "Package Select"));
 
     addSubView(_headerView);
+    addSubView(_downloadImageView);
     addSubView(_footerView);
 }
 
 AppUpdateScene::~AppUpdateScene() {
     if (_headerView != NULL)
         delete _headerView;
+
+    if (_downloadImageView != NULL)
+        delete _downloadImageView;
 
     if (_footerView != NULL)
         delete _footerView;

@@ -24,6 +24,7 @@ PackageSelectScene::PackageSelectScene() {
 
     _footerView = new FooterView();
     _footerView->frame = { 0, 647, 1280, 73 };
+    _footerView->actions.push_back(new Action(A_BUTTON, "All Done"));
 
     addSubView(_headerView);
     addSubView(_footerView);
