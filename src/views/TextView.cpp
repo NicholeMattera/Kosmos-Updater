@@ -21,6 +21,8 @@
 TextView::TextView(TTF_Font * theFont, string theText, SDL_Color theTextColor) : View() {
     isFocusable = false;
     isTouchable = false;
+    textAlignment = LEFT_ALIGN;
+    _textTexture = NULL;
     
     font = theFont;
     text = theText;
@@ -42,8 +44,24 @@ void TextView::render(SDL_Rect rect) {
         SDL_FreeSurface(surface);
     }
 
+    int x = 0;
+    int width = max(_textWidth, rect.w);
+    switch (textAlignment) {
+        case LEFT_ALIGN:
+            x = rect.x;
+            break;
+
+        case CENTER_ALIGN:
+            x = (width - _textWidth) / 2;
+            break;
+
+        case RIGHT_ALIGN:
+            x = width - _textWidth;
+            break;
+    }
+    
     // Render the text.
-    SDL_Rect textFrame = { rect.x, rect.y, min(_textWidth, rect.w), min(_textHeight, rect.h) };
+    SDL_Rect textFrame = { x, rect.y, _textWidth, _textHeight };
     SDL_RenderCopy(SceneDirector::renderer, _textTexture, NULL, &textFrame);
 
     // Render any subviews.

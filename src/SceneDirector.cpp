@@ -50,9 +50,8 @@ SceneDirector::SceneDirector() {
     _last = 0;
     _allDoneScene = NULL;
     _appUpdateScene = NULL;
-    _downloadingAppScene = NULL;
-    _downloadingPackageScene = NULL;
     _packageSelectScene = NULL;
+    _currentScene = NULL;
 }
 
 SceneDirector::~SceneDirector() {
@@ -61,12 +60,6 @@ SceneDirector::~SceneDirector() {
 
     if (_appUpdateScene != NULL)
         delete _appUpdateScene;
-
-    if (_downloadingAppScene != NULL)
-        delete _downloadingAppScene;
-
-    if (_downloadingPackageScene != NULL)
-        delete _downloadingPackageScene;
 
     if (_packageSelectScene != NULL)
         delete _packageSelectScene;
@@ -102,15 +95,9 @@ bool SceneDirector::direct() {
     // Unload previous scenes
     switch(SceneDirector::currentScene) {
         case SCENE_PACKAGE_SELECT:
-        case SCENE_DOWNLOADING_PACKAGE:
             if (_appUpdateScene != NULL) {
                 delete _appUpdateScene;
                 _appUpdateScene = NULL;
-            }
-
-            if (_downloadingAppScene != NULL) {
-                delete _downloadingAppScene;
-                _downloadingAppScene = NULL;
             }
             break;
 
@@ -120,20 +107,11 @@ bool SceneDirector::direct() {
                 _appUpdateScene = NULL;
             }
 
-            if (_downloadingAppScene != NULL) {
-                delete _downloadingAppScene;
-                _downloadingAppScene = NULL;
-            }
-
             if (_packageSelectScene != NULL) {
                 delete _packageSelectScene;
                 _packageSelectScene = NULL;
             }
 
-            if (_downloadingPackageScene != NULL) {
-                delete _downloadingPackageScene;
-                _downloadingPackageScene = NULL;
-            }
             break;
 
         default:
@@ -150,25 +128,11 @@ bool SceneDirector::direct() {
             _currentScene = _appUpdateScene;
             break;
 
-        case SCENE_DOWNLOADING_APP:
-            if (_downloadingAppScene == NULL)
-                _downloadingAppScene = new DownloadingAppScene();
-            
-            _currentScene = _downloadingAppScene;
-            break;
-
         case SCENE_PACKAGE_SELECT:
             if (_packageSelectScene == NULL)
                 _packageSelectScene = new PackageSelectScene();
             
             _currentScene = _packageSelectScene;
-            break;
-
-        case SCENE_DOWNLOADING_PACKAGE:
-            if (_downloadingPackageScene == NULL)
-                _downloadingPackageScene = new DownloadingPackageScene();
-            
-            _currentScene = _downloadingPackageScene;
             break;
 
         case SCENE_ALL_DONE:
@@ -179,9 +143,10 @@ bool SceneDirector::direct() {
             break;
     }
 
+    _currentScene->handleButton(kDown);
     _currentScene->render({ 0, 0, 1280, 720 }, dTime);
 
     SDL_RenderPresent(SceneDirector::renderer);
 
     return !SceneDirector::exitApp;
-};
+}

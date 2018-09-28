@@ -17,14 +17,7 @@
 
 #pragma once
 
-#include "../Scene.hpp"
+using namespace std;
 
-class DownloadingPackageScene : public Scene {
-    public:
-        DownloadingPackageScene();
-        ~DownloadingPackageScene();
-        
-        void render(SDL_Rect rect, double dTime);
-
-    private:
+class Touch {
 };

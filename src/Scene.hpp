@@ -18,6 +18,9 @@
 #pragma once
 
 #include <SDL2/SDL.h>
+#include <switch.h>
+#include <list>
+#include "View.hpp"
 
 using namespace std;
 
@@ -26,5 +29,19 @@ class Scene {
         Scene();
         virtual ~Scene();
 
+        virtual void handleButton(u32 buttons);
         virtual void render(SDL_Rect rect, double dTime);
+
+        /* Touch Controls */
+        void touchStarted();
+        void touchMoved();
+        void touchEnded();
+
+        /* View Hierarchy */
+        list<View *> subviews;
+        void addSubView(View * view);
+        void removeSubView(View * view);
+
+    private:
+        View * _touchedView;
 };

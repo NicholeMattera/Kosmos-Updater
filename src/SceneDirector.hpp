@@ -23,15 +23,11 @@
 
 #include "scenes/AllDoneScene.hpp"
 #include "scenes/AppUpdateScene.hpp"
-#include "scenes/DownloadingAppScene.hpp"
-#include "scenes/DownloadingPackageScene.hpp"
 #include "scenes/PackageSelectScene.hpp"
 
 typedef enum {
     SCENE_APP_UPDATE,
-    SCENE_DOWNLOADING_APP,
     SCENE_PACKAGE_SELECT,
-    SCENE_DOWNLOADING_PACKAGE,
     SCENE_ALL_DONE
 } Scenes;
 
@@ -56,7 +52,5 @@ class SceneDirector {
         Scene * _currentScene;
         AllDoneScene * _allDoneScene;
         AppUpdateScene * _appUpdateScene;
-        DownloadingAppScene * _downloadingAppScene;
-        DownloadingPackageScene * _downloadingPackageScene;
         PackageSelectScene * _packageSelectScene;
 };

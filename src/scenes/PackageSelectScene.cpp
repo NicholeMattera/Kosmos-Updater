@@ -17,10 +17,29 @@
 
 #include "PackageSelectScene.hpp"
 
-PackageSelectScene::PackageSelectScene() {}
+PackageSelectScene::PackageSelectScene() {
+    _headerView = new HeaderView();
+    _headerView->frame = { 0, 0, 1280, 88 };
 
-PackageSelectScene::~PackageSelectScene() {}
+    _footerView = new FooterView();
+    _footerView->frame = { 0, 647, 1280, 73 };
+
+    addSubView(_headerView);
+    addSubView(_footerView);
+}
+
+PackageSelectScene::~PackageSelectScene() {
+    if (_headerView != NULL)
+        delete _headerView;
+
+    if (_footerView != NULL)
+        delete _footerView;
+}
+
+void PackageSelectScene::handleButton(u32 buttons) {
+    
+}
 
 void PackageSelectScene::render(SDL_Rect rect, double dTime) {
-
+    Scene::render(rect, dTime);
 }

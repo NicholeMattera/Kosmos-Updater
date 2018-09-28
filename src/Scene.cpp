@@ -17,8 +17,49 @@
 
 #include "Scene.hpp"
 
-Scene::Scene() {}
+Scene::Scene() {
+    _touchedView = NULL;
+}
 
 Scene::~Scene() {}
 
-void Scene::render(SDL_Rect rect, double dTime) {}
+void Scene::handleButton(u32 buttons) {}
+
+void Scene::render(SDL_Rect rect, double dTime) {
+    for (list<View *>::iterator it = subviews.begin(); it != subviews.end(); it++) {
+        SDL_Rect subviewFrame = (*it)->frame;
+        (*it)->render({ rect.x + subviewFrame.x, rect.y + subviewFrame.y, subviewFrame.w, subviewFrame.h });
+    }
+}
+
+void Scene::touchStarted() {
+    for (list<View *>::iterator it = subviews.begin(); it != subviews.end(); it++) {
+        // TODO: Check if touch is within the view
+        if ((*it)->isTouchable) {
+            _touchedView = (*it);
+            _touchedView->touchStarted();
+        }
+    }
+}
+
+void Scene::touchMoved() {
+    if (_touchedView != NULL) {
+        _touchedView->touchMoved();
+    }
+}
+
+void Scene::touchEnded() {
+    if (_touchedView != NULL) {
+        _touchedView->touchEnded();
+    }
+}
+
+void Scene::addSubView(View * view) {
+    view->superview = NULL;
+    subviews.push_back(view);
+}
+
+void Scene::removeSubView(View * view) {
+    view->superview = NULL;
+    subviews.remove(view);
+}

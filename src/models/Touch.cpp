@@ -15,12 +15,4 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "DownloadingAppScene.hpp"
-
-DownloadingAppScene::DownloadingAppScene() {}
-
-DownloadingAppScene::~DownloadingAppScene() {}
-
-void DownloadingAppScene::render(SDL_Rect rect, double dTime) {
-
-}
+#include "Touch.hpp"

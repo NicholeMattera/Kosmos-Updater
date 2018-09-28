@@ -47,12 +47,16 @@ SDL_Color AssetManager::disabled_text;
 PlFontData AssetManager::standardFontData;
 TTF_Font * AssetManager::header_font = NULL;
 TTF_Font * AssetManager::body_font = NULL;
+TTF_Font * AssetManager::subbody_font = NULL;
 PlFontData AssetManager::extendedFontData;
 TTF_Font * AssetManager::button_font = NULL;
 
 void AssetManager::dealloc() {
     if (AssetManager::button_font != NULL)
         TTF_CloseFont(AssetManager::button_font);
+
+    if (AssetManager::subbody_font != NULL)
+        TTF_CloseFont(AssetManager::subbody_font);
 
     if (AssetManager::body_font != NULL)
         TTF_CloseFont(AssetManager::body_font);
@@ -77,7 +81,7 @@ void AssetManager::dealloc() {
 
     if (AssetManager::a_button != NULL) 
         SDL_DestroyTexture(AssetManager::a_button);
-};
+}
 
 bool AssetManager::initialize() {
     Result rc;
@@ -121,6 +125,7 @@ bool AssetManager::initialize() {
 
     AssetManager::header_font = TTF_OpenFontRW(SDL_RWFromMem(AssetManager::standardFontData.address, AssetManager::standardFontData.size), 1, 28);
     AssetManager::body_font = TTF_OpenFontRW(SDL_RWFromMem(AssetManager::standardFontData.address, AssetManager::standardFontData.size), 1, 23);
+    AssetManager::subbody_font = TTF_OpenFontRW(SDL_RWFromMem(AssetManager::standardFontData.address, AssetManager::standardFontData.size), 1, 18);
     if (!AssetManager::header_font || !AssetManager::body_font)
         return false;
 
@@ -133,7 +138,7 @@ bool AssetManager::initialize() {
         return false;
 
     return true;
-};
+}
 
 void AssetManager::setRenderColor(SDL_Color color) {
     SDL_SetRenderDrawColor(SceneDirector::renderer, color.r, color.g, color.b, color.a);
@@ -146,4 +151,4 @@ SDL_Texture * AssetManager::loadAsset(string file) {
     SDL_Texture * texture = SDL_CreateTextureFromSurface(SceneDirector::renderer, image);
     SDL_FreeSurface(image);
     return texture;
-};
+}

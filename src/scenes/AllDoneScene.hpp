@@ -18,13 +18,21 @@
 #pragma once
 
 #include "../Scene.hpp"
+#include "../views/HeaderView.hpp"
+#include "../views/TextView.hpp"
+#include "../views/FooterView.hpp"
 
 class AllDoneScene : public Scene {
     public:
         AllDoneScene();
         ~AllDoneScene();
         
+        void handleButton(u32 buttons);
         void render(SDL_Rect rect, double dTime);
 
     private:
+        HeaderView * _headerView;
+        TextView * _textView;
+        TextView * _subtextView;
+        FooterView * _footerView;
 };

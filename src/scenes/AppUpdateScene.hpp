@@ -18,13 +18,18 @@
 #pragma once
 
 #include "../Scene.hpp"
+#include "../views/HeaderView.hpp"
+#include "../views/FooterView.hpp"
 
 class AppUpdateScene : public Scene {
     public:
         AppUpdateScene();
         ~AppUpdateScene();
         
+        void handleButton(u32 buttons);
         void render(SDL_Rect rect, double dTime);
 
     private:
+        HeaderView * _headerView;
+        FooterView * _footerView;
 };

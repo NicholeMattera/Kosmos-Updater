@@ -21,6 +21,12 @@
 #include <string>
 #include "../View.hpp"
 
+typedef enum {
+    LEFT_ALIGN,
+    CENTER_ALIGN,
+    RIGHT_ALIGN
+} TextAlignment;
+
 using namespace std;
 
 class TextView : public View {
@@ -28,6 +34,7 @@ class TextView : public View {
         TTF_Font * font;
         string text;
         SDL_Color textColor;
+        TextAlignment textAlignment;
 
         TextView(TTF_Font * theFont, string theText, SDL_Color theTextColor);
         ~TextView();

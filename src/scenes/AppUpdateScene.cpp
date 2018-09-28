@@ -16,11 +16,33 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "AppUpdateScene.hpp"
+#include "../SceneDirector.hpp"
 
-AppUpdateScene::AppUpdateScene() {}
+AppUpdateScene::AppUpdateScene() {
+    _headerView = new HeaderView();
+    _headerView->frame = { 0, 0, 1280, 88 };
 
-AppUpdateScene::~AppUpdateScene() {}
+    _footerView = new FooterView();
+    _footerView->frame = { 0, 647, 1280, 73 };
+
+    addSubView(_headerView);
+    addSubView(_footerView);
+}
+
+AppUpdateScene::~AppUpdateScene() {
+    if (_headerView != NULL)
+        delete _headerView;
+
+    if (_footerView != NULL)
+        delete _footerView;
+}
+
+void AppUpdateScene::handleButton(u32 buttons) {
+    if (buttons & KEY_A) {
+        SceneDirector::currentScene = SCENE_ALL_DONE;
+    }
+}
 
 void AppUpdateScene::render(SDL_Rect rect, double dTime) {
-
+    Scene::render(rect, dTime);
 }

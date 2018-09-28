@@ -56,6 +56,7 @@ class AssetManager {
         static PlFontData standardFontData;
         static TTF_Font * header_font;
         static TTF_Font * body_font;
+        static TTF_Font * subbody_font;
         static PlFontData extendedFontData;
         static TTF_Font * button_font;
 
