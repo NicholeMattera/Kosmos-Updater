@@ -40,8 +40,12 @@ void ProgressBarView::render(SDL_Rect rect) {
     // Draw progress bar.
     double currentProgress = ((double) progress) / 100;
     int progressWidth = (rect.w - rect.h) * currentProgress;
+    
     if (progressWidth > rect.w - rect.h)
         progressWidth = rect.w - rect.h;
+
+    if (progressWidth < 0)
+        progressWidth = 0;
 
     roundedBoxRGBA(
         SceneDirector::renderer,

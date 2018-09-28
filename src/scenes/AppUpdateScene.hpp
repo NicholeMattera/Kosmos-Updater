@@ -21,6 +21,7 @@
 #include "../views/HeaderView.hpp"
 #include "../views/ImageView.hpp"
 #include "../views/ProgressBarView.hpp"
+#include "../views/TextView.hpp"
 #include "../views/FooterView.hpp"
 
 class AppUpdateScene : public Scene {
@@ -37,5 +38,6 @@ class AppUpdateScene : public Scene {
         HeaderView * _headerView;
         ImageView * _downloadImageView;
         ProgressBarView * _progressBarView;
+        TextView * _statusTextView;
         FooterView * _footerView;
 };

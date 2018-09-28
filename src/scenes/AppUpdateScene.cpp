@@ -33,6 +33,10 @@ AppUpdateScene::AppUpdateScene() {
     _progressBarView = new ProgressBarView();
     _progressBarView->frame = { 437, 457, 411, 10 };
 
+    _statusTextView = new TextView(AssetManager::subbody_font, "Checking for updates to SDFiles Updater...", AssetManager::text);
+    _statusTextView->frame = { 0, 491, 1280, 0 };
+    _statusTextView->textAlignment = CENTER_ALIGN;
+
     _footerView = new FooterView();
     _footerView->frame = { 0, 647, 1280, 73 };
     _footerView->actions.push_back(new Action(A_BUTTON, "Package Select"));
@@ -40,6 +44,7 @@ AppUpdateScene::AppUpdateScene() {
     addSubView(_headerView);
     addSubView(_downloadImageView);
     addSubView(_progressBarView);
+    addSubView(_statusTextView);
     addSubView(_footerView);
 }
 
