@@ -17,8 +17,9 @@
 
 #include "View.hpp"
 
-View::View(AssetManager * assetManager) {
-    _assetManager = assetManager;
+View::View() {
+    frame = { 0, 0, 0, 0 };
+    hasFocus = false;
 }
 
 View::~View() {}
@@ -30,10 +31,16 @@ void View::render(SDL_Rect rect) {
     }
 }
 
+void View::touchStarted() {}
+void View::touchMoved() {}
+void View::touchEnded() {}
+
 void View::addSubView(View * view) {
+    view->superview = view;
     subviews.push_back(view);
 }
 
 void View::removeSubView(View * view) {
+    view->superview = NULL;
     subviews.remove(view);
 }

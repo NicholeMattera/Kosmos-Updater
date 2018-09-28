@@ -16,28 +16,42 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "HeaderView.hpp"
+#include "../AssetManager.hpp"
+#include "../SceneDirector.hpp"
 
-HeaderView::HeaderView(AssetManager * assetManager) : View(assetManager) {
-    title = new TextView(assetManager, assetManager->header_font, "SDFiles Updater", assetManager->text);
-    title->frame = { 132, 36, 250, 51 };
-    addSubView(title);
-}
+HeaderView::HeaderView() : View() {
+    _titleTexture = NULL;
 
-HeaderView::~HeaderView() {
-    if (title != NULL) {
-        removeSubView(title);
-        delete title;
+    isFocusable = false;
+    isTouchable = false;
+
+    if (AssetManager::icon == NULL) {
+        AssetManager::icon = AssetManager::loadAsset("icon.png");
     }
 }
+
+HeaderView::~HeaderView() {}
 
 void HeaderView::render(SDL_Rect rect) {
     // Icon
     SDL_Rect iconFrame = { rect.x + 74, rect.y + 29, 30, 44 };
-    SDL_RenderCopy(_assetManager->renderer, _assetManager->icon, NULL, &iconFrame);
+    SDL_RenderCopy(SceneDirector::renderer, AssetManager::icon, NULL, &iconFrame);
+
+    // Title
+    if (_titleTexture == NULL) {
+        SDL_Surface *surface = TTF_RenderText_Blended(AssetManager::header_font, "SDFiles Updater", AssetManager::text);
+        _titleTexture = SDL_CreateTextureFromSurface(SceneDirector::renderer, surface);
+        _titleWidth = surface->w;
+        _titleHeight = surface->h;
+        SDL_FreeSurface(surface);
+    }
+
+    SDL_Rect titleFrame = { rect.x + 132, rect.y + 36, _titleWidth, _titleHeight };
+    SDL_RenderCopy(SceneDirector::renderer, _titleTexture, NULL, &titleFrame);
 
     // Divider
-    _assetManager->setRenderColor(_assetManager->header_footer_divider);
-    SDL_RenderDrawLine(_assetManager->renderer, rect.x + 30, rect.y + 87, rect.w - 30, rect.y + 87);
+    AssetManager::setRenderColor(AssetManager::header_footer_divider);
+    SDL_RenderDrawLine(SceneDirector::renderer, rect.x + 30, rect.y + 87, rect.w - 30, rect.y + 87);
 
     // Render any subviews
     View::render(rect);

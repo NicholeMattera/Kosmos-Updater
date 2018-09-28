@@ -15,21 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#pragma once
+#include "PackageSelectScene.hpp"
 
-#include "../View.hpp"
-#include "TextView.hpp"
+PackageSelectScene::PackageSelectScene() {}
 
-using namespace std;
-
-class HeaderView : public View {
-    public:
-        HeaderView();
-        ~HeaderView();
-        void render(SDL_Rect rect);
-
-    private:
-        SDL_Texture * _titleTexture;
-        int _titleWidth;
-        int _titleHeight;
-};
+PackageSelectScene::~PackageSelectScene() {}

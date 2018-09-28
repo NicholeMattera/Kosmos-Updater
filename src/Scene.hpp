@@ -17,19 +17,10 @@
 
 #pragma once
 
-#include "../View.hpp"
-#include "TextView.hpp"
-
 using namespace std;
 
-class HeaderView : public View {
+class Scene {
     public:
-        HeaderView();
-        ~HeaderView();
-        void render(SDL_Rect rect);
-
-    private:
-        SDL_Texture * _titleTexture;
-        int _titleWidth;
-        int _titleHeight;
+        Scene();
+        ~Scene();
 };

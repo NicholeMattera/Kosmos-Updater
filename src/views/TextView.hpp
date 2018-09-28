@@ -17,7 +17,11 @@
 
 #pragma once
 
+#include <SDL2/SDL_ttf.h>
+#include <string>
 #include "../View.hpp"
+
+using namespace std;
 
 class TextView : public View {
     public:
@@ -25,7 +29,7 @@ class TextView : public View {
         string text;
         SDL_Color textColor;
 
-        TextView(AssetManager * assetManager, TTF_Font * theFont, string theText, SDL_Color theTextColor);
+        TextView(TTF_Font * theFont, string theText, SDL_Color theTextColor);
         ~TextView();
 
         void render(SDL_Rect rect);

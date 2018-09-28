@@ -17,20 +17,44 @@
 
 #include <switch.h>
 #include "FooterView.hpp"
+#include "../AssetManager.hpp"
+#include "../SceneDirector.hpp"
 
-FooterView::FooterView(AssetManager * assetManager) : View(assetManager) {
-    _aButtonTexture = NULL;
-    _bButtonTexture = NULL;
-    _xButtonTexture = NULL;
-    _yButtonTexture = NULL;
+FooterView::FooterView() : View() {
+    isFocusable = false;
+    isTouchable = false;
+
+    if (AssetManager::a_button == NULL) {
+        SDL_Surface *surface = TTF_RenderGlyph_Blended(AssetManager::button_font, 0xE0E0, AssetManager::text);
+        AssetManager::a_button = SDL_CreateTextureFromSurface(SceneDirector::renderer, surface);
+        SDL_FreeSurface(surface);
+    }
+
+    if (AssetManager::b_button == NULL) {
+        SDL_Surface *surface = TTF_RenderGlyph_Blended(AssetManager::button_font, 0xE0E1, AssetManager::text);
+        AssetManager::b_button = SDL_CreateTextureFromSurface(SceneDirector::renderer, surface);
+        SDL_FreeSurface(surface);
+    }
+
+    if (AssetManager::x_button == NULL) {
+        SDL_Surface *surface = TTF_RenderGlyph_Blended(AssetManager::button_font, 0xE0E2, AssetManager::text);
+        AssetManager::x_button = SDL_CreateTextureFromSurface(SceneDirector::renderer, surface);
+        SDL_FreeSurface(surface);
+    }
+
+    if (AssetManager::y_button == NULL) {
+        SDL_Surface *surface = TTF_RenderGlyph_Blended(AssetManager::button_font, 0xE0E3, AssetManager::text);
+        AssetManager::y_button = SDL_CreateTextureFromSurface(SceneDirector::renderer, surface);
+        SDL_FreeSurface(surface);
+    }
 }
 
 FooterView::~FooterView() {}
 
 void FooterView::render(SDL_Rect rect) {
     // Divider.
-    _assetManager->setRenderColor(_assetManager->header_footer_divider);
-    SDL_RenderDrawLine(_assetManager->renderer, rect.x + 30, rect.y, rect.w - 30, rect.y);
+    AssetManager::setRenderColor(AssetManager::header_footer_divider);
+    SDL_RenderDrawLine(SceneDirector::renderer, rect.x + 30, rect.y, rect.w - 30, rect.y);
 
     // Render Actions.
     int current_x = rect.w - 60;
@@ -39,8 +63,8 @@ void FooterView::render(SDL_Rect rect) {
 
         // Create texture if it doesn't already exists.
         if (action->textTexture == NULL) {
-            SDL_Surface *surface = TTF_RenderText_Blended(_assetManager->footer_font, action->text.c_str(), _assetManager->text);
-            action->textTexture = SDL_CreateTextureFromSurface(_assetManager->renderer, surface);
+            SDL_Surface *surface = TTF_RenderText_Blended(AssetManager::body_font, action->text.c_str(), AssetManager::text);
+            action->textTexture = SDL_CreateTextureFromSurface(SceneDirector::renderer, surface);
             action->textWidth = surface->w;
             action->textHeight = surface->h;
             SDL_FreeSurface(surface);
@@ -49,26 +73,26 @@ void FooterView::render(SDL_Rect rect) {
         // Render Action Text
         current_x -= action->textWidth;
         SDL_Rect textFrame = { current_x, rect.y + 25, action->textWidth, action->textHeight };
-        SDL_RenderCopy(_assetManager->renderer, action->textTexture, NULL, &textFrame);
+        SDL_RenderCopy(SceneDirector::renderer, action->textTexture, NULL, &textFrame);
 
         current_x -= 37;
         // Render Action Button Icon
         SDL_Rect iconFrame = { current_x, rect.y + 25, 25, 25 };
         switch(action->button) {
             case B_BUTTON:
-                _renderButton(action->button, _bButtonTexture, iconFrame);
+                SDL_RenderCopy(SceneDirector::renderer, AssetManager::b_button, NULL, &iconFrame);
                 break;
 
             case X_BUTTON:
-                _renderButton(action->button, _xButtonTexture, iconFrame);
+                SDL_RenderCopy(SceneDirector::renderer, AssetManager::x_button, NULL, &iconFrame);
                 break;
 
             case Y_BUTTON:
-                _renderButton(action->button, _yButtonTexture, iconFrame);
+                SDL_RenderCopy(SceneDirector::renderer, AssetManager::y_button, NULL, &iconFrame);
                 break;
 
             default:
-                _renderButton(action->button, _aButtonTexture, iconFrame);
+                SDL_RenderCopy(SceneDirector::renderer, AssetManager::a_button, NULL, &iconFrame);
                 break;
         }
         current_x -= 40;
@@ -76,33 +100,4 @@ void FooterView::render(SDL_Rect rect) {
 
     // Render any subviews.
     View::render(rect);
-}
-
-void FooterView::_renderButton(ActionButton button, SDL_Texture * texture, SDL_Rect frame) {
-    if (texture == NULL) {
-        u16 buttonText;
-        switch(button) {
-            case B_BUTTON:
-                buttonText = 0xE0E1;
-                break;
-
-            case X_BUTTON:
-                buttonText = 0xE0E2;
-                break;
-
-            case Y_BUTTON:
-                buttonText = 0xE0E3;
-                break;
-
-            default:
-                buttonText = 0xE0E0;
-                break;
-        }
-
-        SDL_Surface *surface = TTF_RenderGlyph_Blended(_assetManager->button_font, buttonText, _assetManager->text);
-        texture = SDL_CreateTextureFromSurface(_assetManager->renderer, surface);
-        SDL_FreeSurface(surface);
-    }
-
-    SDL_RenderCopy(_assetManager->renderer, texture, NULL, &frame);
 }

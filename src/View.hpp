@@ -19,23 +19,31 @@
 
 #include <list>
 #include <SDL2/SDL.h>
-#include "AssetManager.hpp"
 
 using namespace std;
 
 class View {
     public:
         SDL_Rect frame;
-        list<View *> subviews;
 
-        View(AssetManager * assetManager);
+        View();
         virtual ~View();
 
-        virtual void render(SDL_Rect rect)=0;
-        void renderSubviews(SDL_Rect rect);
+        virtual void render(SDL_Rect rect);
+
+        /* Controller Input */
+        bool isFocusable;
+        bool hasFocus;
+
+        /* Touch Controls */
+        bool isTouchable;
+        virtual void touchStarted();
+        virtual void touchMoved();
+        virtual void touchEnded();
+
+        /* View Hierarchy */
+        View * superview;
+        list<View *> subviews;
         void addSubView(View * view);
         void removeSubView(View * view);
-    
-    protected:
-        AssetManager * _assetManager;
 };

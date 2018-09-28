@@ -27,50 +27,40 @@ using namespace std;
 
 class AssetManager {
     public:
-        SDL_Window * window;
-        SDL_Renderer * renderer;
-
         /* Textures */
-        SDL_Texture * a_button;
-        SDL_Texture * right_button;
-        SDL_Texture * free_controller;
-        SDL_Texture * handheld_controller;
-        SDL_Texture * left_landscape_controller;
-        SDL_Texture * right_landscape_controller;
-        SDL_Texture * pro_controller;
-        SDL_Texture * downloading;
-        SDL_Texture * icon;
+        static SDL_Texture * a_button;
+        static SDL_Texture * b_button;
+        static SDL_Texture * x_button;
+        static SDL_Texture * y_button;
+        static SDL_Texture * downloading;
+        static SDL_Texture * icon;
 
         /* Colors */
-        SDL_Color background;
-        SDL_Color sidebard_background;
-        SDL_Color header_footer_divider;
-        SDL_Color list_divider;
-        SDL_Color active_player_indicator;
-        SDL_Color player_indicator;
-        SDL_Color selected_background;
-        SDL_Color selected_border_1;
-        SDL_Color selected_border_2;
-        SDL_Color modal_faded_background;
-        SDL_Color modal_background;
-        SDL_Color text;
-        SDL_Color active_text;
-        SDL_Color disabled_text;
+        static ColorSetId theme;
+        static SDL_Color background;
+        static SDL_Color sidebard_background;
+        static SDL_Color header_footer_divider;
+        static SDL_Color list_divider;
+        static SDL_Color active_player_indicator;
+        static SDL_Color player_indicator;
+        static SDL_Color selected_background;
+        static SDL_Color selected_border_1;
+        static SDL_Color selected_border_2;
+        static SDL_Color modal_faded_background;
+        static SDL_Color modal_background;
+        static SDL_Color text;
+        static SDL_Color active_text;
+        static SDL_Color disabled_text;
 
         /* Fonts */
-        PlFontData standardFontData;
-        TTF_Font * header_font;
-        TTF_Font * footer_font;
-        PlFontData extendedFontData;
-        TTF_Font * button_font;
+        static PlFontData standardFontData;
+        static TTF_Font * header_font;
+        static TTF_Font * body_font;
+        static PlFontData extendedFontData;
+        static TTF_Font * button_font;
 
-        AssetManager();
-        ~AssetManager();
-
-        bool initialize();
-        void setRenderColor(SDL_Color color);
-
-    private:
-        std::string _getFolderName(ColorSetId theme);
-        SDL_Texture * _loadAsset(string file);
+        static bool initialize();
+        static void dealloc();
+        static void setRenderColor(SDL_Color color);
+        static SDL_Texture * loadAsset(string file);
 };

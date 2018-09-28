@@ -17,19 +17,12 @@
 
 #pragma once
 
-#include "../View.hpp"
-#include "TextView.hpp"
+#include "../Scene.hpp"
 
-using namespace std;
-
-class HeaderView : public View {
+class PackageSelectScene : public Scene {
     public:
-        HeaderView();
-        ~HeaderView();
-        void render(SDL_Rect rect);
+        PackageSelectScene();
+        ~PackageSelectScene();
 
     private:
-        SDL_Texture * _titleTexture;
-        int _titleWidth;
-        int _titleHeight;
 };

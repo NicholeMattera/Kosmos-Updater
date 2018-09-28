@@ -22,9 +22,24 @@
 #include "views/HeaderView.hpp"
 #include "views/FooterView.hpp"
 
+typedef enum {
+    SCENE_APP_UPDATE,
+    SCENE_DOWNLOADING_APP,
+    SCENE_PACKAGE_SELECT,
+    SCENE_DOWNLOADING_PACKAGE,
+    SCENE_ALL_DONE
+} Scenes;
+
+using namespace std;
+
 class SceneDirector {
     public:
-        SceneDirector(AssetManager * assetManager);
+        static SDL_Window * window;
+        static SDL_Renderer * renderer;
+        static Scenes currentScene;
+        static bool exitApp;
+        
+        SceneDirector();
         ~SceneDirector();
 
         bool direct();
@@ -32,9 +47,4 @@ class SceneDirector {
     private:
         Uint64 _now;
         Uint64 _last;
-        AssetManager * _assetManager;
-        /* Temporary for testing. Views belong in scenes. */
-        HeaderView * _headerView;
-        FooterView * _footerView;
-        /* End of temporary for testing. */
 };

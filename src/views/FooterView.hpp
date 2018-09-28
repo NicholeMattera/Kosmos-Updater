@@ -21,19 +21,16 @@
 #include "../View.hpp"
 #include "../models/Action.hpp"
 
+using namespace std;
+
 class FooterView : public View {
     public:
         list<Action *> actions;
 
-        FooterView(AssetManager * assetManager);
+        FooterView();
         ~FooterView();
         void render(SDL_Rect rect);
 
     private:
-        SDL_Texture * _aButtonTexture;
-        SDL_Texture * _bButtonTexture;
-        SDL_Texture * _xButtonTexture;
-        SDL_Texture * _yButtonTexture;
-
         void _renderButton(ActionButton button, SDL_Texture * texture, SDL_Rect frame);
 };

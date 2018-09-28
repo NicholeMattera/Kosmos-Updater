@@ -26,16 +26,15 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-    socketInitializeDefault();
-    nxlinkStdio();
-
-    AssetManager * assetManager = new AssetManager();
-    if(!assetManager->initialize()) {
-        delete assetManager;
-        return 0;
+    SceneDirector * sceneDirector = new SceneDirector();
+    if (!SceneDirector::renderer || !SceneDirector::window) {
+        return -1;
     }
 
-    SceneDirector * sceneDirector = new SceneDirector(assetManager);
+    if(!AssetManager::initialize()) {
+        AssetManager::dealloc();
+        return -1;
+    }
 
     // Main Game Loop
     while(appletMainLoop())
@@ -44,10 +43,8 @@ int main(int argc, char **argv)
             break;
     }
 
+    AssetManager::dealloc();
     delete sceneDirector;
-    delete assetManager;
-
-    socketExit();
 
     return 0;
 }

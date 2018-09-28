@@ -18,24 +18,52 @@
 #include <switch.h>
 #include "SceneDirector.hpp"
 
-SceneDirector::SceneDirector(AssetManager * assetManager) {
+SDL_Window * SceneDirector::window = NULL;
+SDL_Renderer * SceneDirector::renderer = NULL;
+Scenes SceneDirector::currentScene = SCENE_APP_UPDATE;
+bool SceneDirector::exitApp = false;
+
+SceneDirector::SceneDirector() {
+    socketInitializeDefault();
+    nxlinkStdio();
+
+    romfsInit();
+    setsysInitialize();
+    plInitialize();
+
+    SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO);
+
+    if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
+        return;
+
+    SceneDirector::window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_FULLSCREEN);
+    if (!SceneDirector::window)
+        return;
+
+    SceneDirector::renderer = SDL_CreateRenderer(SceneDirector::window, 0, SDL_RENDERER_SOFTWARE);
+    if (!SceneDirector::renderer)
+        return;
+
+    TTF_Init();
+
     _now = SDL_GetPerformanceCounter();
     _last = 0;
-    _assetManager = assetManager;
-    /* Temporary for testing. Views belong in scenes. */
-    _headerView = NULL;
-    _footerView = NULL;
-    /* End of temporary for testing. */
 }
 
 SceneDirector::~SceneDirector() {
-    /* Temporary for testing. Views belong in scenes. */
-    if (_headerView != NULL)
-        delete _headerView;
+    if (SceneDirector::renderer != NULL)
+        SDL_DestroyRenderer(SceneDirector::renderer);
 
-    if (_footerView != NULL)
-        delete _footerView;
-    /* End of temporary for testing. */
+    if (SceneDirector::window != NULL)
+        SDL_DestroyWindow(SceneDirector::window);
+
+    TTF_Quit();
+    IMG_Quit();
+    SDL_Quit();
+    plExit();
+    setsysExit();
+    romfsExit();
+    socketExit();
 }
 
 bool SceneDirector::direct() {
@@ -48,26 +76,27 @@ bool SceneDirector::direct() {
     if (kDown & KEY_A)
         return false;
 
-    _assetManager->setRenderColor(_assetManager->background);
-    SDL_RenderClear(_assetManager->renderer);
+    AssetManager::setRenderColor(AssetManager::background);
+    SDL_RenderClear(SceneDirector::renderer);
 
-    /* Temporary for testing. Views belong in scenes. */
-    if (_headerView == NULL)
-        _headerView = new HeaderView(_assetManager);
+    switch(SceneDirector::currentScene) {
+        case SCENE_APP_UPDATE:
+            break;
 
-    if (_footerView == NULL) {
-        _footerView = new FooterView(_assetManager);
-        _footerView->actions.push_front(new Action(A_BUTTON, "OK"));
-        _footerView->actions.push_front(new Action(B_BUTTON, "Cancel"));
-        _footerView->actions.push_front(new Action(X_BUTTON, "View Something?"));
-        _footerView->actions.push_front(new Action(Y_BUTTON, "Wut?"));
+        case SCENE_DOWNLOADING_APP:
+            break;
+
+        case SCENE_PACKAGE_SELECT:
+            break;
+
+        case SCENE_DOWNLOADING_PACKAGE:
+            break;
+
+        case SCENE_ALL_DONE:
+            break;
     }
 
-    _headerView->render({ 0, 0, 1280, 88 });
-    _footerView->render({ 0, 647, 1280, 73 });
-    /* End of temporary for testing. */
+    SDL_RenderPresent(SceneDirector::renderer);
 
-    SDL_RenderPresent(_assetManager->renderer);
-    
-    return true;
+    return !SceneDirector::exitApp;
 };
