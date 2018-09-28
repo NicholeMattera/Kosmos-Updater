@@ -24,3 +24,10 @@ Action::Action(ActionButton actionButton, string actionText) {
     textWidth = 0;
     textHeight = 0;
 }
+
+Action::~Action() {
+    if (textTexture != NULL) {
+        SDL_DestroyTexture(textTexture);
+        textTexture = NULL;
+    }
+}

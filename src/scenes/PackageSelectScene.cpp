@@ -16,6 +16,7 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "PackageSelectScene.hpp"
+#include "../SceneDirector.hpp"
 
 PackageSelectScene::PackageSelectScene() {
     _headerView = new HeaderView();
@@ -37,7 +38,9 @@ PackageSelectScene::~PackageSelectScene() {
 }
 
 void PackageSelectScene::handleButton(u32 buttons) {
-    
+    if (buttons & KEY_A) {
+        SceneDirector::currentScene = SCENE_ALL_DONE;
+    }
 }
 
 void PackageSelectScene::render(SDL_Rect rect, double dTime) {

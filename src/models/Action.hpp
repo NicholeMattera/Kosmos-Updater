@@ -39,4 +39,5 @@ class Action {
         int textHeight;
 
         Action(ActionButton actionButton, string actionText);
+        ~Action();
 };

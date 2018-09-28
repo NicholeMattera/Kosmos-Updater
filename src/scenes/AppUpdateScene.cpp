@@ -24,6 +24,7 @@ AppUpdateScene::AppUpdateScene() {
 
     _footerView = new FooterView();
     _footerView->frame = { 0, 647, 1280, 73 };
+    _footerView->actions.push_back(new Action(A_BUTTON, "Next"));
 
     addSubView(_headerView);
     addSubView(_footerView);
@@ -39,7 +40,7 @@ AppUpdateScene::~AppUpdateScene() {
 
 void AppUpdateScene::handleButton(u32 buttons) {
     if (buttons & KEY_A) {
-        SceneDirector::currentScene = SCENE_ALL_DONE;
+        SceneDirector::currentScene = SCENE_PACKAGE_SELECT;
     }
 }
 

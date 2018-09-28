@@ -49,7 +49,13 @@ FooterView::FooterView() : View() {
     }
 }
 
-FooterView::~FooterView() {}
+FooterView::~FooterView() {
+    for (list<Action *>::iterator it = actions.begin(); it != actions.end(); it++) {
+        delete (*it);
+    }
+
+    actions.clear();
+}
 
 void FooterView::render(SDL_Rect rect) {
     // Divider.
