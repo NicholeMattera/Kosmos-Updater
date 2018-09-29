@@ -20,6 +20,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include <string>
 #include <switch.h>
 
@@ -32,6 +33,7 @@ class AssetManager {
         static SDL_Texture * b_button;
         static SDL_Texture * x_button;
         static SDL_Texture * y_button;
+        static SDL_Texture * handheld;
         static SDL_Texture * downloading;
         static SDL_Texture * icon;
 
@@ -59,6 +61,12 @@ class AssetManager {
         static TTF_Font * subbody_font;
         static PlFontData extendedFontData;
         static TTF_Font * button_font;
+        static TTF_Font * large_button_font;
+
+        /* Sounds */
+        static Mix_Chunk * enter;
+        static Mix_Chunk * back;
+        static Mix_Chunk * select;
 
         static bool initialize();
         static void dealloc();

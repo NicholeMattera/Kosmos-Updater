@@ -40,6 +40,7 @@ PackageSelectScene::~PackageSelectScene() {
 
 void PackageSelectScene::handleButton(u32 buttons) {
     if (buttons & KEY_A) {
+        Mix_PlayChannel(-1, AssetManager::enter, 0);
         SceneDirector::currentScene = SCENE_ALL_DONE;
     }
 }

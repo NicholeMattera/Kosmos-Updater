@@ -47,6 +47,12 @@ FooterView::FooterView() : View() {
         AssetManager::y_button = SDL_CreateTextureFromSurface(SceneDirector::renderer, surface);
         SDL_FreeSurface(surface);
     }
+
+    if (AssetManager::handheld == NULL) {
+        SDL_Surface *surface = TTF_RenderGlyph_Blended(AssetManager::large_button_font, 0xE121, AssetManager::text);
+        AssetManager::handheld = SDL_CreateTextureFromSurface(SceneDirector::renderer, surface);
+        SDL_FreeSurface(surface);
+    }
 }
 
 FooterView::~FooterView() {
@@ -61,6 +67,9 @@ void FooterView::render(SDL_Rect rect) {
     // Divider.
     AssetManager::setRenderColor(AssetManager::header_footer_divider);
     SDL_RenderDrawLine(SceneDirector::renderer, rect.x + 30, rect.y, rect.w - 30, rect.y);
+
+    SDL_Rect handheldFrame = { 55, rect.y + 2, 70, 70 };
+    SDL_RenderCopy(SceneDirector::renderer, AssetManager::handheld, NULL, &handheldFrame);
 
     // Render Actions.
     int current_x = rect.w - 60;

@@ -31,7 +31,7 @@ SceneDirector::SceneDirector() {
     setsysInitialize();
     plInitialize();
 
-    SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
     if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
         return;
@@ -45,6 +45,9 @@ SceneDirector::SceneDirector() {
         return;
 
     TTF_Init();
+
+    Mix_AllocateChannels(2);
+    Mix_OpenAudio(48000, AUDIO_S16, 2, 4096);
 
     _now = SDL_GetPerformanceCounter();
     _last = 0;
@@ -70,6 +73,9 @@ SceneDirector::~SceneDirector() {
     if (SceneDirector::window != NULL)
         SDL_DestroyWindow(SceneDirector::window);
 
+    Mix_HaltChannel(-1);
+    Mix_CloseAudio();
+    Mix_Quit();
     TTF_Quit();
     IMG_Quit();
     SDL_Quit();

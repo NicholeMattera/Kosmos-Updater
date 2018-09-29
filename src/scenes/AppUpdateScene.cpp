@@ -61,15 +61,18 @@ AppUpdateScene::~AppUpdateScene() {
 
 void AppUpdateScene::handleButton(u32 buttons) {
     if (buttons & KEY_A) {
+        Mix_PlayChannel(-1, AssetManager::enter, 0);
         SceneDirector::currentScene = SCENE_PACKAGE_SELECT;
     }
     
     if (buttons & KEY_X) {
+        Mix_PlayChannel(-1, AssetManager::enter, 0);
         _downloadProgress++;
         _progressBarView->progress = _downloadProgress;
     }
     
     if (buttons & KEY_B) {
+        Mix_PlayChannel(-1, AssetManager::back, 0);
         _downloadProgress--;
         _progressBarView->progress = _downloadProgress;
     }

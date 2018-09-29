@@ -23,6 +23,7 @@ SDL_Texture * AssetManager::a_button = NULL;
 SDL_Texture * AssetManager::b_button = NULL;
 SDL_Texture * AssetManager::x_button = NULL;
 SDL_Texture * AssetManager::y_button = NULL;
+SDL_Texture * AssetManager::handheld = NULL;
 SDL_Texture * AssetManager::downloading = NULL;
 SDL_Texture * AssetManager::icon = NULL;
 
@@ -50,8 +51,26 @@ TTF_Font * AssetManager::body_font = NULL;
 TTF_Font * AssetManager::subbody_font = NULL;
 PlFontData AssetManager::extendedFontData;
 TTF_Font * AssetManager::button_font = NULL;
+TTF_Font * AssetManager::large_button_font = NULL;
+
+/* Sounds */
+Mix_Chunk * AssetManager::enter = NULL;
+Mix_Chunk * AssetManager::back = NULL;
+Mix_Chunk * AssetManager::select = NULL;
 
 void AssetManager::dealloc() {
+    if (AssetManager::select != NULL)
+        Mix_FreeChunk(AssetManager::select);
+
+    if (AssetManager::back != NULL)
+        Mix_FreeChunk(AssetManager::back);
+
+    if (AssetManager::enter != NULL)
+        Mix_FreeChunk(AssetManager::enter);
+
+    if (AssetManager::large_button_font != NULL)
+        TTF_CloseFont(AssetManager::large_button_font);
+
     if (AssetManager::button_font != NULL)
         TTF_CloseFont(AssetManager::button_font);
 
@@ -69,6 +88,9 @@ void AssetManager::dealloc() {
     
     if (AssetManager::downloading != NULL) 
         SDL_DestroyTexture(AssetManager::downloading);
+
+    if (AssetManager::handheld != NULL)
+        SDL_DestroyTexture(AssetManager::handheld);
 
     if (AssetManager::y_button != NULL)
         SDL_DestroyTexture(AssetManager::y_button);
@@ -136,6 +158,14 @@ bool AssetManager::initialize() {
     AssetManager::button_font = TTF_OpenFontRW(SDL_RWFromMem(AssetManager::extendedFontData.address, AssetManager::extendedFontData.size), 1, 25);
     if (!AssetManager::button_font)
         return false;
+
+    AssetManager::large_button_font = TTF_OpenFontRW(SDL_RWFromMem(AssetManager::extendedFontData.address, AssetManager::extendedFontData.size), 1, 70);
+    if (!AssetManager::large_button_font)
+        return false;
+
+    AssetManager::enter = Mix_LoadWAV("romfs:/enter.wav");
+    AssetManager::back = Mix_LoadWAV("romfs:/back.wav");
+    AssetManager::select = Mix_LoadWAV("romfs:/select.wav");
 
     return true;
 }

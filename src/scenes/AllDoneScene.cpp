@@ -57,6 +57,7 @@ AllDoneScene::~AllDoneScene() {
 
 void AllDoneScene::handleButton(u32 buttons) {
     if (buttons & KEY_A) {
+        Mix_PlayChannel(-1, AssetManager::enter, 0);
         SceneDirector::exitApp = true;
     }
 }
