@@ -17,37 +17,44 @@
 
 #pragma once
 
-#include <SDL2/SDL_ttf.h>
 #include <string>
 #include "../View.hpp"
 
 typedef enum {
-    LEFT_ALIGN,
-    CENTER_ALIGN,
-    RIGHT_ALIGN
-} TextAlignment;
+    DEFAULT,
+    SUBTITLE,
+    VALUE
+} ListRowStyle;
 
 using namespace std;
 
-class TextView : public View {
+class ListRowView : public View {
     public:
-        TTF_Font * font;
-        string text;
-        SDL_Color textColor;
-        TextAlignment textAlignment;
-
-        TextView(TTF_Font * theFont, string theText, SDL_Color theTextColor);
-        ~TextView();
+        bool isLast;
+        
+        ListRowView(string primaryText, string secondaryText, ListRowStyle style);
+        ~ListRowView();
 
         void render(SDL_Rect rect, double dTime);
-        void setFont(TTF_Font * theFont);
-        void setText(string theText);
-        void setTextColor(SDL_Color theTextColor);
 
     private:
-        SDL_Texture * _textTexture;
-        int _textWidth;
-        int _textHeight;
+        double _timeElapsed;
 
-        void _reset();
+        SDL_Texture * _primaryTextTexture;
+        string _primaryText;
+        int _primaryTextWidth;
+        int _primaryTextHeight;
+
+        SDL_Texture * _secondaryTextTexture;
+        string _secondaryText;
+        int _secondaryTextWidth;
+        int _secondaryTextHeight;
+
+        ListRowStyle _style;
+
+        SDL_Color _generateSelectionColor();
+        void _drawBorders(int x1, int y1, int x2, int y2, SDL_Color color);
+        void _renderDefaultStyle(SDL_Rect rect);
+        void _renderSubtitleStyle(SDL_Rect rect);
+        void _renderValueStyle(SDL_Rect rect);
 };

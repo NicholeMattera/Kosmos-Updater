@@ -63,7 +63,7 @@ FooterView::~FooterView() {
     actions.clear();
 }
 
-void FooterView::render(SDL_Rect rect) {
+void FooterView::render(SDL_Rect rect, double dTime) {
     // Divider.
     AssetManager::setRenderColor(AssetManager::header_footer_divider);
     SDL_RenderDrawLine(SceneDirector::renderer, rect.x + 30, rect.y, rect.w - 30, rect.y);
@@ -114,5 +114,5 @@ void FooterView::render(SDL_Rect rect) {
     }
 
     // Render any subviews.
-    View::render(rect);
+    View::render(rect, dTime);
 }

@@ -32,7 +32,7 @@ HeaderView::HeaderView() : View() {
 
 HeaderView::~HeaderView() {}
 
-void HeaderView::render(SDL_Rect rect) {
+void HeaderView::render(SDL_Rect rect, double dTime) {
     // Icon
     SDL_Rect iconFrame = { rect.x + 74, rect.y + 29, 30, 44 };
     SDL_RenderCopy(SceneDirector::renderer, AssetManager::icon, NULL, &iconFrame);
@@ -54,5 +54,5 @@ void HeaderView::render(SDL_Rect rect) {
     SDL_RenderDrawLine(SceneDirector::renderer, rect.x + 30, rect.y + 87, rect.w - 30, rect.y + 87);
 
     // Render any subviews
-    View::render(rect);
+    View::render(rect, dTime);
 }

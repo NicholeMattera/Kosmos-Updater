@@ -15,10 +15,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "AppUpdateScene.hpp"
+#include "PackageDownloadScene.hpp"
 #include "../SceneDirector.hpp"
 
-AppUpdateScene::AppUpdateScene() {
+PackageDownloadScene::PackageDownloadScene() {
     _downloadProgress = 0;
 
     _headerView = new HeaderView();
@@ -33,7 +33,7 @@ AppUpdateScene::AppUpdateScene() {
     _progressBarView = new ProgressBarView();
     _progressBarView->frame = { 437, 457, 411, 10 };
 
-    _statusTextView = new TextView(AssetManager::subbody_font, "Checking for updates to SDFiles Updater...", AssetManager::text);
+    _statusTextView = new TextView(AssetManager::subbody_font, "Downloading the latest SDFiles...", AssetManager::text);
     _statusTextView->frame = { 0, 491, 1280, 0 };
     _statusTextView->textAlignment = CENTER_ALIGN;
 
@@ -47,7 +47,7 @@ AppUpdateScene::AppUpdateScene() {
     addSubView(_footerView);
 }
 
-AppUpdateScene::~AppUpdateScene() {
+PackageDownloadScene::~PackageDownloadScene() {
     if (_headerView != NULL)
         delete _headerView;
 
@@ -64,14 +64,14 @@ AppUpdateScene::~AppUpdateScene() {
         delete _footerView;
 }
 
-void AppUpdateScene::handleButton(u32 buttons) {}
+void PackageDownloadScene::handleButton(u32 buttons) {}
 
-void AppUpdateScene::render(SDL_Rect rect, double dTime) {
+void PackageDownloadScene::render(SDL_Rect rect, double dTime) {
     // Temporary to simulate downloading.
     _downloadProgress += 0.01;
     _progressBarView->progress = _downloadProgress;
     if (_downloadProgress >= 1) {
-        SceneDirector::currentScene = SCENE_PACKAGE_SELECT;
+        SceneDirector::currentScene = SCENE_ALL_DONE;
     }
 
     Scene::render(rect, dTime);

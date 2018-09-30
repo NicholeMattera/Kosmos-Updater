@@ -21,13 +21,15 @@
 #include "AssetManager.hpp"
 #include "Scene.hpp"
 
-#include "scenes/AllDoneScene.hpp"
 #include "scenes/AppUpdateScene.hpp"
 #include "scenes/PackageSelectScene.hpp"
+#include "scenes/PackageDownloadScene.hpp"
+#include "scenes/AllDoneScene.hpp"
 
 typedef enum {
     SCENE_APP_UPDATE,
     SCENE_PACKAGE_SELECT,
+    SCENE_PACKAGE_DOWNLOAD,
     SCENE_ALL_DONE
 } Scenes;
 
@@ -50,7 +52,8 @@ class SceneDirector {
         Uint64 _last;
 
         Scene * _currentScene;
-        AllDoneScene * _allDoneScene;
         AppUpdateScene * _appUpdateScene;
         PackageSelectScene * _packageSelectScene;
+        PackageDownloadScene * _packageDownloadScene;
+        AllDoneScene * _allDoneScene;
 };

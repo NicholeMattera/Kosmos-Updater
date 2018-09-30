@@ -23,10 +23,10 @@ using namespace std;
 
 class ProgressBarView : public View {
     public:
-        int progress;
+        double progress;
 
         ProgressBarView();
         ~ProgressBarView();
 
-        void render(SDL_Rect rect);
+        void render(SDL_Rect rect, double dTime);
 };

@@ -27,8 +27,10 @@ void Scene::handleButton(u32 buttons) {}
 
 void Scene::render(SDL_Rect rect, double dTime) {
     for (list<View *>::iterator it = subviews.begin(); it != subviews.end(); it++) {
-        SDL_Rect subviewFrame = (*it)->frame;
-        (*it)->render({ rect.x + subviewFrame.x, rect.y + subviewFrame.y, subviewFrame.w, subviewFrame.h });
+        if (!(*it)->hidden) {
+            SDL_Rect subviewFrame = (*it)->frame;
+            (*it)->render({ rect.x + subviewFrame.x, rect.y + subviewFrame.y, subviewFrame.w, subviewFrame.h }, dTime);
+        }
     }
 }
 

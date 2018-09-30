@@ -51,9 +51,10 @@ SceneDirector::SceneDirector() {
 
     _now = SDL_GetPerformanceCounter();
     _last = 0;
-    _allDoneScene = NULL;
     _appUpdateScene = NULL;
     _packageSelectScene = NULL;
+    _packageDownloadScene = NULL;
+    _allDoneScene = NULL;
     _currentScene = NULL;
 }
 
@@ -107,6 +108,19 @@ bool SceneDirector::direct() {
             }
             break;
 
+        case SCENE_PACKAGE_DOWNLOAD:
+            if (_appUpdateScene != NULL) {
+                delete _appUpdateScene;
+                _appUpdateScene = NULL;
+            }
+
+            if (_packageSelectScene != NULL) {
+                delete _packageSelectScene;
+                _packageSelectScene = NULL;
+            }
+            break;
+
+
         case SCENE_ALL_DONE:
             if (_appUpdateScene != NULL) {
                 delete _appUpdateScene;
@@ -116,6 +130,11 @@ bool SceneDirector::direct() {
             if (_packageSelectScene != NULL) {
                 delete _packageSelectScene;
                 _packageSelectScene = NULL;
+            }
+
+            if (_packageDownloadScene != NULL) {
+                delete _packageDownloadScene;
+                _packageDownloadScene = NULL;
             }
 
             break;
@@ -139,6 +158,13 @@ bool SceneDirector::direct() {
                 _packageSelectScene = new PackageSelectScene();
             
             _currentScene = _packageSelectScene;
+            break;
+
+        case SCENE_PACKAGE_DOWNLOAD:
+            if (_packageDownloadScene == NULL)
+                _packageDownloadScene = new PackageDownloadScene();
+            
+            _currentScene = _packageDownloadScene;
             break;
 
         case SCENE_ALL_DONE:

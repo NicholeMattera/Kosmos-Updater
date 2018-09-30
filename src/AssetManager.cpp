@@ -24,6 +24,7 @@ SDL_Texture * AssetManager::b_button = NULL;
 SDL_Texture * AssetManager::x_button = NULL;
 SDL_Texture * AssetManager::y_button = NULL;
 SDL_Texture * AssetManager::handheld = NULL;
+SDL_Texture * AssetManager::checkmark = NULL;
 SDL_Texture * AssetManager::downloading = NULL;
 SDL_Texture * AssetManager::icon = NULL;
 
@@ -32,6 +33,7 @@ ColorSetId AssetManager::theme;
 SDL_Color AssetManager::background;
 SDL_Color AssetManager::sidebard_background;
 SDL_Color AssetManager::header_footer_divider;
+SDL_Color AssetManager::header_bullet;
 SDL_Color AssetManager::list_divider;
 SDL_Color AssetManager::active_player_indicator;
 SDL_Color AssetManager::player_indicator;
@@ -89,6 +91,9 @@ void AssetManager::dealloc() {
     if (AssetManager::downloading != NULL) 
         SDL_DestroyTexture(AssetManager::downloading);
 
+    if (AssetManager::checkmark != NULL)
+        SDL_DestroyTexture(AssetManager::checkmark);
+
     if (AssetManager::handheld != NULL)
         SDL_DestroyTexture(AssetManager::handheld);
 
@@ -113,6 +118,7 @@ bool AssetManager::initialize() {
         AssetManager::background = { 235, 235, 235, 255 };
         AssetManager::sidebard_background = { 240, 240, 240, 255 };
         AssetManager::header_footer_divider = { 45, 45, 45, 255 };
+        AssetManager::header_bullet = { 121, 121, 121, 255 };
         AssetManager::list_divider = { 205, 205, 205, 255 };
         AssetManager::active_player_indicator = { 158, 228, 0, 255 };
         AssetManager::player_indicator = { 125, 125, 125, 255 };
@@ -128,10 +134,11 @@ bool AssetManager::initialize() {
         AssetManager::background = { 45, 45, 45, 255 };
         AssetManager::sidebard_background = { 51, 51, 51, 255 };
         AssetManager::header_footer_divider = { 255, 255, 255, 255 };
+        AssetManager::header_bullet = { 160, 160, 160, 255 };
         AssetManager::list_divider = { 77, 77, 77, 255 };
         AssetManager::active_player_indicator = { 158, 228, 0, 255 };
         AssetManager::player_indicator = { 125, 125, 125, 255 };
-        AssetManager::selected_background = { 34, 34, 34, 255 };
+        AssetManager::selected_background = { 31, 34, 39, 255 };
         AssetManager::selected_border_1 = { 0, 255, 196, 255 };
         AssetManager::selected_border_2 = { 22, 146, 197, 255 };
         AssetManager::modal_faded_background = { 18, 27, 36, 229 };

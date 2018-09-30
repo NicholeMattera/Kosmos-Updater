@@ -26,7 +26,7 @@ class ImageView : public View {
         ImageView(SDL_Texture * image);
         ~ImageView();
 
-        void render(SDL_Rect rect);
+        void render(SDL_Rect rect, double dTime);
 
     private:
         SDL_Texture * _image;

@@ -24,7 +24,7 @@ ImageView::ImageView(SDL_Texture * image) : View() {
 
 ImageView::~ImageView() {}
 
-void ImageView::render(SDL_Rect rect) {
+void ImageView::render(SDL_Rect rect, double dTime) {
     SDL_RenderCopy(SceneDirector::renderer, _image, NULL, &rect);
-    View::render(rect);
+    View::render(rect, dTime);
 }

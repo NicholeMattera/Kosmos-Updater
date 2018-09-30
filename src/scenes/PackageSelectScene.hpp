@@ -19,6 +19,8 @@
 
 #include "../Scene.hpp"
 #include "../views/HeaderView.hpp"
+#include "../views/ListHeaderView.hpp"
+#include "../views/ListRowView.hpp"
 #include "../views/FooterView.hpp"
 
 class PackageSelectScene : public Scene {
@@ -30,6 +32,14 @@ class PackageSelectScene : public Scene {
         void render(SDL_Rect rect, double dTime);
 
     private:
+        int _focusSelection;
+
         HeaderView * _headerView;
+        ListRowView * _installRowView;
+        ListHeaderView * _settingHeaderView;
+        ListRowView * _channelRowView;
+        ListRowView * _bundleRowView;
         FooterView * _footerView;
+        
+        void _manageFocus();
 };

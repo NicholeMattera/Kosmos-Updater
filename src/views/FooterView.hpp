@@ -29,7 +29,7 @@ class FooterView : public View {
 
         FooterView();
         ~FooterView();
-        void render(SDL_Rect rect);
+        void render(SDL_Rect rect, double dTime);
 
     private:
         void _renderButton(ActionButton button, SDL_Texture * texture, SDL_Rect frame);

@@ -26,7 +26,7 @@ class HeaderView : public View {
     public:
         HeaderView();
         ~HeaderView();
-        void render(SDL_Rect rect);
+        void render(SDL_Rect rect, double dTime);
 
     private:
         SDL_Texture * _titleTexture;

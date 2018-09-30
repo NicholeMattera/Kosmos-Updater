@@ -34,6 +34,7 @@ class AssetManager {
         static SDL_Texture * x_button;
         static SDL_Texture * y_button;
         static SDL_Texture * handheld;
+        static SDL_Texture * checkmark;
         static SDL_Texture * downloading;
         static SDL_Texture * icon;
 
@@ -42,6 +43,7 @@ class AssetManager {
         static SDL_Color background;
         static SDL_Color sidebard_background;
         static SDL_Color header_footer_divider;
+        static SDL_Color header_bullet;
         static SDL_Color list_divider;
         static SDL_Color active_player_indicator;
         static SDL_Color player_indicator;

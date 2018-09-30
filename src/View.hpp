@@ -25,11 +25,12 @@ using namespace std;
 class View {
     public:
         SDL_Rect frame;
+        bool hidden;
 
         View();
         virtual ~View();
 
-        virtual void render(SDL_Rect rect);
+        virtual void render(SDL_Rect rect, double dTime);
 
         /* Controller Input */
         bool isFocusable;

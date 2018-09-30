@@ -26,7 +26,7 @@ ProgressBarView::ProgressBarView() : View() {
 ProgressBarView::~ProgressBarView() {
 }
 
-void ProgressBarView::render(SDL_Rect rect) {
+void ProgressBarView::render(SDL_Rect rect, double dTime) {
     // Draw background.
     roundedBoxRGBA(
         SceneDirector::renderer,
@@ -38,8 +38,7 @@ void ProgressBarView::render(SDL_Rect rect) {
         AssetManager::disabled_text.r, AssetManager::disabled_text.g, AssetManager::disabled_text.b, AssetManager::disabled_text.a);
 
     // Draw progress bar.
-    double currentProgress = ((double) progress) / 100;
-    int progressWidth = (rect.w - rect.h) * currentProgress;
+    int progressWidth = (rect.w - rect.h) * progress;
     
     if (progressWidth > rect.w - rect.h)
         progressWidth = rect.w - rect.h;
@@ -57,5 +56,5 @@ void ProgressBarView::render(SDL_Rect rect) {
         AssetManager::active_text.r, AssetManager::active_text.g, AssetManager::active_text.b, AssetManager::active_text.a);
 
     // Render any subviews.
-    View::render(rect);
+    View::render(rect, dTime);
 }

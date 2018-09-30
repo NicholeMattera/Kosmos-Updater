@@ -34,7 +34,7 @@ TextView::~TextView() {
         SDL_DestroyTexture(_textTexture);
 }
 
-void TextView::render(SDL_Rect rect) {
+void TextView::render(SDL_Rect rect, double dTime) {
     // Create texture if it doesn't already exists.
     if (_textTexture == NULL) {
         SDL_Surface *surface = TTF_RenderText_Blended(font, text.c_str(), textColor);
@@ -65,7 +65,7 @@ void TextView::render(SDL_Rect rect) {
     SDL_RenderCopy(SceneDirector::renderer, _textTexture, NULL, &textFrame);
 
     // Render any subviews.
-    View::render(rect);
+    View::render(rect, dTime);
 }
 
 void TextView::setFont(TTF_Font * theFont) {

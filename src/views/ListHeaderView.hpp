@@ -17,27 +17,21 @@
 
 #pragma once
 
-#include "../Scene.hpp"
-#include "../views/HeaderView.hpp"
-#include "../views/ImageView.hpp"
-#include "../views/ProgressBarView.hpp"
-#include "../views/TextView.hpp"
-#include "../views/FooterView.hpp"
+#include <string>
+#include "../View.hpp"
 
-class AppUpdateScene : public Scene {
+using namespace std;
+
+class ListHeaderView : public View {
     public:
-        AppUpdateScene();
-        ~AppUpdateScene();
-        
-        void handleButton(u32 buttons);
+        ListHeaderView(string text);
+        ~ListHeaderView();
+
         void render(SDL_Rect rect, double dTime);
 
     private:
-        double _downloadProgress;
-
-        HeaderView * _headerView;
-        ImageView * _downloadImageView;
-        ProgressBarView * _progressBarView;
-        TextView * _statusTextView;
-        FooterView * _footerView;
+        string _text;
+        int _textWidth;
+        int _textHeight;
+        SDL_Texture * _textTexture;
 };

@@ -24,11 +24,11 @@
 #include "../views/TextView.hpp"
 #include "../views/FooterView.hpp"
 
-class AppUpdateScene : public Scene {
+class PackageDownloadScene : public Scene {
     public:
-        AppUpdateScene();
-        ~AppUpdateScene();
-        
+        PackageDownloadScene();
+        ~PackageDownloadScene();
+
         void handleButton(u32 buttons);
         void render(SDL_Rect rect, double dTime);
 
