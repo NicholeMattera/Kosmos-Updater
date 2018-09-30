@@ -17,6 +17,7 @@
 
 #include "PackageDownloadScene.hpp"
 #include "../SceneDirector.hpp"
+#include "../NetManager.hpp"
 
 PackageDownloadScene::PackageDownloadScene() {
     _headerView = new HeaderView();

@@ -20,8 +20,6 @@
 #include "../NetManager.hpp"
 
 AppUpdateScene::AppUpdateScene() {
-    //NetManager::progressFunc = _getProgress;
-    
     _headerView = new HeaderView();
     _headerView->frame = { 0, 0, 1280, 88 };
 
