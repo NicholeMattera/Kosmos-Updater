@@ -19,6 +19,7 @@
 
 #include <string>
 #include "../View.hpp"
+#include "TextView.hpp"
 
 using namespace std;
 
@@ -29,9 +30,7 @@ class ListHeaderView : public View {
 
         void render(SDL_Rect rect, double dTime);
 
+        void setText(string text);
     private:
-        string _text;
-        int _textWidth;
-        int _textHeight;
-        SDL_Texture * _textTexture;
+        TextView * _textView;
 };

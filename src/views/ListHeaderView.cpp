@@ -19,14 +19,17 @@
 #include "../SceneDirector.hpp"
 
 ListHeaderView::ListHeaderView(string text) : View() {
-    _text = text;
-    _textTexture = NULL;
     frame = { 0, 0, 840, 80 };
+
+    _textView = new TextView(AssetManager::subbody_font, text, AssetManager::text);
+    _textView->frame = { 20, 47, 800, 0 };
+
+    addSubView(_textView);
 }
 
 ListHeaderView::~ListHeaderView() {
-    if (_textTexture != NULL)
-        SDL_DestroyTexture(_textTexture);
+    if (_textView != NULL)
+        delete _textView;
 }
 
 void ListHeaderView::render(SDL_Rect rect, double dTime) {
@@ -35,15 +38,10 @@ void ListHeaderView::render(SDL_Rect rect, double dTime) {
     SDL_Rect squareFrame = { rect.x + 5, rect.y + 44, 5, 22 };
     SDL_RenderFillRect(SceneDirector::renderer, &squareFrame);
 
-    // Draw header.
-    if (_textTexture == NULL) {
-        SDL_Surface *surface = TTF_RenderText_Blended(AssetManager::subbody_font, _text.c_str(), AssetManager::text);
-        _textTexture = SDL_CreateTextureFromSurface(SceneDirector::renderer, surface);
-        _textWidth = surface->w;
-        _textHeight = surface->h;
-        SDL_FreeSurface(surface);
-    }
+    // Render any subviews.
+    View::render(rect, dTime);
+}
 
-    SDL_Rect textFrame = { rect.x + 20, rect.y + 47, _textWidth, _textHeight };
-    SDL_RenderCopy(SceneDirector::renderer, _textTexture, NULL, &textFrame);
+void ListHeaderView::setText(string text) {
+    _textView->setText(text);
 }

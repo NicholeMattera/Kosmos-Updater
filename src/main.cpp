@@ -19,8 +19,9 @@
 #include <SDL2/SDL_image.h>
 #include <switch.h>
 
-#include "AssetManager.hpp"
 #include "SceneDirector.hpp"
+#include "AssetManager.hpp"
+#include "ConfigManager.hpp"
 
 using namespace std;
 
@@ -36,6 +37,8 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    ConfigManager::initialize();
+
     // Main Game Loop
     while(appletMainLoop())
     {
@@ -43,6 +46,7 @@ int main(int argc, char **argv)
             break;
     }
 
+    ConfigManager::dealloc();
     AssetManager::dealloc();
     delete sceneDirector;
 

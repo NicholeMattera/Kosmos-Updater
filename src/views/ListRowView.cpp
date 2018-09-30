@@ -24,19 +24,39 @@ ListRowView::ListRowView(string primaryText, string secondaryText, ListRowStyle 
     frame = { 0, 0, 850, 71 };
 
     _timeElapsed = 0;
-    _primaryTextTexture = NULL;
-    _primaryText = primaryText;
-    _secondaryTextTexture = NULL;
-    _secondaryText = secondaryText;
     _style = style;
+
+    _primaryTextView = new TextView(AssetManager::body_font, primaryText, AssetManager::text);
+    _primaryTextView->textAlignment = LEFT_ALIGN;
+    if (style != SUBTITLE) {
+        _primaryTextView->frame = { 21, 26, 808, 0 };
+    } else {
+        _primaryTextView->frame = { 21, 10, 808, 0 };
+    }
+    addSubView(_primaryTextView);
+
+    if (style != DEFAULT) {
+        _secondaryTextView = new TextView(AssetManager::subbody_font, secondaryText, (style == SUBTITLE) ? AssetManager::disabled_text : AssetManager::active_text);
+        if (style != SUBTITLE) {
+            _secondaryTextView->textAlignment = RIGHT_ALIGN;
+            _secondaryTextView->frame = { 21, 29, 808, 0 };
+        } else {
+            _secondaryTextView->textAlignment = LEFT_ALIGN;
+            _secondaryTextView->frame = { 21, 41, 808, 0 };
+        }
+
+        addSubView(_secondaryTextView);
+    } else {
+        _secondaryTextView = NULL;
+    }
 }
 
 ListRowView::~ListRowView() {
-    if (_primaryTextTexture != NULL)
-        SDL_DestroyTexture(_primaryTextTexture);
-        
-    if (_secondaryTextTexture != NULL)
-        SDL_DestroyTexture(_secondaryTextTexture);
+    if (_primaryTextView != NULL)
+        delete _primaryTextView;
+
+    if (_secondaryTextView != NULL)
+        delete _secondaryTextView;
 }
 
 void ListRowView::render(SDL_Rect rect, double dTime) {
@@ -61,20 +81,16 @@ void ListRowView::render(SDL_Rect rect, double dTime) {
         _timeElapsed = 0;
     }
 
-    // Draw Text
-    switch (_style) {
-        case DEFAULT:
-            _renderDefaultStyle(rect);
-            break;
+    // Render any subviews.
+    View::render(rect, dTime);
+}
 
-        case SUBTITLE:
-            _renderSubtitleStyle(rect);
-            break;
+void ListRowView::setPrimaryText(string text) {
+    _primaryTextView->setText(text);
+}
 
-        case VALUE:
-            _renderValueStyle(rect);
-            break;
-    }
+void ListRowView::setSecondaryText(string text) {
+    _secondaryTextView->setText(text);
 }
 
 SDL_Color ListRowView::_generateSelectionColor() {
@@ -132,45 +148,4 @@ void ListRowView::_drawBorders(int x1, int y1, int x2, int y2, SDL_Color color) 
             x1 + 2, y2 - 3, x1 + 2, y1 + 3,
             5,
             color.r, color.g, color.b, color.a);
-}
-
-void ListRowView::_renderDefaultStyle(SDL_Rect rect) {
-    if (_primaryTextTexture == NULL) {
-        SDL_Surface *surface = TTF_RenderText_Blended(AssetManager::body_font, _primaryText.c_str(), AssetManager::text);
-        _primaryTextTexture = SDL_CreateTextureFromSurface(SceneDirector::renderer, surface);
-        _primaryTextWidth = surface->w;
-        _primaryTextHeight = surface->h;
-        SDL_FreeSurface(surface);
-    }
-
-    SDL_Rect textFrame = { rect.x + 21, rect.y + 26, _primaryTextWidth, _primaryTextHeight };
-    SDL_RenderCopy(SceneDirector::renderer, _primaryTextTexture, NULL, &textFrame);
-}
-
-void ListRowView::_renderSubtitleStyle(SDL_Rect rect) {
-
-}
-
-void ListRowView::_renderValueStyle(SDL_Rect rect) {
-    if (_primaryTextTexture == NULL) {
-        SDL_Surface *surface = TTF_RenderText_Blended(AssetManager::body_font, _primaryText.c_str(), AssetManager::text);
-        _primaryTextTexture = SDL_CreateTextureFromSurface(SceneDirector::renderer, surface);
-        _primaryTextWidth = surface->w;
-        _primaryTextHeight = surface->h;
-        SDL_FreeSurface(surface);
-    }
-
-    SDL_Rect primaryTextFrame = { rect.x + 21, rect.y + 26, _primaryTextWidth, _primaryTextHeight };
-    SDL_RenderCopy(SceneDirector::renderer, _primaryTextTexture, NULL, &primaryTextFrame);
-
-    if (_secondaryTextTexture == NULL) {
-        SDL_Surface *surface = TTF_RenderText_Blended(AssetManager::subbody_font, _secondaryText.c_str(), AssetManager::active_text);
-        _secondaryTextTexture = SDL_CreateTextureFromSurface(SceneDirector::renderer, surface);
-        _secondaryTextWidth = surface->w;
-        _secondaryTextHeight = surface->h;
-        SDL_FreeSurface(surface);
-    }
-
-    SDL_Rect secondaryTextFrame = { rect.x + rect.w - _secondaryTextWidth - 21, rect.y + 29, _secondaryTextWidth, _secondaryTextHeight };
-    SDL_RenderCopy(SceneDirector::renderer, _secondaryTextTexture, NULL, &secondaryTextFrame);
 }

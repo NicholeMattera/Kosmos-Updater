@@ -52,11 +52,11 @@ void TextView::render(SDL_Rect rect, double dTime) {
             break;
 
         case CENTER_ALIGN:
-            x = (width - _textWidth) / 2;
+            x = rect.x + (width - _textWidth) / 2;
             break;
 
         case RIGHT_ALIGN:
-            x = width - _textWidth;
+            x = rect.x + width - _textWidth;
             break;
     }
     

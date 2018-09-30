@@ -17,6 +17,7 @@
 
 #include "PackageSelectScene.hpp"
 #include "../SceneDirector.hpp"
+#include "../ConfigManager.hpp"
 
 PackageSelectScene::PackageSelectScene() {
     _focusSelection = 0;
@@ -34,11 +35,29 @@ PackageSelectScene::PackageSelectScene() {
     _settingHeaderView->frame.x = 220;
     _settingHeaderView->frame.y = 208;
 
-    _channelRowView = new ListRowView("Channel", "Stable", VALUE);
+    string channel = ConfigManager::getChannel();
+    if (channel == "bleeding-edge") {
+        channel = "Bleeding Edge";
+    } else {
+        channel = "Stable";
+    }
+
+    _channelRowView = new ListRowView("Channel", channel, VALUE);
     _channelRowView->frame.x = 215;
     _channelRowView->frame.y = 288;
 
-    _bundleRowView = new ListRowView("Bundle", "SDFiles", VALUE);
+    string bundle = ConfigManager::getChannel();
+    if (bundle == "hekate") {
+        bundle = "Hekate";
+    } else if (bundle == "atmosphere") {
+        bundle = "Atmosphere";
+    } else if (bundle == "reinx") {
+        bundle = "ReiNX";
+    } else {
+        bundle = "SDFiles";
+    }
+
+    _bundleRowView = new ListRowView("Bundle", bundle, VALUE);
     _bundleRowView->frame.x = 215;
     _bundleRowView->frame.y = 359;
     _bundleRowView->isLast = true;
@@ -94,6 +113,7 @@ void PackageSelectScene::handleButton(u32 buttons) {
     }
 
     if (buttons & KEY_B) {
+        Mix_PlayChannel(-1, AssetManager::back, 0);
         SceneDirector::exitApp = true;
     }
 
