@@ -18,48 +18,6 @@
 #include "AssetManager.hpp"
 #include "SceneDirector.hpp"
 
-/* Textures */
-SDL_Texture * AssetManager::a_button = NULL;
-SDL_Texture * AssetManager::b_button = NULL;
-SDL_Texture * AssetManager::x_button = NULL;
-SDL_Texture * AssetManager::y_button = NULL;
-SDL_Texture * AssetManager::handheld = NULL;
-SDL_Texture * AssetManager::checkmark = NULL;
-SDL_Texture * AssetManager::downloading = NULL;
-SDL_Texture * AssetManager::icon = NULL;
-
-/* Colors */
-ColorSetId AssetManager::theme;
-SDL_Color AssetManager::background;
-SDL_Color AssetManager::sidebard_background;
-SDL_Color AssetManager::header_footer_divider;
-SDL_Color AssetManager::header_bullet;
-SDL_Color AssetManager::list_divider;
-SDL_Color AssetManager::active_player_indicator;
-SDL_Color AssetManager::player_indicator;
-SDL_Color AssetManager::selected_background;
-SDL_Color AssetManager::selected_border_1;
-SDL_Color AssetManager::selected_border_2;
-SDL_Color AssetManager::modal_faded_background;
-SDL_Color AssetManager::modal_background;
-SDL_Color AssetManager::text;
-SDL_Color AssetManager::active_text;
-SDL_Color AssetManager::disabled_text;
-
-/* Fonts */
-PlFontData AssetManager::standardFontData;
-TTF_Font * AssetManager::header_font = NULL;
-TTF_Font * AssetManager::body_font = NULL;
-TTF_Font * AssetManager::subbody_font = NULL;
-PlFontData AssetManager::extendedFontData;
-TTF_Font * AssetManager::button_font = NULL;
-TTF_Font * AssetManager::large_button_font = NULL;
-
-/* Sounds */
-Mix_Chunk * AssetManager::enter = NULL;
-Mix_Chunk * AssetManager::back = NULL;
-Mix_Chunk * AssetManager::select = NULL;
-
 void AssetManager::dealloc() {
     if (AssetManager::select != NULL)
         Mix_FreeChunk(AssetManager::select);

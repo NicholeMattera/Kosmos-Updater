@@ -18,15 +18,7 @@
 #include <switch.h>
 #include "SceneDirector.hpp"
 
-SDL_Window * SceneDirector::window = NULL;
-SDL_Renderer * SceneDirector::renderer = NULL;
-Scenes SceneDirector::currentScene = SCENE_APP_UPDATE;
-bool SceneDirector::exitApp = false;
-
 SceneDirector::SceneDirector() {
-    socketInitializeDefault();
-    nxlinkStdio();
-
     romfsInit();
     setsysInitialize();
     plInitialize();
@@ -83,7 +75,6 @@ SceneDirector::~SceneDirector() {
     plExit();
     setsysExit();
     romfsExit();
-    socketExit();
 }
 
 bool SceneDirector::direct() {

@@ -15,44 +15,31 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <switch.h>
+#pragma once
 
-#include "SceneDirector.hpp"
-#include "NetManager.hpp"
-#include "AssetManager.hpp"
-#include "ConfigManager.hpp"
+#include <switch.h>
+#include <curl/curl.h>
+#include <string>
+#include <functional>
+#include <iostream>
+#include <vector>
 
 using namespace std;
 
-int main(int argc, char **argv)
-{
-    SceneDirector * sceneDirector = new SceneDirector();
-    if (!SceneDirector::renderer || !SceneDirector::window) {
-        return -1;
-    }
+class NetManager {
+    public:
+        static void initialize();
+        static void dealloc();
 
-    NetManager::initialize();
+        static void getLatestAppVersion();
+        static void getLatestApp();
+        static void getLatestSDFilesVersion(string channel);
+        static void getLatestSDFiles(string bundle, string channel);
 
-    if (!AssetManager::initialize()) {
-        AssetManager::dealloc();
-        return -1;
-    }
-
-    ConfigManager::initialize();
-
-    // Main Game Loop
-    while (appletMainLoop())
-    {
-        if (!sceneDirector->direct())
-            break;
-    }
-
-    ConfigManager::dealloc();
-    AssetManager::dealloc();
-    NetManager::dealloc();
-    delete sceneDirector;
-
-    return 0;
-}
+    private:
+        static inline vector<Thread> _threads;
+        
+        static Result _createThread(ThreadFunc func);
+        static void _request(string method, string url);
+        static size_t _writeFunction(void *ptr, size_t size, size_t nmemb, string * data);
+};

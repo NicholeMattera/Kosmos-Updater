@@ -37,10 +37,10 @@ using namespace std;
 
 class SceneDirector {
     public:
-        static SDL_Window * window;
-        static SDL_Renderer * renderer;
-        static Scenes currentScene;
-        static bool exitApp;
+        static inline SDL_Window * window = NULL;
+        static inline SDL_Renderer * renderer = NULL;
+        static inline Scenes currentScene = SCENE_APP_UPDATE;
+        static inline bool exitApp = false;
         
         SceneDirector();
         ~SceneDirector();

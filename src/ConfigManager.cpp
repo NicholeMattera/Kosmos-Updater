@@ -17,8 +17,6 @@
 
 #include "ConfigManager.hpp"
 
-config_t ConfigManager::_cfg;
-
 void ConfigManager::initialize() {
     config_init(&_cfg);
 

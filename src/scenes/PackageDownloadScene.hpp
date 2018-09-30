@@ -19,9 +19,7 @@
 
 #include "../Scene.hpp"
 #include "../views/HeaderView.hpp"
-#include "../views/ImageView.hpp"
-#include "../views/ProgressBarView.hpp"
-#include "../views/TextView.hpp"
+#include "../views/UpdateView.hpp"
 #include "../views/FooterView.hpp"
 
 class PackageDownloadScene : public Scene {
@@ -33,11 +31,9 @@ class PackageDownloadScene : public Scene {
         void render(SDL_Rect rect, double dTime);
 
     private:
-        double _downloadProgress;
-
         HeaderView * _headerView;
-        ImageView * _downloadImageView;
-        ProgressBarView * _progressBarView;
-        TextView * _statusTextView;
+        UpdateView * _updateView;
         FooterView * _footerView;
+
+        void _getProgress(double progress);
 };

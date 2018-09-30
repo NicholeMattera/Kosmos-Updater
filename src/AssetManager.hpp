@@ -29,46 +29,46 @@ using namespace std;
 class AssetManager {
     public:
         /* Textures */
-        static SDL_Texture * a_button;
-        static SDL_Texture * b_button;
-        static SDL_Texture * x_button;
-        static SDL_Texture * y_button;
-        static SDL_Texture * handheld;
-        static SDL_Texture * checkmark;
-        static SDL_Texture * downloading;
-        static SDL_Texture * icon;
+        static inline SDL_Texture * a_button = NULL;
+        static inline SDL_Texture * b_button = NULL;
+        static inline SDL_Texture * x_button = NULL;
+        static inline SDL_Texture * y_button = NULL;
+        static inline SDL_Texture * handheld = NULL;
+        static inline SDL_Texture * checkmark = NULL;
+        static inline SDL_Texture * downloading = NULL;
+        static inline SDL_Texture * icon = NULL;
 
         /* Colors */
-        static ColorSetId theme;
-        static SDL_Color background;
-        static SDL_Color sidebard_background;
-        static SDL_Color header_footer_divider;
-        static SDL_Color header_bullet;
-        static SDL_Color list_divider;
-        static SDL_Color active_player_indicator;
-        static SDL_Color player_indicator;
-        static SDL_Color selected_background;
-        static SDL_Color selected_border_1;
-        static SDL_Color selected_border_2;
-        static SDL_Color modal_faded_background;
-        static SDL_Color modal_background;
-        static SDL_Color text;
-        static SDL_Color active_text;
-        static SDL_Color disabled_text;
+        static inline ColorSetId theme;
+        static inline SDL_Color background;
+        static inline SDL_Color sidebard_background;
+        static inline SDL_Color header_footer_divider;
+        static inline SDL_Color header_bullet;
+        static inline SDL_Color list_divider;
+        static inline SDL_Color active_player_indicator;
+        static inline SDL_Color player_indicator;
+        static inline SDL_Color selected_background;
+        static inline SDL_Color selected_border_1;
+        static inline SDL_Color selected_border_2;
+        static inline SDL_Color modal_faded_background;
+        static inline SDL_Color modal_background;
+        static inline SDL_Color text;
+        static inline SDL_Color active_text;
+        static inline SDL_Color disabled_text;
 
         /* Fonts */
-        static PlFontData standardFontData;
-        static TTF_Font * header_font;
-        static TTF_Font * body_font;
-        static TTF_Font * subbody_font;
-        static PlFontData extendedFontData;
-        static TTF_Font * button_font;
-        static TTF_Font * large_button_font;
-
+        static inline PlFontData standardFontData;
+        static inline TTF_Font * header_font = NULL;
+        static inline TTF_Font * body_font = NULL;
+        static inline TTF_Font * subbody_font = NULL;
+        static inline PlFontData extendedFontData;
+        static inline TTF_Font * button_font = NULL;
+        static inline TTF_Font * large_button_font = NULL;
+ 
         /* Sounds */
-        static Mix_Chunk * enter;
-        static Mix_Chunk * back;
-        static Mix_Chunk * select;
+        static inline Mix_Chunk * enter = NULL;
+        static inline Mix_Chunk * back = NULL;
+        static inline Mix_Chunk * select = NULL;
 
         static bool initialize();
         static void dealloc();

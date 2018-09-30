@@ -15,44 +15,26 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <switch.h>
+#pragma once
 
-#include "SceneDirector.hpp"
-#include "NetManager.hpp"
-#include "AssetManager.hpp"
-#include "ConfigManager.hpp"
+#include <string>
+#include "../View.hpp"
+#include "ImageView.hpp"
+#include "ProgressBarView.hpp"
+#include "TextView.hpp"
 
 using namespace std;
 
-int main(int argc, char **argv)
-{
-    SceneDirector * sceneDirector = new SceneDirector();
-    if (!SceneDirector::renderer || !SceneDirector::window) {
-        return -1;
-    }
+class UpdateView : public View {
+    public:
+        UpdateView(string statusText);
+        ~UpdateView();
 
-    NetManager::initialize();
+        void render(SDL_Rect rect, double dTime);
+        void setProgress(double progress);
 
-    if (!AssetManager::initialize()) {
-        AssetManager::dealloc();
-        return -1;
-    }
-
-    ConfigManager::initialize();
-
-    // Main Game Loop
-    while (appletMainLoop())
-    {
-        if (!sceneDirector->direct())
-            break;
-    }
-
-    ConfigManager::dealloc();
-    AssetManager::dealloc();
-    NetManager::dealloc();
-    delete sceneDirector;
-
-    return 0;
-}
+    private:
+        ImageView * _downloadImageView;
+        ProgressBarView * _progressBarView;
+        TextView * _statusTextView;
+};

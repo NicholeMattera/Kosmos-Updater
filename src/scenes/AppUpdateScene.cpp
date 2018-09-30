@@ -17,33 +17,23 @@
 
 #include "AppUpdateScene.hpp"
 #include "../SceneDirector.hpp"
+#include "../NetManager.hpp"
 
 AppUpdateScene::AppUpdateScene() {
-    _downloadProgress = 0;
-
+    //NetManager::progressFunc = _getProgress;
+    
     _headerView = new HeaderView();
     _headerView->frame = { 0, 0, 1280, 88 };
 
-    if (AssetManager::downloading == NULL) {
-        AssetManager::downloading = AssetManager::loadAsset("downloading.png");
-    }
-    _downloadImageView = new ImageView(AssetManager::downloading);
-    _downloadImageView->frame = { 400, 200, 479, 197 };
-
-    _progressBarView = new ProgressBarView();
-    _progressBarView->frame = { 437, 457, 411, 10 };
-
-    _statusTextView = new TextView(AssetManager::subbody_font, "Checking for updates to SDFiles Updater...", AssetManager::text);
-    _statusTextView->frame = { 0, 491, 1280, 0 };
-    _statusTextView->textAlignment = CENTER_ALIGN;
+    _updateView = new UpdateView("Checking for updates to SDFiles Updater...");
+    _updateView->frame.x = 0;
+    _updateView->frame.y = 200;
 
     _footerView = new FooterView();
     _footerView->frame = { 0, 647, 1280, 73 };
 
     addSubView(_headerView);
-    addSubView(_downloadImageView);
-    addSubView(_progressBarView);
-    addSubView(_statusTextView);
+    addSubView(_updateView);
     addSubView(_footerView);
 }
 
@@ -51,14 +41,8 @@ AppUpdateScene::~AppUpdateScene() {
     if (_headerView != NULL)
         delete _headerView;
 
-    if (_downloadImageView != NULL)
-        delete _downloadImageView;
-
-    if (_progressBarView != NULL)
-        delete _progressBarView;
-
-    if (_statusTextView != NULL)
-        delete _statusTextView;
+    if (_updateView != NULL)
+        delete _updateView;
 
     if (_footerView != NULL)
         delete _footerView;
@@ -67,12 +51,9 @@ AppUpdateScene::~AppUpdateScene() {
 void AppUpdateScene::handleButton(u32 buttons) {}
 
 void AppUpdateScene::render(SDL_Rect rect, double dTime) {
-    // Temporary to simulate downloading.
-    _downloadProgress += 0.01;
-    _progressBarView->progress = _downloadProgress;
-    if (_downloadProgress >= 1) {
-        SceneDirector::currentScene = SCENE_PACKAGE_SELECT;
-    }
-
     Scene::render(rect, dTime);
+}
+
+void AppUpdateScene::_getProgress(double progress) {
+    _updateView->setProgress(progress);
 }

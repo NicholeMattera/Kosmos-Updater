@@ -37,7 +37,7 @@ class ConfigManager {
         static bool setCurrentVersion(string version);
 
     private:
-        static config_t _cfg;
+        static inline config_t _cfg;
         static string _read(string key, string def);
         static bool _write(string key, string value);
 };
