@@ -33,14 +33,13 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    ConfigManager::initialize();
     NetManager::initialize();
 
     if (!AssetManager::initialize()) {
         AssetManager::dealloc();
         return -1;
     }
-
-    ConfigManager::initialize();
 
     // Main Game Loop
     while (appletMainLoop())

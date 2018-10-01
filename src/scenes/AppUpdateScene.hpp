@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../Scene.hpp"
+#include "../models/NetRequest.hpp"
 #include "../views/HeaderView.hpp"
 #include "../views/UpdateView.hpp"
 #include "../views/FooterView.hpp"
@@ -31,9 +32,10 @@ class AppUpdateScene : public Scene {
         void render(SDL_Rect rect, double dTime);
 
     private:
+        NetRequest * _versionRequest;
+        NetRequest * _appRequest;
+        
         HeaderView * _headerView;
         UpdateView * _updateView;
         FooterView * _footerView;
-
-        void _getProgress(double progress);
 };

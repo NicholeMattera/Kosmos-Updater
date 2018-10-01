@@ -51,8 +51,3 @@ void PackageDownloadScene::handleButton(u32 buttons) {}
 void PackageDownloadScene::render(SDL_Rect rect, double dTime) {
     Scene::render(rect, dTime);
 }
-
-void PackageDownloadScene::_getProgress(double progress) {
-    _updateView->setProgress(progress);
-}
-

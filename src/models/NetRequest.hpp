@@ -17,31 +17,24 @@
 
 #pragma once
 
-#include <curl/curl.h>
-#include <functional>
 #include <switch.h>
 #include <string>
-#include <vector>
-#include "models/NetRequest.hpp"
+#include <functional>
 
 using namespace std;
 
-class NetManager {
+class NetRequest {
     public:
-        static void initialize();
-        static void dealloc();
+        Mutex mutexRequest;
+        string method;
+        string url;
+        size_t size;
+        char * data;
+        double progress;
+        bool isComplete;
+        bool hasError;
+        string errorMessage;
 
-        static NetRequest * getLatestAppVersion();
-        static NetRequest * getLatestApp();
-        static NetRequest * getLatestSDFilesVersion(string channel);
-        static NetRequest * getLatestSDFiles(string bundle, string channel);
-
-    private:
-        static inline string _hostname;
-        static inline vector<Thread> _threads;
-        
-        static Result _createThread(ThreadFunc func, void* arg);
-        static void _request(void * args);
-        static int _progressFunction(void *ptr, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
-        static size_t _writeFunction(void *contents, size_t size, size_t nmemb, void * ptr);
+        NetRequest(string method, string url);
+        ~NetRequest();
 };

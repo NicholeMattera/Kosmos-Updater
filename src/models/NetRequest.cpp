@@ -15,23 +15,22 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#pragma once
+#include "NetRequest.hpp"
 
-#include "../Scene.hpp"
-#include "../views/HeaderView.hpp"
-#include "../views/UpdateView.hpp"
-#include "../views/FooterView.hpp"
+NetRequest::NetRequest(string method, string url) {
+    mutexInit(&mutexRequest);
 
-class PackageDownloadScene : public Scene {
-    public:
-        PackageDownloadScene();
-        ~PackageDownloadScene();
+    this->method = method;
+    this->url = url;
 
-        void handleButton(u32 buttons);
-        void render(SDL_Rect rect, double dTime);
+    size = 0;
+    data = (char *) malloc(1);
+    progress = 0.f;
+    isComplete = false;
+    hasError = false;
+    errorMessage = "";
+}
 
-    private:
-        HeaderView * _headerView;
-        UpdateView * _updateView;
-        FooterView * _footerView;
-};
+NetRequest::~NetRequest() {
+    free(data);
+}

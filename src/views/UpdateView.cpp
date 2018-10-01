@@ -18,7 +18,7 @@
 #include "UpdateView.hpp"
 #include "../AssetManager.hpp"
 
-UpdateView::UpdateView(string statusText) {
+UpdateView::UpdateView(string text) {
     if (AssetManager::downloading == NULL) {
         AssetManager::downloading = AssetManager::loadAsset("downloading.png");
     }
@@ -28,7 +28,7 @@ UpdateView::UpdateView(string statusText) {
     _progressBarView = new ProgressBarView();
     _progressBarView->frame = { 437, 257, 411, 10 };
 
-    _statusTextView = new TextView(AssetManager::subbody_font, statusText, AssetManager::text);
+    _statusTextView = new TextView(AssetManager::subbody_font, text, AssetManager::text);
     _statusTextView->frame = { 0, 291, 1280, 0 };
     _statusTextView->textAlignment = CENTER_ALIGN;
 
@@ -55,4 +55,8 @@ void UpdateView::render(SDL_Rect rect, double dTime) {
 
 void UpdateView::setProgress(double progress) {
     _progressBarView->progress = progress;
+}
+
+void UpdateView::setText(string text) {
+    _statusTextView->setText(text);
 }

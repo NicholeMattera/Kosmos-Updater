@@ -33,9 +33,17 @@ AppUpdateScene::AppUpdateScene() {
     addSubView(_headerView);
     addSubView(_updateView);
     addSubView(_footerView);
+
+    _versionRequest = NetManager::getLatestAppVersion();
 }
 
 AppUpdateScene::~AppUpdateScene() {
+    if (_versionRequest != NULL)
+        delete _versionRequest;
+
+    if (_appRequest != NULL)
+        delete _appRequest;
+
     if (_headerView != NULL)
         delete _headerView;
 
@@ -49,9 +57,65 @@ AppUpdateScene::~AppUpdateScene() {
 void AppUpdateScene::handleButton(u32 buttons) {}
 
 void AppUpdateScene::render(SDL_Rect rect, double dTime) {
-    Scene::render(rect, dTime);
-}
+    // App Version Downloading
+    if (_versionRequest != NULL) {
+        mutexLock(&_versionRequest->mutexRequest);
 
-void AppUpdateScene::_getProgress(double progress) {
-    _updateView->setProgress(progress);
+        // Success
+        if (_versionRequest->isComplete) {
+            if (string(VERSION).compare(_versionRequest->data) == 0) {
+                SceneDirector::currentScene = SCENE_PACKAGE_SELECT;
+            } else {
+                _updateView->setProgress(0);
+                _updateView->setText("Getting the latest version of SDFiles Updater...");
+
+                delete _versionRequest;
+                _versionRequest = NULL;
+
+                _appRequest = NetManager::getLatestApp();
+            }
+        }
+        // Failure
+        else if (_versionRequest->hasError) {
+            // TODO: Handle Error.
+            printf("Version Error: %s", _versionRequest->errorMessage.c_str());
+
+            delete _versionRequest;
+            _versionRequest = NULL;
+        }
+        // Progress Update
+        else {
+            _updateView->setProgress(_versionRequest->progress);
+        }
+
+        if (_versionRequest != NULL)
+            mutexUnlock(&_versionRequest->mutexRequest);
+    }
+    
+    // App Downloading
+    else if (_appRequest != NULL) {
+        mutexLock(&_appRequest->mutexRequest);
+        
+        // Success
+        if (_appRequest->isComplete) {
+            // TODO: Handle new application.
+        }
+        // Failure
+        else if (_appRequest->hasError) {
+            // TODO: Handle Error.
+            printf("App Error: %s", _appRequest->errorMessage.c_str());
+
+            delete _appRequest;
+            _appRequest = NULL;
+        }
+        // Progress Update
+        else {
+            _updateView->setProgress(_appRequest->progress);
+        }
+
+        if (_appRequest != NULL)
+            mutexUnlock(&_appRequest->mutexRequest);
+    }
+
+    Scene::render(rect, dTime);
 }

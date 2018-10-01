@@ -27,11 +27,12 @@ using namespace std;
 
 class UpdateView : public View {
     public:
-        UpdateView(string statusText);
+        UpdateView(string text);
         ~UpdateView();
 
         void render(SDL_Rect rect, double dTime);
         void setProgress(double progress);
+        void setText(string text);
 
     private:
         ImageView * _downloadImageView;

@@ -15,8 +15,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include <string.h>
 #include "NetManager.hpp"
-#include <switch.h>
+#include "ConfigManager.hpp"
+#include "models/NetRequest.hpp"
 
 void NetManager::initialize() {
     socketInitializeDefault();
@@ -25,6 +27,7 @@ void NetManager::initialize() {
     #endif
     
     curl_global_init(CURL_GLOBAL_ALL);
+    _hostname = ConfigManager::getHost();
 }
 
 void NetManager::dealloc() {
@@ -37,29 +40,38 @@ void NetManager::dealloc() {
     socketExit();
 }
 
-void getLatestAppVersion() {
-
+NetRequest * NetManager::getLatestAppVersion() {
+    NetRequest * request = new NetRequest("GET", _hostname + "/" + API_VERSION + "/app-version-number");
+    _createThread(_request, request);
+    return request;
 }
 
-void getLatestApp() {
-
+NetRequest * NetManager::getLatestApp() {
+    NetRequest * request = new NetRequest("GET", _hostname + "/" + API_VERSION + "/app-download");
+    // TODO: Create a separate request method that writes straight to file.
+    _createThread(_request, request);
+    return request;
 }
 
-void getLatestSDFilesVersion(string channel) {
-
+NetRequest * NetManager::getLatestSDFilesVersion(string channel) {
+    NetRequest * request = new NetRequest("GET", _hostname + "/" + API_VERSION + "/version-number/" + channel);
+    _createThread(_request, request);
+    return request;
 }
 
-void getLatestSDFiles(string bundle, string channel) {
-
+NetRequest * NetManager::getLatestSDFiles(string bundle, string channel) {
+    NetRequest * request = new NetRequest("GET", _hostname + "/" + API_VERSION + "/download/" + bundle + "/" + channel);
+    // TODO: Create a separate request method that writes straight to file.
+    _createThread(_request, request);
+    return request;
 }
 
-Result NetManager::_createThread(ThreadFunc func) {
+Result NetManager::_createThread(ThreadFunc func, void* ptr) {
     Thread thread;
-
     Result res;
-    if (R_FAILED( res = threadCreate(&thread, func, nullptr, 0x2000, 0x2B, -2)))
-        return res;
 
+    if (R_FAILED( res = threadCreate(&thread, func, ptr, 0x2000, 0x2B, -2)))
+        return res;
     if (R_FAILED( res = threadStart(&thread)))
         return res;
 
@@ -68,10 +80,72 @@ Result NetManager::_createThread(ThreadFunc func) {
     return 0;
 }
 
-void NetManager::_request(string method, string url) {
+void NetManager::_request(void * ptr) {
+    NetRequest * request = (NetRequest *) ptr;
+    CURL * curl;
+    CURLcode res;
+    string userAgent = string("sdfiles-updater/") + VERSION;
 
+    curl = curl_easy_init();
+
+    if (curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, request->url.c_str());
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, request->method.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, _writeFunction);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) request);
+        curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, _progressFunction);
+        curl_easy_setopt(curl, CURLOPT_XFERINFODATA, (void *) request);
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent.c_str());
+
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK) {
+            mutexLock(&request->mutexRequest);
+
+            request->hasError = true;
+            request->errorMessage = string(curl_easy_strerror(res));
+
+            mutexUnlock(&request->mutexRequest);
+            return;
+        }
+
+        curl_easy_cleanup(curl);
+    }
+
+    mutexLock(&request->mutexRequest);
+
+    request->isComplete = true;
+
+    mutexUnlock(&request->mutexRequest);
 }
 
-size_t NetManager::_writeFunction(void *ptr, size_t size, size_t nmemb, string * data) {
+int NetManager::_progressFunction(void *ptr, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
+    NetRequest * request = (NetRequest *) ptr;
+    mutexLock(&request->mutexRequest);
+
+    request->progress = (double) dlnow / (double) dltotal;
+
+    mutexUnlock(&request->mutexRequest);
     return 0;
+}
+
+size_t NetManager::_writeFunction(void *contents, size_t size, size_t nmemb, void * ptr) {
+    size_t realsize = size * nmemb;
+    NetRequest * request = (NetRequest *) ptr;
+    mutexLock(&request->mutexRequest);
+
+    request->data = (char *) realloc(request->data, request->size + realsize + 1);
+    if (request->data == NULL) {
+        request->hasError = true;
+        request->errorMessage = "Not enough memory.";
+        return 0;
+    }
+
+    memcpy(&(request->data[request->size]), contents, realsize);
+    request->size += realsize;
+    request->data[request->size] = 0;
+
+    mutexUnlock(&request->mutexRequest);
+
+    return realsize;
 }
