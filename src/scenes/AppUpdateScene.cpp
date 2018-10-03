@@ -84,22 +84,25 @@ void AppUpdateScene::_updateVersionRequest() {
     _updateView->setProgress(_versionRequest->progress);
     if (_versionRequest->isComplete) {
         _latestAppVersion = string(_versionRequest->getData());
-        printf("_latestAppVersion = '%s'", _latestAppVersion.c_str());
 
-        // No Update
-        if (string(VERSION).compare(_latestAppVersion) == 0) {
+        #ifdef DEBUG
             SceneDirector::currentScene = SCENE_PACKAGE_SELECT;
-        }
-        // Update
-        else {
-            _updateView->setProgress(0);
-            _updateView->setText("Getting the latest version of SDFiles Updater...");
+        #else
+            // No Update
+            if (string(VERSION).compare(_latestAppVersion) == 0) {
+                SceneDirector::currentScene = SCENE_PACKAGE_SELECT;
+            }
+            // Update
+            else {
+                _updateView->setProgress(0);
+                _updateView->setText("Getting the latest version of SDFiles Updater...");
 
-            delete _versionRequest;
-            _versionRequest = NULL;
+                delete _versionRequest;
+                _versionRequest = NULL;
 
-            _appRequest = NetManager::getLatestApp();
-        }
+                _appRequest = NetManager::getLatestApp();
+            }
+        #endif
     }
     else if (_versionRequest->hasError) {
         _showStatus(_appRequest->errorMessage, "Please restart the app to try again.");
