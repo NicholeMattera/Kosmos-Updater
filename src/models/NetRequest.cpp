@@ -15,16 +15,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include <string.h>
 #include "NetRequest.hpp"
 
 NetRequest::NetRequest(string method, string url) {
     mutexInit(&mutexRequest);
 
-    this->method = method;
-    this->url = url;
+    _method = method;
+    _url = url;
+    _size = 0;
+    _data = (char *) malloc(1);
 
-    size = 0;
-    data = (char *) malloc(1);
     progress = 0.f;
     isComplete = false;
     hasError = false;
@@ -32,5 +33,41 @@ NetRequest::NetRequest(string method, string url) {
 }
 
 NetRequest::~NetRequest() {
-    free(data);
+    free(_data);
+}
+
+string NetRequest::getMethod() {
+    return _method;
+}
+
+string NetRequest::getURL() {
+    return _url;
+}
+
+char * NetRequest::getData() {
+    return _data;
+}
+
+size_t NetRequest::getSize() {
+    return _size;
+}
+
+size_t NetRequest::appendData(void *contents, size_t size, size_t nmemb) {
+    size_t realsize = size * nmemb;
+    mutexLock(&mutexRequest);
+
+    _data = (char *) realloc(_data, _size + realsize + 1);
+    if (_data == NULL) {
+        hasError = true;
+        errorMessage = "Not enough memory.";
+        return 0;
+    }
+
+    memcpy(&(_data[_size]), contents, realsize);
+    _size += realsize;
+    _data[_size] = 0;
+
+    mutexUnlock(&mutexRequest);
+
+    return realsize;
 }

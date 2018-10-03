@@ -17,30 +17,22 @@
 
 #pragma once
 
-#include <switch.h>
 #include <string>
+#include "../View.hpp"
+#include "TextView.hpp"
 
 using namespace std;
 
-class NetRequest {
+class StatusView : public View {
     public:
-        Mutex mutexRequest;
-        double progress;
-        bool isComplete;
-        bool hasError;
-        string errorMessage;
+        StatusView(string text, string subtext);
+        ~StatusView();
 
-        NetRequest(string method, string url);
-        ~NetRequest();
-        string getMethod();
-        string getURL();
-        char * getData();
-        size_t getSize();
-        size_t appendData(void *contents, size_t size, size_t nmemb);
+        void render(SDL_Rect rect, double dTime);
+        void setText(string text);
+        void setSubtext(string text);
 
     private:
-        string _method;
-        string _url;
-        size_t _size;
-        char * _data;
+        TextView * _textView;
+        TextView * _subtextView;
 };

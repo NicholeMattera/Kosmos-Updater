@@ -19,6 +19,8 @@
 #include "../AssetManager.hpp"
 
 UpdateView::UpdateView(string text) {
+    frame = { 0, 0, 1280, 325 };
+
     if (AssetManager::downloading == NULL) {
         AssetManager::downloading = AssetManager::loadAsset("downloading.png");
     }

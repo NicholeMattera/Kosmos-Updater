@@ -17,30 +17,14 @@
 
 #pragma once
 
-#include <switch.h>
 #include <string>
+#include "models/NetRequest.hpp"
 
 using namespace std;
 
-class NetRequest {
+class FileManager {
     public:
-        Mutex mutexRequest;
-        double progress;
-        bool isComplete;
-        bool hasError;
-        string errorMessage;
-
-        NetRequest(string method, string url);
-        ~NetRequest();
-        string getMethod();
-        string getURL();
-        char * getData();
-        size_t getSize();
-        size_t appendData(void *contents, size_t size, size_t nmemb);
-
-    private:
-        string _method;
-        string _url;
-        size_t _size;
-        char * _data;
+        static bool writeFile(string filename, NetRequest * request);
+        static bool deleteFile(string filename);
+        static bool fileExists(string filename);
 };

@@ -48,7 +48,6 @@ NetRequest * NetManager::getLatestAppVersion() {
 
 NetRequest * NetManager::getLatestApp() {
     NetRequest * request = new NetRequest("GET", _hostname + "/" + API_VERSION + "/app-download");
-    // TODO: Create a separate request method that writes straight to file.
     _createThread(_request, request);
     return request;
 }
@@ -61,7 +60,6 @@ NetRequest * NetManager::getLatestSDFilesVersion(string channel) {
 
 NetRequest * NetManager::getLatestSDFiles(string bundle, string channel) {
     NetRequest * request = new NetRequest("GET", _hostname + "/" + API_VERSION + "/download/" + bundle + "/" + channel);
-    // TODO: Create a separate request method that writes straight to file.
     _createThread(_request, request);
     return request;
 }
@@ -89,8 +87,8 @@ void NetManager::_request(void * ptr) {
     curl = curl_easy_init();
 
     if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, request->url.c_str());
-        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, request->method.c_str());
+        curl_easy_setopt(curl, CURLOPT_URL, request->getURL().c_str());
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, request->getMethod().c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, _writeFunction);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) request);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, _progressFunction);
@@ -130,22 +128,6 @@ int NetManager::_progressFunction(void *ptr, curl_off_t dltotal, curl_off_t dlno
 }
 
 size_t NetManager::_writeFunction(void *contents, size_t size, size_t nmemb, void * ptr) {
-    size_t realsize = size * nmemb;
     NetRequest * request = (NetRequest *) ptr;
-    mutexLock(&request->mutexRequest);
-
-    request->data = (char *) realloc(request->data, request->size + realsize + 1);
-    if (request->data == NULL) {
-        request->hasError = true;
-        request->errorMessage = "Not enough memory.";
-        return 0;
-    }
-
-    memcpy(&(request->data[request->size]), contents, realsize);
-    request->size += realsize;
-    request->data[request->size] = 0;
-
-    mutexUnlock(&request->mutexRequest);
-
-    return realsize;
+    return request->appendData(contents, size, nmemb);
 }

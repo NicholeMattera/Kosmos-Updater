@@ -19,7 +19,7 @@
 
 #include "../Scene.hpp"
 #include "../views/HeaderView.hpp"
-#include "../views/TextView.hpp"
+#include "../views/StatusView.hpp"
 #include "../views/FooterView.hpp"
 
 class AllDoneScene : public Scene {
@@ -32,7 +32,6 @@ class AllDoneScene : public Scene {
 
     private:
         HeaderView * _headerView;
-        TextView * _textView;
-        TextView * _subtextView;
+        StatusView * _statusView;
         FooterView * _footerView;
 };

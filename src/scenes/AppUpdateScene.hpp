@@ -17,11 +17,15 @@
 
 #pragma once
 
+#include <string>
 #include "../Scene.hpp"
 #include "../models/NetRequest.hpp"
 #include "../views/HeaderView.hpp"
 #include "../views/UpdateView.hpp"
+#include "../views/StatusView.hpp"
 #include "../views/FooterView.hpp"
+
+using namespace std;
 
 class AppUpdateScene : public Scene {
     public:
@@ -32,10 +36,17 @@ class AppUpdateScene : public Scene {
         void render(SDL_Rect rect, double dTime);
 
     private:
+        string _latestAppVersion;
+
         NetRequest * _versionRequest;
         NetRequest * _appRequest;
         
         HeaderView * _headerView;
         UpdateView * _updateView;
+        StatusView * _statusView;
         FooterView * _footerView;
+        
+        void _updateVersionRequest();
+        void _updateAppRequest();
+        void _showStatus(string text, string subtext);
 };

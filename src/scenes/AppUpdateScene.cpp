@@ -18,6 +18,7 @@
 #include "AppUpdateScene.hpp"
 #include "../SceneDirector.hpp"
 #include "../NetManager.hpp"
+#include "../FileManager.hpp"
 
 AppUpdateScene::AppUpdateScene() {
     _headerView = new HeaderView();
@@ -27,11 +28,17 @@ AppUpdateScene::AppUpdateScene() {
     _updateView->frame.x = 0;
     _updateView->frame.y = 200;
 
+    _statusView = new StatusView("", "");
+    _statusView->frame.x = 0;
+    _statusView->frame.y = 323;
+    _statusView->hidden = true;
+
     _footerView = new FooterView();
     _footerView->frame = { 0, 647, 1280, 73 };
 
     addSubView(_headerView);
     addSubView(_updateView);
+    addSubView(_statusView);
     addSubView(_footerView);
 
     _versionRequest = NetManager::getLatestAppVersion();
@@ -54,68 +61,86 @@ AppUpdateScene::~AppUpdateScene() {
         delete _footerView;
 }
 
-void AppUpdateScene::handleButton(u32 buttons) {}
+void AppUpdateScene::handleButton(u32 buttons) {
+    if (_updateView->hidden && buttons & KEY_A) {
+        SceneDirector::exitApp = true;
+    }
+}
 
 void AppUpdateScene::render(SDL_Rect rect, double dTime) {
-    // App Version Downloading
     if (_versionRequest != NULL) {
-        mutexLock(&_versionRequest->mutexRequest);
-
-        // Success
-        if (_versionRequest->isComplete) {
-            if (string(VERSION).compare(_versionRequest->data) == 0) {
-                SceneDirector::currentScene = SCENE_PACKAGE_SELECT;
-            } else {
-                _updateView->setProgress(0);
-                _updateView->setText("Getting the latest version of SDFiles Updater...");
-
-                delete _versionRequest;
-                _versionRequest = NULL;
-
-                _appRequest = NetManager::getLatestApp();
-            }
-        }
-        // Failure
-        else if (_versionRequest->hasError) {
-            // TODO: Handle Error.
-            printf("Version Error: %s", _versionRequest->errorMessage.c_str());
-
-            delete _versionRequest;
-            _versionRequest = NULL;
-        }
-        // Progress Update
-        else {
-            _updateView->setProgress(_versionRequest->progress);
-        }
-
-        if (_versionRequest != NULL)
-            mutexUnlock(&_versionRequest->mutexRequest);
+        _updateVersionRequest();
     }
-    
-    // App Downloading
     else if (_appRequest != NULL) {
-        mutexLock(&_appRequest->mutexRequest);
-        
-        // Success
-        if (_appRequest->isComplete) {
-            // TODO: Handle new application.
-        }
-        // Failure
-        else if (_appRequest->hasError) {
-            // TODO: Handle Error.
-            printf("App Error: %s", _appRequest->errorMessage.c_str());
-
-            delete _appRequest;
-            _appRequest = NULL;
-        }
-        // Progress Update
-        else {
-            _updateView->setProgress(_appRequest->progress);
-        }
-
-        if (_appRequest != NULL)
-            mutexUnlock(&_appRequest->mutexRequest);
+        _updateAppRequest();
     }
 
     Scene::render(rect, dTime);
+}
+
+void AppUpdateScene::_updateVersionRequest() {
+    mutexLock(&_versionRequest->mutexRequest);
+
+    _updateView->setProgress(_versionRequest->progress);
+    if (_versionRequest->isComplete) {
+        _latestAppVersion = string(_versionRequest->getData());
+        printf("_latestAppVersion = '%s'", _latestAppVersion.c_str());
+
+        // No Update
+        if (string(VERSION).compare(_latestAppVersion) == 0) {
+            SceneDirector::currentScene = SCENE_PACKAGE_SELECT;
+        }
+        // Update
+        else {
+            _updateView->setProgress(0);
+            _updateView->setText("Getting the latest version of SDFiles Updater...");
+
+            delete _versionRequest;
+            _versionRequest = NULL;
+
+            _appRequest = NetManager::getLatestApp();
+        }
+    }
+    else if (_versionRequest->hasError) {
+        _showStatus(_appRequest->errorMessage, "Please restart the app to try again.");
+
+        delete _versionRequest;
+        _versionRequest = NULL;
+    }
+
+    if (_versionRequest != NULL)
+        mutexUnlock(&_versionRequest->mutexRequest);
+}
+
+void AppUpdateScene::_updateAppRequest() {
+    mutexLock(&_appRequest->mutexRequest);
+    
+    _updateView->setProgress(_appRequest->progress);
+    if (_appRequest->isComplete) {
+        FileManager::writeFile("SDFilesUpdater.nro", _appRequest);
+
+        _showStatus("SDFiles Updater has been updated to version " + _latestAppVersion + "!", "Please restart the app to update your files.");
+
+        delete _appRequest;
+        _appRequest = NULL;
+    }
+    else if (_appRequest->hasError) {
+        _showStatus(_appRequest->errorMessage, "Please restart the app to try again.");
+
+        delete _appRequest;
+        _appRequest = NULL;
+    }
+
+    if (_appRequest != NULL)
+        mutexUnlock(&_appRequest->mutexRequest);
+}
+
+void AppUpdateScene::_showStatus(string text, string subtext) {
+    _statusView->setText(text);
+    _statusView->setSubtext(text);
+
+    _updateView->hidden = true;
+    _statusView->hidden = false;
+
+    _footerView->actions.push_back(new Action(A_BUTTON, "Quit"));
 }
