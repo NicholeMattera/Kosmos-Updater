@@ -32,6 +32,7 @@ using namespace std;
 class ListRowView : public View {
     public:
         bool isLast;
+        bool hasCheckmark;
         
         ListRowView(string primaryText, string secondaryText, ListRowStyle style);
         ~ListRowView();

@@ -32,9 +32,15 @@ class MultiSelectView : public View {
         ~MultiSelectView();
 
         void render(SDL_Rect rect, double dTime);
+        bool goUp();
+        bool goDown();
+        string select();
+        void reset(string selectedOption);
 
     private:
         int _startY;
+        long unsigned int _focusSelection;
+        vector<string> _options;
 
         HeaderView * _headerView;
         vector<ListRowView *> _listRowViews;

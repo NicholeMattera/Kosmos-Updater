@@ -23,7 +23,9 @@ View::View() {
     hasFocus = false;
 }
 
-View::~View() {}
+View::~View() {
+    subviews.clear();
+}
 
 void View::render(SDL_Rect rect, double dTime) {
     for (list<View *>::iterator it = subviews.begin(); it != subviews.end(); it++) {

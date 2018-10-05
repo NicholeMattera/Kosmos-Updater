@@ -21,6 +21,7 @@
 
 ListRowView::ListRowView(string primaryText, string secondaryText, ListRowStyle style) : View() {
     isLast = false;
+    hasCheckmark = false;
     frame = { 0, 0, 850, 71 };
 
     _timeElapsed = 0;
@@ -48,6 +49,12 @@ ListRowView::ListRowView(string primaryText, string secondaryText, ListRowStyle 
         addSubView(_secondaryTextView);
     } else {
         _secondaryTextView = NULL;
+    }
+
+    if (AssetManager::checkmark == NULL) {
+        SDL_Surface *surface = TTF_RenderGlyph_Blended(AssetManager::button_font, 0xE14B, AssetManager::background);
+        AssetManager::checkmark = SDL_CreateTextureFromSurface(SceneDirector::renderer, surface);
+        SDL_FreeSurface(surface);
     }
 }
 
@@ -79,6 +86,15 @@ void ListRowView::render(SDL_Rect rect, double dTime) {
         _drawBorders(rect.x, rect.y, rect.x + rect.w, rect.y + rect.h, selectionColor);
     } else {
         _timeElapsed = 0;
+    }
+
+    if (hasCheckmark) {
+        SDL_Color activeColor = AssetManager::active_text;
+        filledCircleRGBA(SceneDirector::renderer, rect.x + rect.w - 35, rect.y + 36, 15, activeColor.r, activeColor.g, activeColor.b, activeColor.a);
+        aacircleRGBA(SceneDirector::renderer, rect.x + rect.w - 35, rect.y + 36, 15, activeColor.r, activeColor.g, activeColor.b, activeColor.a);
+
+        SDL_Rect checkmarkFrame = { rect.x + rect.w - 47, rect.y + 24, 25, 25 };
+        SDL_RenderCopy(SceneDirector::renderer, AssetManager::checkmark, NULL, &checkmarkFrame);
     }
 
     // Render any subviews.

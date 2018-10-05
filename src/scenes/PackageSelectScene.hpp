@@ -34,7 +34,9 @@ class PackageSelectScene : public Scene {
 
     private:
         bool _channelOpen;
+        string _channelSelected;
         bool _bundleOpen;
+        string _bundleSelected;
         int _focusSelection;
 
         HeaderView * _headerView;
@@ -48,4 +50,8 @@ class PackageSelectScene : public Scene {
         MultiSelectView * _bundleMultiSelectView;
         
         void _manageFocus();
+
+        void _handleButtonsForChannelMutliSelect(u32 buttons);
+        void _handleButtonsForBundleMutliSelect(u32 buttons);
+        void _resetVersion();
 };
