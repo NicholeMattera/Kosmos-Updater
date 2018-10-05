@@ -19,10 +19,13 @@
 
 #include "../Scene.hpp"
 #include "../views/HeaderView.hpp"
+#include "../views/UpdateView.hpp"
+#include "../views/StatusView.hpp"
 #include "../views/ListHeaderView.hpp"
 #include "../views/ListRowView.hpp"
 #include "../views/FooterView.hpp"
 #include "../views/MultiSelectView.hpp"
+#include "../models/NetRequest.hpp"
 
 class PackageSelectScene : public Scene {
     public:
@@ -33,13 +36,18 @@ class PackageSelectScene : public Scene {
         void render(SDL_Rect rect, double dTime);
 
     private:
+        string _latestVersion;
         bool _channelOpen;
         string _channelSelected;
         bool _bundleOpen;
         string _bundleSelected;
         int _focusSelection;
+        
+        NetRequest * _versionRequest;
 
         HeaderView * _headerView;
+        UpdateView * _updateView;
+        StatusView * _statusView;
         ListRowView * _installRowView;
         ListHeaderView * _settingHeaderView;
         ListRowView * _channelRowView;
@@ -49,9 +57,14 @@ class PackageSelectScene : public Scene {
         MultiSelectView * _channelMultiSelectView;
         MultiSelectView * _bundleMultiSelectView;
         
+        void _updateVersionRequest();
+        void _showUpdateView();
+        void _showPackageSelectViews();
+        void _showStatusView(string text, string subtext);
+        
         void _manageFocus();
 
         void _handleButtonsForChannelMutliSelect(u32 buttons);
         void _handleButtonsForBundleMutliSelect(u32 buttons);
-        void _resetVersion();
+        void _resetVersion(bool channelChange);
 };

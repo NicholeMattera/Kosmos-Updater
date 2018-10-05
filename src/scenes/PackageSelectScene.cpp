@@ -17,6 +17,7 @@
 
 #include "PackageSelectScene.hpp"
 #include "../SceneDirector.hpp"
+#include "../NetManager.hpp"
 #include "../ConfigManager.hpp"
 
 PackageSelectScene::PackageSelectScene() {
@@ -26,6 +27,14 @@ PackageSelectScene::PackageSelectScene() {
 
     _headerView = new HeaderView("SDFiles Updater", true);
     _headerView->frame = { 0, 0, 1280, 88 };
+
+    _updateView = new UpdateView("Checking for updates to SDFiles...");
+    _updateView->frame.x = 0;
+    _updateView->frame.y = 200;
+
+    _statusView = new StatusView("", "");
+    _statusView->frame.x = 0;
+    _statusView->frame.y = 323;
 
     _installRowView = new ListRowView("Install Latest SDFiles", "", SUBTITLE);
     _installRowView->frame.x = 215;
@@ -66,8 +75,6 @@ PackageSelectScene::PackageSelectScene() {
 
     _footerView = new FooterView();
     _footerView->frame = { 0, 647, 1280, 73 };
-    _footerView->actions.push_back(new Action(A_BUTTON, "OK"));
-    _footerView->actions.push_back(new Action(B_BUTTON, "Quit"));
 
     vector<string> channelOptions;
     channelOptions.push_back("Stable");
@@ -91,6 +98,9 @@ PackageSelectScene::PackageSelectScene() {
     addSubView(_footerView);
     addSubView(_channelMultiSelectView);
     addSubView(_bundleMultiSelectView);
+
+    _showUpdateView();
+    _versionRequest = NetManager::getLatestSDFilesVersion(channel);
 }
 
 PackageSelectScene::~PackageSelectScene() {
@@ -116,6 +126,8 @@ PackageSelectScene::~PackageSelectScene() {
         delete _bundleMultiSelectView;
 
     if (_footerView != NULL)
+    _footerView->actions.push_back(new Action(A_BUTTON, "Quit"));
+    _footerView->actions.push_back(new Action(A_BUTTON, "Quit"));
         delete _footerView;
 }
 
@@ -124,7 +136,7 @@ void PackageSelectScene::handleButton(u32 buttons) {
         _handleButtonsForChannelMutliSelect(buttons);
     } else if (_bundleOpen) {
         _handleButtonsForBundleMutliSelect(buttons);
-    } else {
+    } else if (_versionRequest == NULL) {
         if (buttons & KEY_A) {
             Mix_PlayChannel(-1, AssetManager::enter, 0);
 
@@ -171,7 +183,106 @@ void PackageSelectScene::handleButton(u32 buttons) {
 }
 
 void PackageSelectScene::render(SDL_Rect rect, double dTime) {
+    if (_versionRequest != NULL) {
+        _updateVersionRequest();
+    }
+
     Scene::render(rect, dTime);
+}
+
+void PackageSelectScene::_updateVersionRequest() {
+    mutexLock(&_versionRequest->mutexRequest);
+
+    _updateView->setProgress(_versionRequest->progress);
+    if (_versionRequest->isComplete) {
+        _latestVersion = string(_versionRequest->getData());
+
+        _showPackageSelectViews();
+
+        delete _versionRequest;
+        _versionRequest = NULL;
+    }
+    else if (_versionRequest->hasError) {
+        _showStatusView(_versionRequest->errorMessage, "Please restart the app to try again.");
+
+        delete _versionRequest;
+        _versionRequest = NULL;
+    }
+
+    if (_versionRequest != NULL)
+        mutexUnlock(&_versionRequest->mutexRequest);
+}
+
+void PackageSelectScene::_showUpdateView() {
+    _updateView->setProgress(0);
+    _updateView->hidden = false;
+    _statusView->hidden = true;
+    _installRowView->hidden = true;
+    _settingHeaderView->hidden = true;
+    _channelRowView->hidden = true;
+    _bundleRowView->hidden = true;
+
+    for (list<Action *>::iterator it = _footerView->actions.begin(); it != _footerView->actions.end(); it++) {
+        delete (*it);
+    }
+    _footerView->actions.clear();
+}
+
+void PackageSelectScene::_showPackageSelectViews() {
+    _updateView->hidden = true;
+    _statusView->hidden = true;
+
+    _focusSelection = 0;
+
+    _installRowView->hidden = false;
+    _installRowView->hasFocus = true;
+
+    string version = ConfigManager::getCurrentVersion();
+    if (version.compare(_latestVersion) == 0) {
+        _installRowView->setPrimaryText("Reinstall SDFiles");
+    } else {
+        _installRowView->setPrimaryText("Install Latest SDFiles");
+    }
+
+    if (version == "" || version.compare(_latestVersion) == 0) {
+        _installRowView->setSecondaryText("Latest Version is " + ((_latestVersion.size() > 7) ? _latestVersion.substr(0, 7) : _latestVersion));
+    } else {
+        _installRowView->setSecondaryText("You currently have version " + ((version.size() > 7) ? version.substr(0, 7) : version) + " installed, and the latest version is " + ((_latestVersion.size() > 7) ? _latestVersion.substr(0, 7) : _latestVersion + "."));
+    }
+
+    _settingHeaderView->hidden = false;
+    _settingHeaderView->hasFocus = false;
+
+    _channelRowView->hidden = false;
+    _channelRowView->hasFocus = false;
+
+    _bundleRowView->hidden = false;
+    _bundleRowView->hasFocus = false;
+
+    for (list<Action *>::iterator it = _footerView->actions.begin(); it != _footerView->actions.end(); it++) {
+        delete (*it);
+    }
+    _footerView->actions.clear();
+    _footerView->actions.push_back(new Action(A_BUTTON, "OK"));
+    _footerView->actions.push_back(new Action(B_BUTTON, "Quit"));
+}
+
+void PackageSelectScene::_showStatusView(string text, string subtext) {
+    _statusView->setText(text);
+    _statusView->setSubtext(text);
+
+    _updateView->hidden = true;
+    _statusView->hidden = false;
+    _installRowView->hidden = true;
+    _settingHeaderView->hidden = true;
+    _channelRowView->hidden = true;
+    _bundleRowView->hidden = true;
+
+    for (list<Action *>::iterator it = _footerView->actions.begin(); it != _footerView->actions.end(); it++) {
+        delete (*it);
+    }
+    _footerView->actions.clear();
+    _footerView->actions.push_back(new Action(A_BUTTON, "Quit"));
 }
 
 void PackageSelectScene::_manageFocus() {
@@ -209,7 +320,7 @@ void PackageSelectScene::_handleButtonsForChannelMutliSelect(u32 buttons) {
         }
 
         if (channel.compare(_channelSelected) != 0) {
-            _resetVersion();
+            _resetVersion(true);
         }
         _channelSelected = channel;
 
@@ -259,7 +370,7 @@ void PackageSelectScene::_handleButtonsForBundleMutliSelect(u32 buttons) {
         }
 
         if (bundle.compare(_bundleSelected) != 0) {
-            _resetVersion();
+            _resetVersion(false);
         }
         _bundleSelected = bundle;
 
@@ -290,6 +401,13 @@ void PackageSelectScene::_handleButtonsForBundleMutliSelect(u32 buttons) {
     }
 }
 
-void _resetVersion() {
+void PackageSelectScene::_resetVersion(bool channelChange) {
     ConfigManager::setCurrentVersion("");
+
+    if (channelChange) {
+        _showUpdateView();
+
+        string channel = ConfigManager::getChannel();
+        _versionRequest = NetManager::getLatestSDFilesVersion(channel);
+    }
 }

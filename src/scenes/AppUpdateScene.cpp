@@ -42,6 +42,7 @@ AppUpdateScene::AppUpdateScene() {
     addSubView(_footerView);
 
     _versionRequest = NetManager::getLatestAppVersion();
+    _appRequest = NULL;
 }
 
 AppUpdateScene::~AppUpdateScene() {
@@ -105,7 +106,7 @@ void AppUpdateScene::_updateVersionRequest() {
         #endif
     }
     else if (_versionRequest->hasError) {
-        _showStatus(_appRequest->errorMessage, "Please restart the app to try again.");
+        _showStatus(_versionRequest->errorMessage, "Please restart the app to try again.");
 
         delete _versionRequest;
         _versionRequest = NULL;

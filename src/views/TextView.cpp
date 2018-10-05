@@ -38,31 +38,35 @@ void TextView::render(SDL_Rect rect, double dTime) {
     // Create texture if it doesn't already exists.
     if (_textTexture == NULL) {
         SDL_Surface *surface = TTF_RenderText_Blended(font, text.c_str(), textColor);
-        _textTexture = SDL_CreateTextureFromSurface(SceneDirector::renderer, surface);
-        _textWidth = surface->w;
-        _textHeight = surface->h;
-        SDL_FreeSurface(surface);
+        if (surface != NULL) {
+            _textTexture = SDL_CreateTextureFromSurface(SceneDirector::renderer, surface);
+            _textWidth = surface->w;
+            _textHeight = surface->h;
+            SDL_FreeSurface(surface);
+        }
     }
 
-    int x = 0;
-    int width = max(_textWidth, rect.w);
-    switch (textAlignment) {
-        case LEFT_ALIGN:
-            x = rect.x;
-            break;
+    if (_textTexture != NULL) {
+        int x = 0;
+        int width = max(_textWidth, rect.w);
+        switch (textAlignment) {
+            case LEFT_ALIGN:
+                x = rect.x;
+                break;
 
-        case CENTER_ALIGN:
-            x = rect.x + (width - _textWidth) / 2;
-            break;
+            case CENTER_ALIGN:
+                x = rect.x + (width - _textWidth) / 2;
+                break;
 
-        case RIGHT_ALIGN:
-            x = rect.x + width - _textWidth;
-            break;
+            case RIGHT_ALIGN:
+                x = rect.x + width - _textWidth;
+                break;
+        }
+        
+        // Render the text.
+        SDL_Rect textFrame = { x, rect.y, _textWidth, _textHeight };
+        SDL_RenderCopy(SceneDirector::renderer, _textTexture, NULL, &textFrame);
     }
-    
-    // Render the text.
-    SDL_Rect textFrame = { x, rect.y, _textWidth, _textHeight };
-    SDL_RenderCopy(SceneDirector::renderer, _textTexture, NULL, &textFrame);
 
     // Render any subviews.
     View::render(rect, dTime);
