@@ -23,8 +23,7 @@ ProgressBarView::ProgressBarView() : View() {
     progress = 0;
 }
 
-ProgressBarView::~ProgressBarView() {
-}
+ProgressBarView::~ProgressBarView() {}
 
 void ProgressBarView::render(SDL_Rect rect, double dTime) {
     // Draw background.

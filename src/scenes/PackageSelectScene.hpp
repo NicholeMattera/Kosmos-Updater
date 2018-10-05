@@ -22,6 +22,7 @@
 #include "../views/ListHeaderView.hpp"
 #include "../views/ListRowView.hpp"
 #include "../views/FooterView.hpp"
+#include "../views/MultiSelectView.hpp"
 
 class PackageSelectScene : public Scene {
     public:
@@ -32,6 +33,8 @@ class PackageSelectScene : public Scene {
         void render(SDL_Rect rect, double dTime);
 
     private:
+        bool _channelOpen;
+        bool _bundleOpen;
         int _focusSelection;
 
         HeaderView * _headerView;
@@ -40,6 +43,9 @@ class PackageSelectScene : public Scene {
         ListRowView * _channelRowView;
         ListRowView * _bundleRowView;
         FooterView * _footerView;
+
+        MultiSelectView * _channelMultiSelectView;
+        MultiSelectView * _bundleMultiSelectView;
         
         void _manageFocus();
 };

@@ -20,7 +20,7 @@
 #include "../NetManager.hpp"
 
 PackageDownloadScene::PackageDownloadScene() {
-    _headerView = new HeaderView();
+    _headerView = new HeaderView("SDFiles Updater", true);
     _headerView->frame = { 0, 0, 1280, 88 };
 
     _updateView = new UpdateView("Downloading the latest SDFiles...");

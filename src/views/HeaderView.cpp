@@ -19,35 +19,41 @@
 #include "../AssetManager.hpp"
 #include "../SceneDirector.hpp"
 
-HeaderView::HeaderView() : View() {
-    _titleTexture = NULL;
-
+HeaderView::HeaderView(string title, bool showIcon) : View() {
     isFocusable = false;
     isTouchable = false;
+    _showIcon = showIcon;
 
     if (AssetManager::icon == NULL) {
         AssetManager::icon = AssetManager::loadAsset("icon.png");
     }
+
+    SDL_Surface *surface = TTF_RenderText_Blended(AssetManager::header_font, title.c_str(), AssetManager::text);
+    _titleTexture = SDL_CreateTextureFromSurface(SceneDirector::renderer, surface);
+    _titleWidth = surface->w;
+    _titleHeight = surface->h;
+    SDL_FreeSurface(surface);
 }
 
-HeaderView::~HeaderView() {}
+HeaderView::~HeaderView() {
+    if (_titleTexture != NULL) 
+        SDL_DestroyTexture(_titleTexture);
+}
 
 void HeaderView::render(SDL_Rect rect, double dTime) {
-    // Icon
-    SDL_Rect iconFrame = { rect.x + 74, rect.y + 29, 30, 44 };
-    SDL_RenderCopy(SceneDirector::renderer, AssetManager::icon, NULL, &iconFrame);
+    if (_showIcon) {
+        // Icon
+        SDL_Rect iconFrame = { rect.x + 74, rect.y + 29, 30, 44 };
+        SDL_RenderCopy(SceneDirector::renderer, AssetManager::icon, NULL, &iconFrame);
 
-    // Title
-    if (_titleTexture == NULL) {
-        SDL_Surface *surface = TTF_RenderText_Blended(AssetManager::header_font, "SDFiles Updater", AssetManager::text);
-        _titleTexture = SDL_CreateTextureFromSurface(SceneDirector::renderer, surface);
-        _titleWidth = surface->w;
-        _titleHeight = surface->h;
-        SDL_FreeSurface(surface);
+        // Title
+        SDL_Rect titleFrame = { rect.x + 132, rect.y + 36, _titleWidth, _titleHeight };
+        SDL_RenderCopy(SceneDirector::renderer, _titleTexture, NULL, &titleFrame);
+    } else {
+        // Title
+        SDL_Rect titleFrame = { rect.x + 74, rect.y + 36, _titleWidth, _titleHeight };
+        SDL_RenderCopy(SceneDirector::renderer, _titleTexture, NULL, &titleFrame);
     }
-
-    SDL_Rect titleFrame = { rect.x + 132, rect.y + 36, _titleWidth, _titleHeight };
-    SDL_RenderCopy(SceneDirector::renderer, _titleTexture, NULL, &titleFrame);
 
     // Divider
     AssetManager::setRenderColor(AssetManager::header_footer_divider);

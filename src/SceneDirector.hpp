@@ -39,7 +39,7 @@ class SceneDirector {
     public:
         static inline SDL_Window * window = NULL;
         static inline SDL_Renderer * renderer = NULL;
-        static inline Scenes currentScene = SCENE_APP_UPDATE;
+        static inline Scenes currentScene = SCENE_PACKAGE_SELECT;//SCENE_APP_UPDATE;
         static inline bool exitApp = false;
         
         SceneDirector();

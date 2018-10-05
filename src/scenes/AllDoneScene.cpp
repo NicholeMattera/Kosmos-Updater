@@ -20,7 +20,7 @@
 #include "../AssetManager.hpp"
 
 AllDoneScene::AllDoneScene() {
-    _headerView = new HeaderView();
+    _headerView = new HeaderView("SDFiles Updater", true);
     _headerView->frame = { 0, 0, 1280, 88 };
 
     _statusView = new StatusView("SD Files has been updated to version 9.0.4!", "Please restart your Switch to run the latest SD Files.");

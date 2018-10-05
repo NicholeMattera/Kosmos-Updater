@@ -20,9 +20,11 @@
 #include "../ConfigManager.hpp"
 
 PackageSelectScene::PackageSelectScene() {
+    _channelOpen = false;
+    _bundleOpen = false;
     _focusSelection = 0;
 
-    _headerView = new HeaderView();
+    _headerView = new HeaderView("SDFiles Updater", true);
     _headerView->frame = { 0, 0, 1280, 88 };
 
     _installRowView = new ListRowView("Install Latest SDFiles", "", DEFAULT);
@@ -67,12 +69,28 @@ PackageSelectScene::PackageSelectScene() {
     _footerView->actions.push_back(new Action(A_BUTTON, "OK"));
     _footerView->actions.push_back(new Action(B_BUTTON, "Quit"));
 
+    vector<string> channelOptions;
+    channelOptions.push_back("Stable");
+    channelOptions.push_back("Bleeding Edge");
+
+    _channelMultiSelectView = new MultiSelectView("Channel", channelOptions, channel);
+
+    vector<string> bundleOptions;
+    bundleOptions.push_back("SDFiles");
+    bundleOptions.push_back("Hekate");
+    bundleOptions.push_back("Atmosphere");
+    bundleOptions.push_back("ReiNX");
+
+    _bundleMultiSelectView = new MultiSelectView("Bundle", bundleOptions, bundle);
+
     addSubView(_headerView);
     addSubView(_installRowView);
     addSubView(_settingHeaderView);
     addSubView(_channelRowView);
     addSubView(_bundleRowView);
     addSubView(_footerView);
+    addSubView(_channelMultiSelectView);
+    addSubView(_bundleMultiSelectView);
 }
 
 PackageSelectScene::~PackageSelectScene() {
@@ -96,37 +114,105 @@ PackageSelectScene::~PackageSelectScene() {
 }
 
 void PackageSelectScene::handleButton(u32 buttons) {
-    if (buttons & KEY_A) {
-        Mix_PlayChannel(-1, AssetManager::enter, 0);
+    if (_channelOpen) {
+        if (buttons & KEY_A) {
+            Mix_PlayChannel(-1, AssetManager::enter, 0);
 
-        switch(_focusSelection) {
-            case 0:
-                SceneDirector::currentScene = SCENE_PACKAGE_DOWNLOAD;
-                break;
+            _focusSelection = 1;
+            _manageFocus();
 
-            case 1:
-                break;
-            
-            case 2:
-                break;
+            _channelOpen = false;
+            _channelMultiSelectView->hidden = true;
         }
-    }
 
-    if (buttons & KEY_B) {
-        Mix_PlayChannel(-1, AssetManager::back, 0);
-        SceneDirector::exitApp = true;
-    }
+        if (buttons & KEY_B) {
+            Mix_PlayChannel(-1, AssetManager::back, 0);
 
-    if (buttons & KEY_UP && _focusSelection != 0) {
-        Mix_PlayChannel(-1, AssetManager::select, 0);
-        _focusSelection--;
-        _manageFocus();
-    }
+            _focusSelection = 1;
+            _manageFocus();
 
-    if (buttons & KEY_DOWN && _focusSelection != 2) {
-        Mix_PlayChannel(-1, AssetManager::select, 0);
-        _focusSelection++;
-        _manageFocus();
+            _channelOpen = false;
+            _channelMultiSelectView->hidden = true;
+        }
+
+        if (buttons & KEY_UP) {
+            Mix_PlayChannel(-1, AssetManager::select, 0);
+        }
+
+        if (buttons & KEY_DOWN) {
+            Mix_PlayChannel(-1, AssetManager::select, 0);
+        }
+    } else if (_bundleOpen) {
+        if (buttons & KEY_A) {
+            Mix_PlayChannel(-1, AssetManager::enter, 0);
+            
+            _focusSelection = 2;
+            _manageFocus();
+
+            _bundleOpen = false;
+            _bundleMultiSelectView->hidden = true;
+        }
+
+        if (buttons & KEY_B) {
+            Mix_PlayChannel(-1, AssetManager::back, 0);
+
+            _focusSelection = 2;
+            _manageFocus();
+            
+            _bundleOpen = false;
+            _bundleMultiSelectView->hidden = true;
+        }
+
+        if (buttons & KEY_UP) {
+            Mix_PlayChannel(-1, AssetManager::select, 0);
+        }
+
+        if (buttons & KEY_DOWN) {
+            Mix_PlayChannel(-1, AssetManager::select, 0);
+        }
+    } else {
+        if (buttons & KEY_A) {
+            Mix_PlayChannel(-1, AssetManager::enter, 0);
+
+            switch(_focusSelection) {
+                case 0:
+                    SceneDirector::currentScene = SCENE_PACKAGE_DOWNLOAD;
+                    break;
+
+                case 1:
+                    _focusSelection = -1;
+                    _manageFocus();
+
+                    _channelOpen = true;
+                    _channelMultiSelectView->hidden = false;
+                    break;
+                
+                case 2:
+                    _focusSelection = -1;
+                    _manageFocus();
+
+                    _bundleOpen = true;
+                    _bundleMultiSelectView->hidden = false;
+                    break;
+            }
+        }
+
+        if (buttons & KEY_B) {
+            Mix_PlayChannel(-1, AssetManager::back, 0);
+            SceneDirector::exitApp = true;
+        }
+
+        if (buttons & KEY_UP && _focusSelection != 0) {
+            Mix_PlayChannel(-1, AssetManager::select, 0);
+            _focusSelection--;
+            _manageFocus();
+        }
+
+        if (buttons & KEY_DOWN && _focusSelection != 2) {
+            Mix_PlayChannel(-1, AssetManager::select, 0);
+            _focusSelection++;
+            _manageFocus();
+        }
     }
 }
 

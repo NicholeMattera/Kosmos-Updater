@@ -17,20 +17,26 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
 #include "../View.hpp"
-#include "TextView.hpp"
+#include "HeaderView.hpp"
+#include "ListRowView.hpp"
+#include "FooterView.hpp"
 
 using namespace std;
 
-class HeaderView : public View {
+class MultiSelectView : public View {
     public:
-        HeaderView(string title, bool showIcon);
-        ~HeaderView();
+        MultiSelectView(string title, vector<string> options, string selectedOption);
+        ~MultiSelectView();
+
         void render(SDL_Rect rect, double dTime);
 
     private:
-        bool _showIcon;
-        SDL_Texture * _titleTexture;
-        int _titleWidth;
-        int _titleHeight;
+        int _startY;
+
+        HeaderView * _headerView;
+        vector<ListRowView *> _listRowViews;
+        FooterView * _footerView;
 };

@@ -21,7 +21,7 @@
 #include "../FileManager.hpp"
 
 AppUpdateScene::AppUpdateScene() {
-    _headerView = new HeaderView();
+    _headerView = new HeaderView("SDFiles Updater", true);
     _headerView->frame = { 0, 0, 1280, 88 };
 
     _updateView = new UpdateView("Checking for updates to SDFiles Updater...");
