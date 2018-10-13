@@ -107,6 +107,12 @@ PackageSelectScene::~PackageSelectScene() {
     if (_headerView != NULL)
         delete _headerView;
 
+    if (_updateView != NULL)
+        delete _updateView;
+
+    if (_statusView != NULL)
+        delete _statusView;
+
     if (_installRowView != NULL)
         delete _installRowView;
 
@@ -119,16 +125,17 @@ PackageSelectScene::~PackageSelectScene() {
     if (_bundleRowView != NULL)
         delete _bundleRowView;
 
+    if (_footerView != NULL)
+        delete _footerView;
+
     if (_channelMultiSelectView != NULL)
         delete _channelMultiSelectView;
 
     if (_bundleMultiSelectView != NULL)
         delete _bundleMultiSelectView;
 
-    if (_footerView != NULL)
-    _footerView->actions.push_back(new Action(A_BUTTON, "Quit"));
-    _footerView->actions.push_back(new Action(A_BUTTON, "Quit"));
-        delete _footerView;
+    if (_versionRequest != NULL)
+        delete _versionRequest;
 }
 
 void PackageSelectScene::handleButton(u32 buttons) {

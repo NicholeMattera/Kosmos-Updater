@@ -46,7 +46,6 @@ SceneDirector::SceneDirector() {
     _appUpdateScene = NULL;
     _packageSelectScene = NULL;
     _packageDownloadScene = NULL;
-    _allDoneScene = NULL;
     _currentScene = NULL;
 }
 
@@ -60,18 +59,23 @@ SceneDirector::~SceneDirector() {
     if (_packageSelectScene != NULL)
         delete _packageSelectScene;
 
+    if (_packageDownloadScene != NULL)
+        delete _packageDownloadScene;
+
+    Mix_HaltChannel(-1);
+    Mix_CloseAudio();
+    Mix_Quit();
+    TTF_Quit();
+
     if (SceneDirector::renderer != NULL)
         SDL_DestroyRenderer(SceneDirector::renderer);
 
     if (SceneDirector::window != NULL)
         SDL_DestroyWindow(SceneDirector::window);
 
-    Mix_HaltChannel(-1);
-    Mix_CloseAudio();
-    Mix_Quit();
-    TTF_Quit();
     IMG_Quit();
     SDL_Quit();
+
     plExit();
     setsysExit();
     romfsExit();
@@ -111,25 +115,6 @@ bool SceneDirector::direct() {
             }
             break;
 
-
-        case SCENE_ALL_DONE:
-            if (_appUpdateScene != NULL) {
-                delete _appUpdateScene;
-                _appUpdateScene = NULL;
-            }
-
-            if (_packageSelectScene != NULL) {
-                delete _packageSelectScene;
-                _packageSelectScene = NULL;
-            }
-
-            if (_packageDownloadScene != NULL) {
-                delete _packageDownloadScene;
-                _packageDownloadScene = NULL;
-            }
-
-            break;
-
         default:
             /* Do Nothing */
             break;
@@ -156,13 +141,6 @@ bool SceneDirector::direct() {
                 _packageDownloadScene = new PackageDownloadScene();
             
             _currentScene = _packageDownloadScene;
-            break;
-
-        case SCENE_ALL_DONE:
-            if (_allDoneScene == NULL)
-                _allDoneScene = new AllDoneScene();
-            
-            _currentScene = _allDoneScene;
             break;
     }
 

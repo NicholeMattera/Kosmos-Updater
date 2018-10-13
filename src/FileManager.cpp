@@ -55,5 +55,3 @@ bool FileManager::fileExists(string filename) {
 
     return false;
 }
-
-// This is the alert system

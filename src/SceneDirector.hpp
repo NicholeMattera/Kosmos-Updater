@@ -24,13 +24,11 @@
 #include "scenes/AppUpdateScene.hpp"
 #include "scenes/PackageSelectScene.hpp"
 #include "scenes/PackageDownloadScene.hpp"
-#include "scenes/AllDoneScene.hpp"
 
 typedef enum {
     SCENE_APP_UPDATE,
     SCENE_PACKAGE_SELECT,
-    SCENE_PACKAGE_DOWNLOAD,
-    SCENE_ALL_DONE
+    SCENE_PACKAGE_DOWNLOAD
 } Scenes;
 
 using namespace std;
@@ -55,5 +53,4 @@ class SceneDirector {
         AppUpdateScene * _appUpdateScene;
         PackageSelectScene * _packageSelectScene;
         PackageDownloadScene * _packageDownloadScene;
-        AllDoneScene * _allDoneScene;
 };

@@ -58,12 +58,15 @@ AppUpdateScene::~AppUpdateScene() {
     if (_updateView != NULL)
         delete _updateView;
 
+    if (_statusView != NULL)
+        delete _statusView;
+
     if (_footerView != NULL)
         delete _footerView;
 }
 
 void AppUpdateScene::handleButton(u32 buttons) {
-    if (_updateView->hidden && buttons & KEY_A) {
+    if (!_statusView->hidden && buttons & KEY_A) {
         SceneDirector::exitApp = true;
     }
 }

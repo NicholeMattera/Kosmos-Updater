@@ -48,9 +48,9 @@ int main(int argc, char **argv)
             break;
     }
 
-    ConfigManager::dealloc();
     AssetManager::dealloc();
     NetManager::dealloc();
+    ConfigManager::dealloc();
     delete sceneDirector;
 
     return 0;

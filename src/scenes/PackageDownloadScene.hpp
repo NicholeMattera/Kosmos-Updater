@@ -18,8 +18,10 @@
 #pragma once
 
 #include "../Scene.hpp"
+#include "../models/NetRequest.hpp"
 #include "../views/HeaderView.hpp"
 #include "../views/UpdateView.hpp"
+#include "../views/StatusView.hpp"
 #include "../views/FooterView.hpp"
 
 class PackageDownloadScene : public Scene {
@@ -31,7 +33,13 @@ class PackageDownloadScene : public Scene {
         void render(SDL_Rect rect, double dTime);
 
     private:
+        NetRequest * _packageRequest;
+
         HeaderView * _headerView;
         UpdateView * _updateView;
+        StatusView * _statusView;
         FooterView * _footerView;
+
+        void _updatePackageRequest();
+        void _showStatus(string text, string subtext);
 };
