@@ -144,7 +144,7 @@ void AppUpdateScene::_updateAppRequest() {
 
 void AppUpdateScene::_showStatus(string text, string subtext) {
     _statusView->setText(text);
-    _statusView->setSubtext(text);
+    _statusView->setSubtext(subtext);
 
     _updateView->hidden = true;
     _statusView->hidden = false;

@@ -50,9 +50,6 @@ SceneDirector::SceneDirector() {
 }
 
 SceneDirector::~SceneDirector() {
-    if (_allDoneScene != NULL)
-        delete _allDoneScene;
-
     if (_appUpdateScene != NULL)
         delete _appUpdateScene;
 

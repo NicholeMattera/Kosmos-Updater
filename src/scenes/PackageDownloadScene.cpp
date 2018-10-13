@@ -45,6 +45,7 @@ PackageDownloadScene::PackageDownloadScene() {
     string bundle = ConfigManager::getBundle();
     string channel = ConfigManager::getChannel();
     _packageRequest = NetManager::getLatestSDFiles(bundle, channel);
+    _packageUnzip = NULL;
 }
 
 PackageDownloadScene::~PackageDownloadScene() {
@@ -62,6 +63,9 @@ PackageDownloadScene::~PackageDownloadScene() {
 
     if (_packageRequest != NULL)
         delete _packageRequest;
+
+    if (_packageUnzip != NULL)
+        delete _packageUnzip;
 }
 
 void PackageDownloadScene::handleButton(u32 buttons) {
@@ -74,8 +78,8 @@ void PackageDownloadScene::render(SDL_Rect rect, double dTime) {
     if (_packageRequest != NULL) {
         _updatePackageRequest();
     }
-    else {
-        // Update Unzip???
+    else if (_packageUnzip != NULL) {
+        _updatePackageUnzip();
     }
 
     Scene::render(rect, dTime);
@@ -89,11 +93,14 @@ void PackageDownloadScene::_updatePackageRequest() {
         FileManager::writeFile("temp.zip", _packageRequest);
 
         _showStatus("SD Files has been updated to version 9.0.4!", "Please restart your Switch to run the latest SD Files.");
+        
+        // _updateView->setText("Extracting the latest SDFiles...");
+        // _updateView->setProgress(0);
+
+        // _packageUnzip = FileManager::unzipArchive("temp.zip", "sdmc:");
 
         delete _packageRequest;
         _packageRequest = NULL;
-        // TODO: Extract temp file.
-        // TODO: Delete temp file.
     }
     else if (_packageRequest->hasError) {
         _showStatus(_packageRequest->errorMessage, "Please restart the app to try again.");
@@ -106,9 +113,34 @@ void PackageDownloadScene::_updatePackageRequest() {
         mutexUnlock(&_packageRequest->mutexRequest);
 }
 
+void PackageDownloadScene::_updatePackageUnzip() {
+    mutexLock(&_packageUnzip->mutexRequest);
+
+    _updateView->setProgress(_packageUnzip->progress);
+    if (_packageUnzip->isComplete) {
+        // TODO: Delete temp.zip
+
+        _showStatus("SD Files has been updated to version 9.0.4!", "Please restart your Switch to run the latest SD Files.");
+
+        delete _packageUnzip;
+        _packageUnzip = NULL;
+    }
+    else if (_packageUnzip->hasError) {
+        // TODO: Delete temp.zip
+
+        _showStatus(_packageUnzip->errorMessage, "Please restart the app to try again.");
+
+        delete _packageUnzip;
+        _packageUnzip = NULL;
+    }
+
+    if (_packageUnzip != NULL)
+        mutexUnlock(&_packageUnzip->mutexRequest);
+}
+
 void PackageDownloadScene::_showStatus(string text, string subtext) {
     _statusView->setText(text);
-    _statusView->setSubtext(text);
+    _statusView->setSubtext(subtext);
 
     _updateView->hidden = true;
     _statusView->hidden = false;

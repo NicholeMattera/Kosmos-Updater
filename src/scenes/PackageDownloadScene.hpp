@@ -19,6 +19,7 @@
 
 #include "../Scene.hpp"
 #include "../models/NetRequest.hpp"
+#include "../models/Unzip.hpp"
 #include "../views/HeaderView.hpp"
 #include "../views/UpdateView.hpp"
 #include "../views/StatusView.hpp"
@@ -34,6 +35,7 @@ class PackageDownloadScene : public Scene {
 
     private:
         NetRequest * _packageRequest;
+        Unzip * _packageUnzip;
 
         HeaderView * _headerView;
         UpdateView * _updateView;
@@ -41,5 +43,6 @@ class PackageDownloadScene : public Scene {
         FooterView * _footerView;
 
         void _updatePackageRequest();
+        void _updatePackageUnzip();
         void _showStatus(string text, string subtext);
 };
