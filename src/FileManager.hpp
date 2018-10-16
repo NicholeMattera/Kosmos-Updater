@@ -20,8 +20,7 @@
 #include <string>
 #include <vector>
 #include "models/NetRequest.hpp"
-#include "models/Unzip.hpp"
-#include "minizip/unzip.h"
+#include "models/Tar.hpp"
 
 using namespace std;
 
@@ -32,14 +31,12 @@ class FileManager {
         static bool deleteFile(string filename);
         static bool fileExists(string filename);
         static bool createSubfolder(string path);
-        static Unzip * unzipArchive(string filename, string dest);
+        static void extract(Tar * tar);
 
     private:
         static inline vector<Thread> _threads;
 
         static Result _createThread(ThreadFunc func, void* ptr);
-        static void _unzip(void * ptr);
-        static unz_file_info_s * _getFileInfo(unzFile unz);
-        static std::string _getFullFileName(unzFile unz, unz_file_info_s * fileInfo);
-        static int Extract(const char * path, unzFile unz, unz_file_info_s * fileInfo);
+        static void _extract(void * ptr);
+        static bool _makeDirectoryParents(string path);
 };

@@ -44,8 +44,9 @@ PackageDownloadScene::PackageDownloadScene() {
 
     string bundle = ConfigManager::getBundle();
     string channel = ConfigManager::getChannel();
+    
     _packageRequest = NetManager::getLatestSDFiles(bundle, channel);
-    _packageUnzip = NULL;
+    _packageExtract = NULL;
 }
 
 PackageDownloadScene::~PackageDownloadScene() {
@@ -64,8 +65,8 @@ PackageDownloadScene::~PackageDownloadScene() {
     if (_packageRequest != NULL)
         delete _packageRequest;
 
-    if (_packageUnzip != NULL)
-        delete _packageUnzip;
+    if (_packageExtract != NULL)
+        delete _packageExtract;
 }
 
 void PackageDownloadScene::handleButton(u32 buttons) {
@@ -78,8 +79,8 @@ void PackageDownloadScene::render(SDL_Rect rect, double dTime) {
     if (_packageRequest != NULL) {
         _updatePackageRequest();
     }
-    else if (_packageUnzip != NULL) {
-        _updatePackageUnzip();
+    else if (_packageExtract != NULL) {
+        _updatePackageExtract();
     }
 
     Scene::render(rect, dTime);
@@ -92,12 +93,11 @@ void PackageDownloadScene::_updatePackageRequest() {
     if (_packageRequest->isComplete) {
         FileManager::writeFile("temp.zip", _packageRequest);
 
-        _showStatus("SD Files has been updated to version 9.0.4!", "Please restart your Switch to run the latest SD Files.");
-        
-        // _updateView->setText("Extracting the latest SDFiles...");
-        // _updateView->setProgress(0);
+        _updateView->setText("Extracting the latest SDFiles...");
+        _updateView->setProgress(0);
 
-        // _packageUnzip = FileManager::unzipArchive("temp.zip", "sdmc:");
+        _packageExtract = new Tar("temp.tar", "sdmc:/");
+        FileManager::extract(_packageExtract);
 
         delete _packageRequest;
         _packageRequest = NULL;
@@ -113,29 +113,29 @@ void PackageDownloadScene::_updatePackageRequest() {
         mutexUnlock(&_packageRequest->mutexRequest);
 }
 
-void PackageDownloadScene::_updatePackageUnzip() {
-    mutexLock(&_packageUnzip->mutexRequest);
+void PackageDownloadScene::_updatePackageExtract() {
+    mutexLock(&_packageExtract->mutexRequest);
 
-    _updateView->setProgress(_packageUnzip->progress);
-    if (_packageUnzip->isComplete) {
-        // TODO: Delete temp.zip
+    _updateView->setProgress(_packageExtract->progress);
+    if (_packageExtract->isComplete) {
+        FileManager::deleteFile("temp.tar");
 
         _showStatus("SD Files has been updated to version 9.0.4!", "Please restart your Switch to run the latest SD Files.");
 
-        delete _packageUnzip;
-        _packageUnzip = NULL;
+        delete _packageExtract;
+        _packageExtract = NULL;
     }
-    else if (_packageUnzip->hasError) {
-        // TODO: Delete temp.zip
+    else if (_packageExtract->hasError) {
+        FileManager::deleteFile("temp.tar");
 
-        _showStatus(_packageUnzip->errorMessage, "Please restart the app to try again.");
+        _showStatus(_packageExtract->errorMessage, "Please restart the app to try again.");
 
-        delete _packageUnzip;
-        _packageUnzip = NULL;
+        delete _packageExtract;
+        _packageExtract = NULL;
     }
 
-    if (_packageUnzip != NULL)
-        mutexUnlock(&_packageUnzip->mutexRequest);
+    if (_packageExtract != NULL)
+        mutexUnlock(&_packageExtract->mutexRequest);
 }
 
 void PackageDownloadScene::_showStatus(string text, string subtext) {

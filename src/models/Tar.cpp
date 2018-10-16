@@ -15,26 +15,25 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#pragma once
+#include <string.h>
+#include "Tar.hpp"
 
-#include <switch.h>
-#include <string>
+Tar::Tar(string filename, string dest) {
+    mutexInit(&mutexRequest);
 
-using namespace std;
+    _filename = filename;
+    _dest = dest;
 
-class Unzip {
-    public:
-        Mutex mutexRequest;
-        double progress;
-        bool isComplete;
-        bool hasError;
-        string errorMessage;
+    progress = 0.f;
+    isComplete = false;
+    hasError = false;
+    errorMessage = "";
+}
 
-        Unzip(string filename, string dest);
-        string getFilename();
-        string getDestination();
+string Tar::getFilename() {
+    return _filename;
+}
 
-    private:
-        string _filename;
-        string _dest;
-};
+string Tar::getDestination() {
+    return _dest;
+}
