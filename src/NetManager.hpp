@@ -44,4 +44,5 @@ class NetManager {
         static void _request(void * ptr);
         static int _progressFunction(void *ptr, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
         static size_t _writeFunction(void *contents, size_t size, size_t nmemb, void * ptr);
+        static size_t _headerFunction(void *contents, size_t size, size_t nmemb, void * ptr);
 };
