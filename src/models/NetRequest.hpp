@@ -29,6 +29,9 @@ class NetRequest {
         bool isComplete;
         bool hasError;
         string errorMessage;
+    
+        string bundle;
+        string channel;
 
         NetRequest(string method, string url);
         ~NetRequest();
