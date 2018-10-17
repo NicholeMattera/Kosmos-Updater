@@ -30,6 +30,8 @@ NetRequest::NetRequest(string method, string url) {
     isComplete = false;
     hasError = false;
     errorMessage = "";
+    bundle = "";
+    channel = "";
 }
 
 NetRequest::~NetRequest() {
