@@ -25,6 +25,8 @@ NetRequest::NetRequest(string method, string url) {
     _url = url;
     _size = 0;
     _data = (char *) malloc(1);
+    _headerSize = 0;
+    _headerData = (char *) malloc(1);
 
     progress = 0.f;
     isComplete = false;
@@ -36,6 +38,7 @@ NetRequest::NetRequest(string method, string url) {
 
 NetRequest::~NetRequest() {
     free(_data);
+    free(_headerData);
 }
 
 string NetRequest::getMethod() {
@@ -46,12 +49,20 @@ string NetRequest::getURL() {
     return _url;
 }
 
+size_t NetRequest::getSize() {
+    return _size;
+}
+
 char * NetRequest::getData() {
     return _data;
 }
 
-size_t NetRequest::getSize() {
-    return _size;
+size_t NetRequest::getHeaderSize() {
+    return _headerSize;
+}
+
+char * NetRequest::getHeaderData() {
+    return _headerData;
 }
 
 size_t NetRequest::appendData(void *contents, size_t size, size_t nmemb) {
@@ -68,6 +79,26 @@ size_t NetRequest::appendData(void *contents, size_t size, size_t nmemb) {
     memcpy(&(_data[_size]), contents, realsize);
     _size += realsize;
     _data[_size] = 0;
+
+    mutexUnlock(&mutexRequest);
+
+    return realsize;
+}
+
+size_t NetRequest::appendHeaderData(void *contents, size_t size, size_t nmemb) {
+    size_t realsize = size * nmemb;
+    mutexLock(&mutexRequest);
+
+    _headerData = (char *) realloc(_headerData, _headerSize + realsize + 1);
+    if (_headerData == NULL) {
+        hasError = true;
+        errorMessage = "Not enough memory.";
+        return 0;
+    }
+
+    memcpy(&(_headerData[_headerSize]), contents, realsize);
+    _headerSize += realsize;
+    _headerData[_headerSize] = 0;
 
     mutexUnlock(&mutexRequest);
 
