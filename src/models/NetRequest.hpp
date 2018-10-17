@@ -40,10 +40,12 @@ class NetRequest {
         char * getData();
         size_t getSize();
         size_t appendData(void *contents, size_t size, size_t nmemb);
+        size_t appendHeaderData(void *contents, size_t size, size_t nmemb);
 
     private:
         string _method;
         string _url;
         size_t _size;
         char * _data;
+        char * _headerData;
 };
