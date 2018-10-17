@@ -108,6 +108,8 @@ void NetManager::_request(void * ptr) {
         
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, request->getMethod().c_str());
+        curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION , _headerFunction);
+        curl_easy_setopt(curl, CURLOPT_HEADERDATA, (void *) request);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, _writeFunction);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) request);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, _progressFunction);
@@ -149,4 +151,9 @@ int NetManager::_progressFunction(void *ptr, curl_off_t dltotal, curl_off_t dlno
 size_t NetManager::_writeFunction(void *contents, size_t size, size_t nmemb, void * ptr) {
     NetRequest * request = (NetRequest *) ptr;
     return request->appendData(contents, size, nmemb);
+}
+
+size_t NetManager::_headerFunction(void *contents, size_t size, size_t nmemb, void * ptr) {
+    NetRequest * request = (NetRequest *) ptr;
+    return request->appendHeaderData(contents, size, nmemb);
 }
