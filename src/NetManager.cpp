@@ -41,25 +41,28 @@ void NetManager::dealloc() {
 }
 
 NetRequest * NetManager::getLatestAppVersion() {
-    NetRequest * request = new NetRequest("GET", _hostname + "/" + API_VERSION + "/app-version-number");
+    NetRequest * request = new NetRequest("GET", _hostname + "/" + API_VERSION + "/app/version-number");
     _createThread(_request, request);
     return request;
 }
 
 NetRequest * NetManager::getLatestApp() {
-    NetRequest * request = new NetRequest("GET", _hostname + "/" + API_VERSION + "/app-download");
+    NetRequest * request = new NetRequest("GET", _hostname + "/" + API_VERSION + "/app");
     _createThread(_request, request);
     return request;
 }
 
 NetRequest * NetManager::getLatestSDFilesVersion(string channel) {
-    NetRequest * request = new NetRequest("GET", _hostname + "/" + API_VERSION + "/version-number/" + channel);
+    NetRequest * request = new NetRequest("GET", _hostname + "/" + API_VERSION + "/package/version-number");
+    request->channel = channel;
     _createThread(_request, request);
     return request;
 }
 
 NetRequest * NetManager::getLatestSDFiles(string bundle, string channel) {
-    NetRequest * request = new NetRequest("GET", _hostname + "/" + API_VERSION + "/download/" + bundle + "/" + channel);
+    NetRequest * request = new NetRequest("GET", _hostname + "/" + API_VERSION + "/package");
+    request->bundle = bundle;
+    request->channel = channel;
     _createThread(_request, request);
     return request;
 }
@@ -87,7 +90,23 @@ void NetManager::_request(void * ptr) {
     curl = curl_easy_init();
 
     if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, request->getURL().c_str());
+        string url = request->getURL();
+        if (request->bundle != "" || request->channel != "") {
+            url += "?";
+            if (request->bundle != "") {
+                url += "bundle=" + string(curl_easy_escape(curl, request->bundle.c_str(), 0));
+                
+                if (request->channel != "") {
+                    url += "&"
+                }
+            }
+            
+            if (request->channel != "") {
+                url += "channel=" + string(curl_easy_escape(curl, request->channel.c_str(), 0));
+            }
+        }
+        
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, request->getMethod().c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, _writeFunction);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) request);
