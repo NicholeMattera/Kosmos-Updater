@@ -97,7 +97,7 @@ void NetManager::_request(void * ptr) {
                 url += "bundle=" + string(curl_easy_escape(curl, request->bundle.c_str(), 0));
                 
                 if (request->channel != "") {
-                    url += "&"
+                    url += "&";
                 }
             }
             
