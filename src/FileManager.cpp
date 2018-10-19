@@ -29,17 +29,19 @@ void FileManager::dealloc() {
 }
 
 bool FileManager::writeFile(string filename, NetRequest * request) {
-    deleteFile(filename);
+    if (!deleteFile(filename)) {
+        printf("Unable to delete file.");
+    }
 
     FILE * file = fopen(filename.c_str(), "wb");
     if (!file) {
+        printf("Unable to open file.");
         return false;
     }
 
     size_t result = fwrite(request->getData(), sizeof(char), request->getSize(), file);
 
     fflush(file);
-    fsync(fileno(file));
     fclose(file);
 
     return (result == request->getSize());
@@ -58,7 +60,6 @@ bool FileManager::fileExists(string filename) {
 
     if (file) {
         fflush(file);
-        fsync(fileno(file));
         fclose(file);
         return true;
     }
@@ -124,7 +125,13 @@ void FileManager::_extract(void * ptr) {
 
     mtar_open(&tar, tarObj->getFilename().c_str(), "r");
 
+    int i = 0;
+    int numberOfFiles = tarObj->getNumberOfFiles();
     while ((mtar_read_header(&tar, &h)) != MTAR_ENULLRECORD) {
+        mutexLock(&tarObj->mutexRequest);
+        tarObj->progress = (i <= numberOfFiles) ? ((double) i / (double) numberOfFiles) : 1;
+        mutexUnlock(&tarObj->mutexRequest);
+
         string path = tarObj->getDestination() + string(h.name);
 
         // Is the path just a directory?
@@ -160,10 +167,11 @@ void FileManager::_extract(void * ptr) {
         fwrite(buffer, 1, h.size, fp);
 
         fflush(fp);
-        fsync(fileno(fp));
         fclose(fp);
         free(buffer);
         mtar_next(&tar);
+
+        i++;
     }
 
     mtar_close(&tar);

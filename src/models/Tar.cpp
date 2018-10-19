@@ -18,11 +18,12 @@
 #include <string.h>
 #include "Tar.hpp"
 
-Tar::Tar(string filename, string dest) {
+Tar::Tar(string filename, string dest, int numberOfFiles) {
     mutexInit(&mutexRequest);
 
     _filename = filename;
     _dest = dest;
+    _numberOfFiles = numberOfFiles;
 
     progress = 0.f;
     isComplete = false;
@@ -36,4 +37,8 @@ string Tar::getFilename() {
 
 string Tar::getDestination() {
     return _dest;
+}
+
+int Tar::getNumberOfFiles() {
+    return _numberOfFiles;
 }

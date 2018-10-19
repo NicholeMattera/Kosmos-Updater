@@ -27,6 +27,8 @@ NetRequest::NetRequest(string method, string url) {
     _data = (char *) malloc(1);
     _headerSize = 0;
     _headerData = (char *) malloc(1);
+    _versionNumber = "";
+    _numberOfFiles = "";
 
     progress = 0.f;
     isComplete = false;
@@ -57,12 +59,12 @@ char * NetRequest::getData() {
     return _data;
 }
 
-size_t NetRequest::getHeaderSize() {
-    return _headerSize;
+string NetRequest::getVersionNumber() {
+    return _versionNumber;
 }
 
-char * NetRequest::getHeaderData() {
-    return _headerData;
+string NetRequest::getNumberOfFiles() {
+    return _numberOfFiles;
 }
 
 size_t NetRequest::appendData(void *contents, size_t size, size_t nmemb) {
@@ -99,6 +101,29 @@ size_t NetRequest::appendHeaderData(void *contents, size_t size, size_t nmemb) {
     memcpy(&(_headerData[_headerSize]), contents, realsize);
     _headerSize += realsize;
     _headerData[_headerSize] = 0;
+
+    if (_versionNumber == "" || _numberOfFiles == "") {
+        string headers = string(_headerData);
+        if (_versionNumber == "") {
+            size_t versionNumberPos = headers.find("X-Version-Number");
+            if (versionNumberPos != string::npos) {
+                size_t colonPos = headers.find(":", versionNumberPos);
+                size_t endOfLine = headers.find("\r\n", colonPos);
+
+                _versionNumber = headers.substr(colonPos + 2, endOfLine - (colonPos + 2));
+            }
+        }
+
+        if (_numberOfFiles == "") {
+            size_t numberOfFilesPos = headers.find("X-Number-Of-Files");
+            if (numberOfFilesPos != string::npos) {
+                size_t colonPos = headers.find(":", numberOfFilesPos);
+                size_t endOfLine = headers.find("\r\n", colonPos);
+
+                _numberOfFiles = headers.substr(colonPos + 2, endOfLine - (colonPos + 2));
+            }
+        }
+    }
 
     mutexUnlock(&mutexRequest);
 

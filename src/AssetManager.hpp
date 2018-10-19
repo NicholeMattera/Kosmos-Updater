@@ -20,7 +20,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_mixer.h>
 #include <string>
 #include <switch.h>
 
@@ -64,11 +63,6 @@ class AssetManager {
         static inline PlFontData extendedFontData;
         static inline TTF_Font * button_font = NULL;
         static inline TTF_Font * large_button_font = NULL;
- 
-        /* Sounds */
-        static inline Mix_Chunk * enter = NULL;
-        static inline Mix_Chunk * back = NULL;
-        static inline Mix_Chunk * select = NULL;
 
         static bool initialize();
         static void dealloc();

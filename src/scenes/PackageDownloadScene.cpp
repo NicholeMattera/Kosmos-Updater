@@ -91,16 +91,18 @@ void PackageDownloadScene::_updatePackageRequest() {
 
     _updateView->setProgress(_packageRequest->progress);
     if (_packageRequest->isComplete) {
-        FileManager::writeFile("temp.zip", _packageRequest);
+        FileManager::writeFile("temp.tar", _packageRequest);
+        _versionNumber = _packageRequest->getVersionNumber();
+        string numberOfFiles = _packageRequest->getNumberOfFiles();
+
+        delete _packageRequest;
+        _packageRequest = NULL;
 
         _updateView->setText("Extracting the latest SDFiles...");
         _updateView->setProgress(0);
 
-        _packageExtract = new Tar("temp.tar", "sdmc:/");
+        _packageExtract = new Tar("temp.tar", "sdmc:/", stoi(numberOfFiles));
         FileManager::extract(_packageExtract);
-
-        delete _packageRequest;
-        _packageRequest = NULL;
     }
     else if (_packageRequest->hasError) {
         _showStatus(_packageRequest->errorMessage, "Please restart the app to try again.");
@@ -118,12 +120,13 @@ void PackageDownloadScene::_updatePackageExtract() {
 
     _updateView->setProgress(_packageExtract->progress);
     if (_packageExtract->isComplete) {
-        FileManager::deleteFile("temp.tar");
-
-        _showStatus("SD Files has been updated to version 9.0.4!", "Please restart your Switch to run the latest SD Files.");
-
         delete _packageExtract;
         _packageExtract = NULL;
+
+        FileManager::deleteFile("temp.tar");
+        ConfigManager::setCurrentVersion(_versionNumber);
+
+        _showStatus("SD Files has been updated to version " + _versionNumber + "!", "Please restart your Switch to run the latest SD Files.");
     }
     else if (_packageExtract->hasError) {
         FileManager::deleteFile("temp.tar");

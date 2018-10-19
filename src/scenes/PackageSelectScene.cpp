@@ -145,8 +145,6 @@ void PackageSelectScene::handleButton(u32 buttons) {
         _handleButtonsForBundleMutliSelect(buttons);
     } else if (_versionRequest == NULL) {
         if (buttons & KEY_A) {
-            Mix_PlayChannel(-1, AssetManager::enter, 0);
-
             switch(_focusSelection) {
                 case 0:
                     SceneDirector::currentScene = SCENE_PACKAGE_DOWNLOAD;
@@ -171,18 +169,15 @@ void PackageSelectScene::handleButton(u32 buttons) {
         }
 
         if (buttons & KEY_B) {
-            Mix_PlayChannel(-1, AssetManager::back, 0);
             SceneDirector::exitApp = true;
         }
 
         if (buttons & KEY_UP && _focusSelection != 0) {
-            Mix_PlayChannel(-1, AssetManager::select, 0);
             _focusSelection--;
             _manageFocus();
         }
 
         if (buttons & KEY_DOWN && _focusSelection != 2) {
-            Mix_PlayChannel(-1, AssetManager::select, 0);
             _focusSelection++;
             _manageFocus();
         }
@@ -314,8 +309,6 @@ void PackageSelectScene::_manageFocus() {
 
 void PackageSelectScene::_handleButtonsForChannelMutliSelect(u32 buttons) {
     if (buttons & KEY_A) {
-        Mix_PlayChannel(-1, AssetManager::enter, 0);
-
         _focusSelection = 1;
         _manageFocus();
 
@@ -339,8 +332,6 @@ void PackageSelectScene::_handleButtonsForChannelMutliSelect(u32 buttons) {
     }
 
     if (buttons & KEY_B) {
-        Mix_PlayChannel(-1, AssetManager::back, 0);
-
         _focusSelection = 1;
         _manageFocus();
 
@@ -349,19 +340,17 @@ void PackageSelectScene::_handleButtonsForChannelMutliSelect(u32 buttons) {
         _channelMultiSelectView->reset(_channelSelected);
     }
 
-    if (buttons & KEY_UP && _channelMultiSelectView->goUp()) {
-        Mix_PlayChannel(-1, AssetManager::select, 0);
+    if (buttons & KEY_UP) {
+        _channelMultiSelectView->goUp();
     }
 
-    if (buttons & KEY_DOWN && _channelMultiSelectView->goDown()) {
-        Mix_PlayChannel(-1, AssetManager::select, 0);
+    if (buttons & KEY_DOWN) {
+        _channelMultiSelectView->goDown();
     }
 }
 
 void PackageSelectScene::_handleButtonsForBundleMutliSelect(u32 buttons) {
     if (buttons & KEY_A) {
-        Mix_PlayChannel(-1, AssetManager::enter, 0);
-        
         _focusSelection = 2;
         _manageFocus();
 
@@ -389,8 +378,6 @@ void PackageSelectScene::_handleButtonsForBundleMutliSelect(u32 buttons) {
     }
 
     if (buttons & KEY_B) {
-        Mix_PlayChannel(-1, AssetManager::back, 0);
-
         _focusSelection = 2;
         _manageFocus();
         
@@ -399,12 +386,12 @@ void PackageSelectScene::_handleButtonsForBundleMutliSelect(u32 buttons) {
         _bundleMultiSelectView->reset(_bundleSelected);
     }
 
-    if (buttons & KEY_UP && _bundleMultiSelectView->goUp()) {
-        Mix_PlayChannel(-1, AssetManager::select, 0);
+    if (buttons & KEY_UP) {
+        _bundleMultiSelectView->goUp();
     }
 
-    if (buttons & KEY_DOWN && _bundleMultiSelectView->goDown()) {
-        Mix_PlayChannel(-1, AssetManager::select, 0);
+    if (buttons & KEY_DOWN) {
+        _bundleMultiSelectView->goDown();
     }
 }
 

@@ -98,11 +98,11 @@ void AppUpdateScene::_updateVersionRequest() {
             }
             // Update
             else {
-                _updateView->setProgress(0);
-                _updateView->setText("Getting the latest version of SDFiles Updater...");
-
                 delete _versionRequest;
                 _versionRequest = NULL;
+
+                _updateView->setProgress(0);
+                _updateView->setText("Getting the latest version of SDFiles Updater...");
 
                 _appRequest = NetManager::getLatestApp();
             }
@@ -124,12 +124,13 @@ void AppUpdateScene::_updateAppRequest() {
     
     _updateView->setProgress(_appRequest->progress);
     if (_appRequest->isComplete) {
+        romfsExit();
         FileManager::writeFile("SDFilesUpdater.nro", _appRequest);
-
-        _showStatus("SDFiles Updater has been updated to version " + _latestAppVersion + "!", "Please restart the app to update your files.");
 
         delete _appRequest;
         _appRequest = NULL;
+
+        _showStatus("SDFiles Updater has been updated to version " + _latestAppVersion + "!", "Please restart the app to update your files.");
     }
     else if (_appRequest->hasError) {
         _showStatus(_appRequest->errorMessage, "Please restart the app to try again.");

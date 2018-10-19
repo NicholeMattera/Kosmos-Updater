@@ -30,11 +30,13 @@ class Tar {
         bool hasError;
         string errorMessage;
 
-        Tar(string filename, string dest);
+        Tar(string filename, string dest, int numberOfFiles);
         string getFilename();
         string getDestination();
+        int getNumberOfFiles();
 
     private:
         string _filename;
         string _dest;
+        int _numberOfFiles;
 };

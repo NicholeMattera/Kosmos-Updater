@@ -36,6 +36,7 @@ class PackageDownloadScene : public Scene {
     private:
         NetRequest * _packageRequest;
         Tar * _packageExtract;
+        string _versionNumber;
 
         HeaderView * _headerView;
         UpdateView * _updateView;

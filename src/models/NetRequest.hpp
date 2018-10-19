@@ -39,8 +39,8 @@ class NetRequest {
         string getURL();
         size_t getSize();
         char * getData();
-        size_t getHeaderSize();
-        char * getHeaderData();
+        string getVersionNumber();
+        string getNumberOfFiles();
         size_t appendData(void *contents, size_t size, size_t nmemb);
         size_t appendHeaderData(void *contents, size_t size, size_t nmemb);
 
@@ -51,4 +51,7 @@ class NetRequest {
         char * _data;
         size_t _headerSize;
         char * _headerData;
+
+        string _versionNumber;
+        string _numberOfFiles;
 };
