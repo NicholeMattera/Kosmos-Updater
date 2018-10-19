@@ -24,7 +24,9 @@ using namespace std;
 
 class NetRequest {
     public:
+        Thread thread;
         Mutex mutexRequest;
+        
         double progress;
         bool isComplete;
         bool hasError;

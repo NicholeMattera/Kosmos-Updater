@@ -24,13 +24,16 @@ using namespace std;
 
 class Tar {
     public:
+        Thread thread;
         Mutex mutexRequest;
+
         double progress;
         bool isComplete;
         bool hasError;
         string errorMessage;
 
         Tar(string filename, string dest, int numberOfFiles);
+        ~Tar();
         string getFilename();
         string getDestination();
         int getNumberOfFiles();

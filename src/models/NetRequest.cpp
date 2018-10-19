@@ -41,6 +41,9 @@ NetRequest::NetRequest(string method, string url) {
 NetRequest::~NetRequest() {
     free(_data);
     free(_headerData);
+
+    threadWaitForExit(&thread);
+    threadClose(&thread);
 }
 
 string NetRequest::getMethod() {

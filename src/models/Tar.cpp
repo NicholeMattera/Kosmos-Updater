@@ -31,6 +31,11 @@ Tar::Tar(string filename, string dest, int numberOfFiles) {
     errorMessage = "";
 }
 
+Tar::~Tar() {
+    threadWaitForExit(&thread);
+    threadClose(&thread);
+}
+
 string Tar::getFilename() {
     return _filename;
 }

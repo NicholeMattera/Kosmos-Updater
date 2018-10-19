@@ -21,13 +21,6 @@
 #include "FileManager.hpp"
 #include "microtar/microtar.h"
 
-void FileManager::dealloc() {
-    for (u32 i = 0; i < _threads.size(); i++) {
-        threadWaitForExit(&_threads.at(i));
-        threadClose(&_threads.at(i));
-    }
-}
-
 bool FileManager::writeFile(string filename, NetRequest * request) {
     if (!deleteFile(filename)) {
         printf("Unable to delete file.");
@@ -102,15 +95,16 @@ void FileManager::extract(Tar * tar) {
     _createThread(_extract, tar);
 }
 
-Result FileManager::_createThread(ThreadFunc func, void* ptr) {
+Result FileManager::_createThread(ThreadFunc func, Tar * tar) {
     Thread thread;
     Result res;
 
-    if (R_FAILED( res = threadCreate(&thread, func, ptr, 0x2000, 0x2B, -2)))
+    if (R_FAILED( res = threadCreate(&thread, func, (void *) tar, 0x2000, 0x2B, -2)))
         return res;
     if (R_FAILED( res = threadStart(&thread)))
         return res;
 
+    tar->thread = thread;
     _threads.push_back(thread);
 
     return 0;

@@ -31,11 +31,6 @@ void NetManager::initialize() {
 }
 
 void NetManager::dealloc() {
-    for (u32 i = 0; i < _threads.size(); i++) {
-        threadWaitForExit(&_threads.at(i));
-        threadClose(&_threads.at(i));
-    }
-
     curl_global_cleanup();
     socketExit();
 }
@@ -67,15 +62,16 @@ NetRequest * NetManager::getLatestSDFiles(string bundle, string channel) {
     return request;
 }
 
-Result NetManager::_createThread(ThreadFunc func, void* ptr) {
+Result NetManager::_createThread(ThreadFunc func, NetRequest * request) {
     Thread thread;
     Result res;
 
-    if (R_FAILED( res = threadCreate(&thread, func, ptr, 0x2000, 0x2B, -2)))
+    if (R_FAILED( res = threadCreate(&thread, func, (void *) request, 0x2000, 0x2B, -2)))
         return res;
     if (R_FAILED( res = threadStart(&thread)))
         return res;
 
+    request->thread = thread;
     _threads.push_back(thread);
 
     return 0;

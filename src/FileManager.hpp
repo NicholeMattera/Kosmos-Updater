@@ -26,7 +26,6 @@ using namespace std;
 
 class FileManager {
     public:
-        static void dealloc();
         static bool writeFile(string filename, NetRequest * request);
         static bool deleteFile(string filename);
         static bool fileExists(string filename);
@@ -36,7 +35,7 @@ class FileManager {
     private:
         static inline vector<Thread> _threads;
 
-        static Result _createThread(ThreadFunc func, void* ptr);
+        static Result _createThread(ThreadFunc func, Tar * tar);
         static void _extract(void * ptr);
         static bool _makeDirectoryParents(string path);
 };
