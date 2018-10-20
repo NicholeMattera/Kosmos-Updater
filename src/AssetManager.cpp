@@ -19,6 +19,15 @@
 #include "SceneDirector.hpp"
 
 void AssetManager::dealloc() {
+    if (AssetManager::select != NULL)
+        Mix_FreeChunk(AssetManager::select);
+
+    if (AssetManager::back != NULL)
+        Mix_FreeChunk(AssetManager::back);
+
+    if (AssetManager::enter != NULL)
+        Mix_FreeChunk(AssetManager::enter);
+
     if (AssetManager::large_button_font != NULL)
         TTF_CloseFont(AssetManager::large_button_font);
 
@@ -118,6 +127,10 @@ bool AssetManager::initialize() {
     AssetManager::large_button_font = TTF_OpenFontRW(SDL_RWFromMem(AssetManager::extendedFontData.address, AssetManager::extendedFontData.size), 1, 70);
     if (!AssetManager::large_button_font)
         return false;
+
+    AssetManager::enter = Mix_LoadWAV("romfs:/enter.wav");
+    AssetManager::back = Mix_LoadWAV("romfs:/back.wav");
+    AssetManager::select = Mix_LoadWAV("romfs:/select.wav");
 
     return true;
 }
