@@ -15,43 +15,31 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <switch.h>
+#pragma once
 
-#include "SceneDirector.hpp"
-#include "NetManager.hpp"
-#include "AssetManager.hpp"
-#include "ConfigManager.hpp"
+#include <switch.h>
+#include <string>
 
 using namespace std;
 
-int main(int argc, char **argv)
-{
-    SceneDirector * sceneDirector = new SceneDirector();
-    if (!SceneDirector::renderer || !SceneDirector::window) {
-        return -1;
-    }
+class Tar {
+    public:
+        Thread thread;
+        Mutex mutexRequest;
 
-    ConfigManager::initialize();
-    NetManager::initialize();
+        double progress;
+        bool isComplete;
+        bool hasError;
+        string errorMessage;
 
-    if (!AssetManager::initialize()) {
-        AssetManager::dealloc();
-        return -1;
-    }
+        Tar(string filename, string dest, int numberOfFiles);
+        ~Tar();
+        string getFilename();
+        string getDestination();
+        int getNumberOfFiles();
 
-    // Main Game Loop
-    while (appletMainLoop())
-    {
-        if (!sceneDirector->direct())
-            break;
-    }
-
-    AssetManager::dealloc();
-    NetManager::dealloc();
-    ConfigManager::dealloc();
-    delete sceneDirector;
-
-    return 0;
-}
+    private:
+        string _filename;
+        string _dest;
+        int _numberOfFiles;
+};

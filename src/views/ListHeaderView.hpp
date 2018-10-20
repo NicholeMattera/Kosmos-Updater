@@ -15,43 +15,22 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <switch.h>
+#pragma once
 
-#include "SceneDirector.hpp"
-#include "NetManager.hpp"
-#include "AssetManager.hpp"
-#include "ConfigManager.hpp"
+#include <string>
+#include "../View.hpp"
+#include "TextView.hpp"
 
 using namespace std;
 
-int main(int argc, char **argv)
-{
-    SceneDirector * sceneDirector = new SceneDirector();
-    if (!SceneDirector::renderer || !SceneDirector::window) {
-        return -1;
-    }
+class ListHeaderView : public View {
+    public:
+        ListHeaderView(string text);
+        ~ListHeaderView();
 
-    ConfigManager::initialize();
-    NetManager::initialize();
+        void render(SDL_Rect rect, double dTime);
 
-    if (!AssetManager::initialize()) {
-        AssetManager::dealloc();
-        return -1;
-    }
-
-    // Main Game Loop
-    while (appletMainLoop())
-    {
-        if (!sceneDirector->direct())
-            break;
-    }
-
-    AssetManager::dealloc();
-    NetManager::dealloc();
-    ConfigManager::dealloc();
-    delete sceneDirector;
-
-    return 0;
-}
+        void setText(string text);
+    private:
+        TextView * _textView;
+};

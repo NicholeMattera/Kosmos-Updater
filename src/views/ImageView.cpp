@@ -15,29 +15,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#pragma once
+#include "ImageView.hpp"
+#include "../SceneDirector.hpp"
 
-#include <libconfig.h>
-#include <string>
+ImageView::ImageView(SDL_Texture * image) : View() {
+    _image = image;
+}
 
-using namespace std;
+ImageView::~ImageView() {}
 
-class ConfigManager {
-    public:
-        static void initialize();
-        static void dealloc();
-
-        static string getHost();
-        static string getChannel();
-        static string getBundle();
-        static string getCurrentVersion();
-
-        static bool setChannel(string channel);
-        static bool setBundle(string bundle);
-        static bool setCurrentVersion(string version);
-
-    private:
-        static inline config_t _cfg;
-        static string _read(string key, string def);
-        static bool _write(string key, string value);
-};
+void ImageView::render(SDL_Rect rect, double dTime) {
+    SDL_RenderCopy(SceneDirector::renderer, _image, NULL, &rect);
+    View::render(rect, dTime);
+}

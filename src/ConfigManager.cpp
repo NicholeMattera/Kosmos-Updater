@@ -17,12 +17,12 @@
 
 #include "ConfigManager.hpp"
 
-ConfigManager::ConfigManager() {
-    config_init(&cfg);
+void ConfigManager::initialize() {
+    config_init(&_cfg);
 
-    if(!config_read_file(&cfg, "settings.cfg")) {
+    if(!config_read_file(&_cfg, "settings.cfg")) {
         config_setting_t * root, * setting;
-        root = config_root_setting(&cfg);
+        root = config_root_setting(&_cfg);
 
         setting = config_setting_add(root, "host", CONFIG_TYPE_STRING);
         config_setting_set_string(setting, "http://sdfu.stevenmattera.com");
@@ -30,62 +30,63 @@ ConfigManager::ConfigManager() {
         setting = config_setting_add(root, "channel", CONFIG_TYPE_STRING);
         config_setting_set_string(setting, "stable");
 
+        setting = config_setting_add(root, "bundle", CONFIG_TYPE_STRING);
+        config_setting_set_string(setting, "sdfiles");
+
         setting = config_setting_add(root, "version", CONFIG_TYPE_STRING);
         config_setting_set_string(setting, "");
 
-        setting = config_setting_add(root, "launcher", CONFIG_TYPE_STRING);
-        config_setting_set_string(setting, "Hekate");
-
-        config_write_file(&cfg, "settings.cfg");
+        config_write_file(&_cfg, "settings.cfg");
     }
 }
 
-ConfigManager::~ConfigManager() {
-    config_destroy(&cfg);
+void ConfigManager::dealloc() {
+    config_destroy(&_cfg);
 }
 
-std::string ConfigManager::getHost() {
+string ConfigManager::getHost() {
+    return _read("host", "http://sdfu.stevenmattera.com");
+}
+
+string ConfigManager::getChannel() {
+    return _read("channel", "stable");
+}
+
+string ConfigManager::getBundle() {
+    return _read("bundle", "sdfiles");
+}
+
+string ConfigManager::getCurrentVersion() {
+    return _read("version", "");
+}
+
+bool ConfigManager::setChannel(string channel) {
+    return _write("channel", channel);
+}
+
+bool ConfigManager::setBundle(string bundle) {
+    return _write("bundle", bundle);
+}
+
+bool ConfigManager::setCurrentVersion(string version) {
+    return _write("version", version);
+}
+
+string ConfigManager::_read(string key, string def) {
     const char * str;
 
-    if (!config_lookup_string(&cfg, "host", &str))
-        return "http://sdfu.stevenmattera.com";
+    if (!config_lookup_string(&_cfg, key.c_str(), &str))
+        return def;
 
-    return std::string(str);
+    return string(str);
 }
 
-std::string ConfigManager::getChannel() {
-    const char * str;
-
-    if (!config_lookup_string(&cfg, "channel", &str))
-        return "stable";
-
-    return std::string(str);
-}
-
-std::string ConfigManager::getCurrentVersion() {
-    const char * str;
-
-    if (!config_lookup_string(&cfg, "version", &str))
-        return "";
-
-    return std::string(str);
-}
-
-std::string ConfigManager::getLauncherPreference() {
-    const char * str;
-
-    if (!config_lookup_string(&cfg, "launcher", &str))
-        return "Hekate";
-
-    return std::string(str);
-}
-
-bool ConfigManager::writeCurrentVersion(std::string version) {
+bool ConfigManager::_write(string key, string value) {
     config_setting_t * root, * setting;
-    root = config_root_setting(&cfg);
+    root = config_root_setting(&_cfg);
 
-    setting = config_setting_get_member(root, "version");
-    config_setting_set_string(setting, version.c_str());
+    setting = config_setting_get_member(root, key.c_str());
+    config_setting_set_string(setting, value.c_str());
 
-    return config_write_file(&cfg, "settings.cfg");
+    return config_write_file(&_cfg, "settings.cfg");
 }

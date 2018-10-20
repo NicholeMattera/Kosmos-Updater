@@ -15,43 +15,42 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <switch.h>
+#pragma once
 
-#include "SceneDirector.hpp"
-#include "NetManager.hpp"
+#include <SDL2/SDL.h>
 #include "AssetManager.hpp"
-#include "ConfigManager.hpp"
+#include "Scene.hpp"
+
+#include "scenes/AppUpdateScene.hpp"
+#include "scenes/PackageSelectScene.hpp"
+#include "scenes/PackageDownloadScene.hpp"
+
+typedef enum {
+    SCENE_APP_UPDATE,
+    SCENE_PACKAGE_SELECT,
+    SCENE_PACKAGE_DOWNLOAD
+} Scenes;
 
 using namespace std;
 
-int main(int argc, char **argv)
-{
-    SceneDirector * sceneDirector = new SceneDirector();
-    if (!SceneDirector::renderer || !SceneDirector::window) {
-        return -1;
-    }
+class SceneDirector {
+    public:
+        static inline SDL_Window * window = NULL;
+        static inline SDL_Renderer * renderer = NULL;
+        static inline Scenes currentScene = SCENE_APP_UPDATE;
+        static inline bool exitApp = false;
+        
+        SceneDirector();
+        ~SceneDirector();
 
-    ConfigManager::initialize();
-    NetManager::initialize();
+        bool direct();
 
-    if (!AssetManager::initialize()) {
-        AssetManager::dealloc();
-        return -1;
-    }
+    private:
+        Uint64 _now;
+        Uint64 _last;
 
-    // Main Game Loop
-    while (appletMainLoop())
-    {
-        if (!sceneDirector->direct())
-            break;
-    }
-
-    AssetManager::dealloc();
-    NetManager::dealloc();
-    ConfigManager::dealloc();
-    delete sceneDirector;
-
-    return 0;
-}
+        Scene * _currentScene;
+        AppUpdateScene * _appUpdateScene;
+        PackageSelectScene * _packageSelectScene;
+        PackageDownloadScene * _packageDownloadScene;
+};

@@ -17,27 +17,41 @@
 
 #pragma once
 
-#include <libconfig.h>
 #include <string>
+#include "../View.hpp"
+#include "TextView.hpp"
+
+typedef enum {
+    DEFAULT,
+    SUBTITLE,
+    VALUE
+} ListRowStyle;
 
 using namespace std;
 
-class ConfigManager {
+class ListRowView : public View {
     public:
-        static void initialize();
-        static void dealloc();
+        bool isLast;
+        bool hasCheckmark;
+        
+        ListRowView(string primaryText, string secondaryText, ListRowStyle style);
+        ~ListRowView();
 
-        static string getHost();
-        static string getChannel();
-        static string getBundle();
-        static string getCurrentVersion();
+        void render(SDL_Rect rect, double dTime);
 
-        static bool setChannel(string channel);
-        static bool setBundle(string bundle);
-        static bool setCurrentVersion(string version);
-
+        void setPrimaryText(string text);
+        void setSecondaryText(string text);
     private:
-        static inline config_t _cfg;
-        static string _read(string key, string def);
-        static bool _write(string key, string value);
+        double _timeElapsed;
+
+        TextView * _primaryTextView;
+        TextView * _secondaryTextView;
+
+        ListRowStyle _style;
+
+        SDL_Color _generateSelectionColor();
+        void _drawBorders(int x1, int y1, int x2, int y2, SDL_Color color);
+        void _renderDefaultStyle(SDL_Rect rect);
+        void _renderSubtitleStyle(SDL_Rect rect);
+        void _renderValueStyle(SDL_Rect rect);
 };

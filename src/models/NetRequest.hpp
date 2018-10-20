@@ -17,27 +17,43 @@
 
 #pragma once
 
-#include <libconfig.h>
+#include <switch.h>
 #include <string>
 
 using namespace std;
 
-class ConfigManager {
+class NetRequest {
     public:
-        static void initialize();
-        static void dealloc();
+        Thread thread;
+        Mutex mutexRequest;
+        
+        double progress;
+        bool isComplete;
+        bool hasError;
+        string errorMessage;
+    
+        string bundle;
+        string channel;
 
-        static string getHost();
-        static string getChannel();
-        static string getBundle();
-        static string getCurrentVersion();
-
-        static bool setChannel(string channel);
-        static bool setBundle(string bundle);
-        static bool setCurrentVersion(string version);
+        NetRequest(string method, string url);
+        ~NetRequest();
+        string getMethod();
+        string getURL();
+        size_t getSize();
+        char * getData();
+        string getVersionNumber();
+        string getNumberOfFiles();
+        size_t appendData(void *contents, size_t size, size_t nmemb);
+        size_t appendHeaderData(void *contents, size_t size, size_t nmemb);
 
     private:
-        static inline config_t _cfg;
-        static string _read(string key, string def);
-        static bool _write(string key, string value);
+        string _method;
+        string _url;
+        size_t _size;
+        char * _data;
+        size_t _headerSize;
+        char * _headerData;
+
+        string _versionNumber;
+        string _numberOfFiles;
 };

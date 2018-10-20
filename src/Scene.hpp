@@ -15,43 +15,33 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <switch.h>
+#pragma once
 
-#include "SceneDirector.hpp"
-#include "NetManager.hpp"
-#include "AssetManager.hpp"
-#include "ConfigManager.hpp"
+#include <SDL2/SDL.h>
+#include <switch.h>
+#include <list>
+#include "View.hpp"
 
 using namespace std;
 
-int main(int argc, char **argv)
-{
-    SceneDirector * sceneDirector = new SceneDirector();
-    if (!SceneDirector::renderer || !SceneDirector::window) {
-        return -1;
-    }
+class Scene {
+    public:
+        Scene();
+        virtual ~Scene();
 
-    ConfigManager::initialize();
-    NetManager::initialize();
+        virtual void handleButton(u32 buttons);
+        virtual void render(SDL_Rect rect, double dTime);
 
-    if (!AssetManager::initialize()) {
-        AssetManager::dealloc();
-        return -1;
-    }
+        /* Touch Controls */
+        void touchStarted();
+        void touchMoved();
+        void touchEnded();
 
-    // Main Game Loop
-    while (appletMainLoop())
-    {
-        if (!sceneDirector->direct())
-            break;
-    }
+        /* View Hierarchy */
+        list<View *> subviews;
+        void addSubView(View * view);
+        void removeSubView(View * view);
 
-    AssetManager::dealloc();
-    NetManager::dealloc();
-    ConfigManager::dealloc();
-    delete sceneDirector;
-
-    return 0;
-}
+    private:
+        View * _touchedView;
+};

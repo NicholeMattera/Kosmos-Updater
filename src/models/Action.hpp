@@ -15,43 +15,29 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <switch.h>
+#pragma once
 
-#include "SceneDirector.hpp"
-#include "NetManager.hpp"
-#include "AssetManager.hpp"
-#include "ConfigManager.hpp"
+#include <SDL2/SDL.h>
+#include <string>
 
 using namespace std;
 
-int main(int argc, char **argv)
-{
-    SceneDirector * sceneDirector = new SceneDirector();
-    if (!SceneDirector::renderer || !SceneDirector::window) {
-        return -1;
-    }
+typedef enum {
+    A_BUTTON,
+    B_BUTTON,
+    Y_BUTTON,
+    X_BUTTON
+} ActionButton;
 
-    ConfigManager::initialize();
-    NetManager::initialize();
+class Action {
+    public:
+        ActionButton button;
 
-    if (!AssetManager::initialize()) {
-        AssetManager::dealloc();
-        return -1;
-    }
+        string text;
+        SDL_Texture * textTexture;
+        int textWidth;
+        int textHeight;
 
-    // Main Game Loop
-    while (appletMainLoop())
-    {
-        if (!sceneDirector->direct())
-            break;
-    }
-
-    AssetManager::dealloc();
-    NetManager::dealloc();
-    ConfigManager::dealloc();
-    delete sceneDirector;
-
-    return 0;
-}
+        Action(ActionButton actionButton, string actionText);
+        ~Action();
+};

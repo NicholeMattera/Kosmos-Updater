@@ -15,43 +15,36 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <switch.h>
+#pragma once
 
-#include "SceneDirector.hpp"
-#include "NetManager.hpp"
-#include "AssetManager.hpp"
-#include "ConfigManager.hpp"
+#include <list>
+#include <SDL2/SDL.h>
 
 using namespace std;
 
-int main(int argc, char **argv)
-{
-    SceneDirector * sceneDirector = new SceneDirector();
-    if (!SceneDirector::renderer || !SceneDirector::window) {
-        return -1;
-    }
+class View {
+    public:
+        SDL_Rect frame;
+        bool hidden;
 
-    ConfigManager::initialize();
-    NetManager::initialize();
+        View();
+        virtual ~View();
 
-    if (!AssetManager::initialize()) {
-        AssetManager::dealloc();
-        return -1;
-    }
+        virtual void render(SDL_Rect rect, double dTime);
 
-    // Main Game Loop
-    while (appletMainLoop())
-    {
-        if (!sceneDirector->direct())
-            break;
-    }
+        /* Controller Input */
+        bool isFocusable;
+        bool hasFocus;
 
-    AssetManager::dealloc();
-    NetManager::dealloc();
-    ConfigManager::dealloc();
-    delete sceneDirector;
+        /* Touch Controls */
+        bool isTouchable;
+        virtual void touchStarted();
+        virtual void touchMoved();
+        virtual void touchEnded();
 
-    return 0;
-}
+        /* View Hierarchy */
+        View * superview;
+        list<View *> subviews;
+        void addSubView(View * view);
+        void removeSubView(View * view);
+};

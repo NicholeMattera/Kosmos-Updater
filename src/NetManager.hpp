@@ -17,27 +17,32 @@
 
 #pragma once
 
-#include <libconfig.h>
+#include <curl/curl.h>
+#include <functional>
+#include <switch.h>
 #include <string>
+#include <vector>
+#include "models/NetRequest.hpp"
 
 using namespace std;
 
-class ConfigManager {
+class NetManager {
     public:
         static void initialize();
         static void dealloc();
 
-        static string getHost();
-        static string getChannel();
-        static string getBundle();
-        static string getCurrentVersion();
-
-        static bool setChannel(string channel);
-        static bool setBundle(string bundle);
-        static bool setCurrentVersion(string version);
+        static NetRequest * getLatestAppVersion();
+        static NetRequest * getLatestApp();
+        static NetRequest * getLatestSDFilesVersion(string channel);
+        static NetRequest * getLatestSDFiles(string bundle, string channel);
 
     private:
-        static inline config_t _cfg;
-        static string _read(string key, string def);
-        static bool _write(string key, string value);
+        static inline string _hostname;
+        static inline vector<Thread> _threads;
+        
+        static Result _createThread(ThreadFunc func, NetRequest * ptr);
+        static void _request(void * ptr);
+        static int _progressFunction(void *ptr, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
+        static size_t _writeFunction(void *contents, size_t size, size_t nmemb, void * ptr);
+        static size_t _headerFunction(void *contents, size_t size, size_t nmemb, void * ptr);
 };

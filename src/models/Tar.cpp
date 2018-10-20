@@ -15,29 +15,35 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#pragma once
+#include <string.h>
+#include "Tar.hpp"
 
-#include <libconfig.h>
-#include <string>
+Tar::Tar(string filename, string dest, int numberOfFiles) {
+    mutexInit(&mutexRequest);
 
-using namespace std;
+    _filename = filename;
+    _dest = dest;
+    _numberOfFiles = numberOfFiles;
 
-class ConfigManager {
-    public:
-        static void initialize();
-        static void dealloc();
+    progress = 0.f;
+    isComplete = false;
+    hasError = false;
+    errorMessage = "";
+}
 
-        static string getHost();
-        static string getChannel();
-        static string getBundle();
-        static string getCurrentVersion();
+Tar::~Tar() {
+    threadWaitForExit(&thread);
+    threadClose(&thread);
+}
 
-        static bool setChannel(string channel);
-        static bool setBundle(string bundle);
-        static bool setCurrentVersion(string version);
+string Tar::getFilename() {
+    return _filename;
+}
 
-    private:
-        static inline config_t _cfg;
-        static string _read(string key, string def);
-        static bool _write(string key, string value);
-};
+string Tar::getDestination() {
+    return _dest;
+}
+
+int Tar::getNumberOfFiles() {
+    return _numberOfFiles;
+}

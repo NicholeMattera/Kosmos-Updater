@@ -15,43 +15,39 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <switch.h>
+#pragma once
 
-#include "SceneDirector.hpp"
-#include "NetManager.hpp"
-#include "AssetManager.hpp"
-#include "ConfigManager.hpp"
+#include <SDL2/SDL_ttf.h>
+#include <string>
+#include "../View.hpp"
+
+typedef enum {
+    LEFT_ALIGN,
+    CENTER_ALIGN,
+    RIGHT_ALIGN
+} TextAlignment;
 
 using namespace std;
 
-int main(int argc, char **argv)
-{
-    SceneDirector * sceneDirector = new SceneDirector();
-    if (!SceneDirector::renderer || !SceneDirector::window) {
-        return -1;
-    }
+class TextView : public View {
+    public:
+        TTF_Font * font;
+        string text;
+        SDL_Color textColor;
+        TextAlignment textAlignment;
 
-    ConfigManager::initialize();
-    NetManager::initialize();
+        TextView(TTF_Font * theFont, string theText, SDL_Color theTextColor);
+        ~TextView();
 
-    if (!AssetManager::initialize()) {
-        AssetManager::dealloc();
-        return -1;
-    }
+        void render(SDL_Rect rect, double dTime);
+        void setFont(TTF_Font * theFont);
+        void setText(string theText);
+        void setTextColor(SDL_Color theTextColor);
 
-    // Main Game Loop
-    while (appletMainLoop())
-    {
-        if (!sceneDirector->direct())
-            break;
-    }
+    private:
+        SDL_Texture * _textTexture;
+        int _textWidth;
+        int _textHeight;
 
-    AssetManager::dealloc();
-    NetManager::dealloc();
-    ConfigManager::dealloc();
-    delete sceneDirector;
-
-    return 0;
-}
+        void _reset();
+};

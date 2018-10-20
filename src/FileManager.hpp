@@ -15,43 +15,27 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <switch.h>
+#pragma once
 
-#include "SceneDirector.hpp"
-#include "NetManager.hpp"
-#include "AssetManager.hpp"
-#include "ConfigManager.hpp"
+#include <string>
+#include <vector>
+#include "models/NetRequest.hpp"
+#include "models/Tar.hpp"
 
 using namespace std;
 
-int main(int argc, char **argv)
-{
-    SceneDirector * sceneDirector = new SceneDirector();
-    if (!SceneDirector::renderer || !SceneDirector::window) {
-        return -1;
-    }
+class FileManager {
+    public:
+        static bool writeFile(string filename, NetRequest * request);
+        static bool deleteFile(string filename);
+        static bool fileExists(string filename);
+        static bool createSubfolder(string path);
+        static void extract(Tar * tar);
 
-    ConfigManager::initialize();
-    NetManager::initialize();
+    private:
+        static inline vector<Thread> _threads;
 
-    if (!AssetManager::initialize()) {
-        AssetManager::dealloc();
-        return -1;
-    }
-
-    // Main Game Loop
-    while (appletMainLoop())
-    {
-        if (!sceneDirector->direct())
-            break;
-    }
-
-    AssetManager::dealloc();
-    NetManager::dealloc();
-    ConfigManager::dealloc();
-    delete sceneDirector;
-
-    return 0;
-}
+        static Result _createThread(ThreadFunc func, Tar * tar);
+        static void _extract(void * ptr);
+        static bool _makeDirectoryParents(string path);
+};

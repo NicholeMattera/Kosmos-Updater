@@ -17,27 +17,36 @@
 
 #pragma once
 
-#include <libconfig.h>
 #include <string>
+#include "../Scene.hpp"
+#include "../models/NetRequest.hpp"
+#include "../views/HeaderView.hpp"
+#include "../views/UpdateView.hpp"
+#include "../views/StatusView.hpp"
+#include "../views/FooterView.hpp"
 
 using namespace std;
 
-class ConfigManager {
+class AppUpdateScene : public Scene {
     public:
-        static void initialize();
-        static void dealloc();
-
-        static string getHost();
-        static string getChannel();
-        static string getBundle();
-        static string getCurrentVersion();
-
-        static bool setChannel(string channel);
-        static bool setBundle(string bundle);
-        static bool setCurrentVersion(string version);
+        AppUpdateScene();
+        ~AppUpdateScene();
+        
+        void handleButton(u32 buttons);
+        void render(SDL_Rect rect, double dTime);
 
     private:
-        static inline config_t _cfg;
-        static string _read(string key, string def);
-        static bool _write(string key, string value);
+        string _latestAppVersion;
+
+        NetRequest * _versionRequest;
+        NetRequest * _appRequest;
+        
+        HeaderView * _headerView;
+        UpdateView * _updateView;
+        StatusView * _statusView;
+        FooterView * _footerView;
+        
+        void _updateVersionRequest();
+        void _updateAppRequest();
+        void _showStatus(string text, string subtext);
 };
