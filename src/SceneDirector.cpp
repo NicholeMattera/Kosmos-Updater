@@ -17,6 +17,7 @@
 
 #include <switch.h>
 #include "SceneDirector.hpp"
+#include "ConfigManager.hpp"
 
 SceneDirector::SceneDirector() {
     romfsInit();
@@ -47,6 +48,10 @@ SceneDirector::SceneDirector() {
     _packageSelectScene = NULL;
     _packageDownloadScene = NULL;
     _currentScene = NULL;
+
+    if (!ConfigManager::shouldAutoUpdate()) {
+        currentScene = SCENE_PACKAGE_SELECT;
+    }
 }
 
 SceneDirector::~SceneDirector() {

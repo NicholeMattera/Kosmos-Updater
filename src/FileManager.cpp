@@ -18,7 +18,9 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <algorithm>
 #include "FileManager.hpp"
+#include "ConfigManager.hpp"
 #include "microtar/microtar.h"
 
 bool FileManager::writeFile(string filename, NetRequest * request) {
@@ -116,6 +118,7 @@ void FileManager::_extract(void * ptr) {
     mtar_t tar;
     mtar_header_t h;
     char * buffer;
+    vector<string> filesToIgnore = ConfigManager::getFilesToIgnore();
 
     mtar_open(&tar, tarObj->getFilename().c_str(), "r");
 
@@ -127,6 +130,12 @@ void FileManager::_extract(void * ptr) {
         mutexUnlock(&tarObj->mutexRequest);
 
         string path = tarObj->getDestination() + string(h.name);
+
+        if (find(begin(filesToIgnore), end(filesToIgnore), path) != end(filesToIgnore)) {
+            mtar_next(&tar);
+            i++;
+            continue;
+        }
 
         // Is the path just a directory?
         if (path.back() == '/') {

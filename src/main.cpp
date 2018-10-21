@@ -28,12 +28,13 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
+    ConfigManager::initialize();
+    
     SceneDirector * sceneDirector = new SceneDirector();
     if (!SceneDirector::renderer || !SceneDirector::window) {
         return -1;
     }
 
-    ConfigManager::initialize();
     NetManager::initialize();
 
     if (!AssetManager::initialize()) {
