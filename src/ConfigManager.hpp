@@ -19,6 +19,7 @@
 
 #include <libconfig.h>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -31,6 +32,8 @@ class ConfigManager {
         static string getChannel();
         static string getBundle();
         static string getCurrentVersion();
+        static vector<string> getFilesToIgnore();
+        static bool shouldAutoUpdate();
 
         static bool setChannel(string channel);
         static bool setBundle(string bundle);

@@ -36,6 +36,11 @@ void ConfigManager::initialize() {
         setting = config_setting_add(root, "version", CONFIG_TYPE_STRING);
         config_setting_set_string(setting, "");
 
+        setting = config_setting_add(root, "ignore", CONFIG_TYPE_ARRAY);
+
+        setting = config_setting_add(root, "autoupdate", CONFIG_TYPE_BOOL);
+        config_setting_set_bool(setting, true);
+
         config_write_file(&_cfg, "settings.cfg");
     }
 }
@@ -58,6 +63,30 @@ string ConfigManager::getBundle() {
 
 string ConfigManager::getCurrentVersion() {
     return _read("version", "");
+}
+
+vector<string> ConfigManager::getFilesToIgnore() {
+    vector<string> result;
+    
+    config_setting_t * array = config_lookup(&_cfg, "ignore");
+    if (array == NULL)
+        return result;
+
+    int count = config_setting_length(array);
+    for (int i = 0; i < count; i++) {
+        result.push_back(string(config_setting_get_string_elem(array, i)));
+    }
+
+    return result;
+}
+
+bool ConfigManager::shouldAutoUpdate() {
+    int autoupdate;
+
+    if (!config_lookup_bool(&_cfg, "autoupdate", &autoupdate))
+        return true;
+
+    return autoupdate;
 }
 
 bool ConfigManager::setChannel(string channel) {

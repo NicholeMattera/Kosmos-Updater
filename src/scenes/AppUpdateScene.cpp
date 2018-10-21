@@ -89,24 +89,20 @@ void AppUpdateScene::_updateVersionRequest() {
     if (_versionRequest->isComplete) {
         _latestAppVersion = string(_versionRequest->getData());
 
-        #ifdef DEBUG
+        // No Update
+        if (string(VERSION).compare(_latestAppVersion) == 0) {
             SceneDirector::currentScene = SCENE_PACKAGE_SELECT;
-        #else
-            // No Update
-            if (string(VERSION).compare(_latestAppVersion) == 0) {
-                SceneDirector::currentScene = SCENE_PACKAGE_SELECT;
-            }
-            // Update
-            else {
-                delete _versionRequest;
-                _versionRequest = NULL;
+        }
+        // Update
+        else {
+            delete _versionRequest;
+            _versionRequest = NULL;
 
-                _updateView->setProgress(0);
-                _updateView->setText("Getting the latest version of SDFiles Updater...");
+            _updateView->setProgress(0);
+            _updateView->setText("Getting the latest version of SDFiles Updater...");
 
-                _appRequest = NetManager::getLatestApp();
-            }
-        #endif
+            _appRequest = NetManager::getLatestApp();
+        }
     }
     else if (_versionRequest->hasError) {
         _showStatus(_versionRequest->errorMessage, "Please restart the app to try again.");
