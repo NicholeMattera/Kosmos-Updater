@@ -22,6 +22,8 @@
 #include "../FileManager.hpp"
 
 PackageDownloadScene::PackageDownloadScene() {
+    bpcInitialize();
+    
     _headerView = new HeaderView("SDFiles Updater", true);
     _headerView->frame = { 0, 0, 1280, 88 };
 
@@ -67,11 +69,17 @@ PackageDownloadScene::~PackageDownloadScene() {
 
     if (_packageExtract != NULL)
         delete _packageExtract;
+
+    bpcExit();
 }
 
 void PackageDownloadScene::handleButton(u32 buttons) {
     if (!_statusView->hidden && buttons & KEY_A) {
         SceneDirector::exitApp = true;
+    }
+
+    if (!_statusView->hidden && _footerView->actions.size() == 2 && buttons & KEY_X) {
+        bpcRebootSystem();
     }
 }
 
@@ -105,7 +113,7 @@ void PackageDownloadScene::_updatePackageRequest() {
         FileManager::extract(_packageExtract);
     }
     else if (_packageRequest->hasError) {
-        _showStatus(_packageRequest->errorMessage, "Please restart the app to try again.");
+        _showStatus(_packageRequest->errorMessage, "Please restart the app to try again.", false);
 
         delete _packageRequest;
         _packageRequest = NULL;
@@ -126,12 +134,12 @@ void PackageDownloadScene::_updatePackageExtract() {
         FileManager::deleteFile("temp.tar");
         ConfigManager::setCurrentVersion(_versionNumber);
 
-        _showStatus("SD Files has been updated to version " + _versionNumber + "!", "Please restart your Switch to run the latest SD Files.");
+        _showStatus("SD Files has been updated to version " + _versionNumber + "!", "Please restart your Switch to run the latest SD Files.", true);
     }
     else if (_packageExtract->hasError) {
         FileManager::deleteFile("temp.tar");
 
-        _showStatus(_packageExtract->errorMessage, "Please restart the app to try again.");
+        _showStatus(_packageExtract->errorMessage, "Please restart the app to try again.", false);
 
         delete _packageExtract;
         _packageExtract = NULL;
@@ -141,7 +149,7 @@ void PackageDownloadScene::_updatePackageExtract() {
         mutexUnlock(&_packageExtract->mutexRequest);
 }
 
-void PackageDownloadScene::_showStatus(string text, string subtext) {
+void PackageDownloadScene::_showStatus(string text, string subtext, bool wasSuccessful) {
     _statusView->setText(text);
     _statusView->setSubtext(subtext);
 
@@ -149,4 +157,7 @@ void PackageDownloadScene::_showStatus(string text, string subtext) {
     _statusView->hidden = false;
 
     _footerView->actions.push_back(new Action(A_BUTTON, "Quit"));
+    if (wasSuccessful) {
+        _footerView->actions.push_back(new Action(X_BUTTON, "Restart"));
+    }
 }

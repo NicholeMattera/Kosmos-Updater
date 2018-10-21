@@ -45,5 +45,5 @@ class PackageDownloadScene : public Scene {
 
         void _updatePackageRequest();
         void _updatePackageExtract();
-        void _showStatus(string text, string subtext);
+        void _showStatus(string text, string subtext, bool wasSuccessful);
 };
