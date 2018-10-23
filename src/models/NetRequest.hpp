@@ -34,6 +34,7 @@ class NetRequest {
     
         string bundle;
         string channel;
+        string type;
 
         NetRequest(string method, string url);
         ~NetRequest();

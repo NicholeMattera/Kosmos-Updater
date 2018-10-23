@@ -54,10 +54,11 @@ NetRequest * NetManager::getLatestSDFilesVersion(string channel) {
     return request;
 }
 
-NetRequest * NetManager::getLatestSDFiles(string bundle, string channel) {
+NetRequest * NetManager::getLatestSDFiles(string bundle, string channel, string type) {
     NetRequest * request = new NetRequest("GET", _hostname + "/" + API_VERSION + "/package");
     request->bundle = bundle;
     request->channel = channel;
+    request->type = type;
     _createThread(_request, request);
     return request;
 }
@@ -92,13 +93,21 @@ void NetManager::_request(void * ptr) {
             if (request->bundle != "") {
                 url += "bundle=" + string(curl_easy_escape(curl, request->bundle.c_str(), 0));
                 
-                if (request->channel != "") {
+                if (request->channel != "" || request->type != "") {
                     url += "&";
                 }
             }
             
             if (request->channel != "") {
                 url += "channel=" + string(curl_easy_escape(curl, request->channel.c_str(), 0));
+
+                if (request->type != "") {
+                    url += "&";
+                }
+            }
+
+            if (request->type != "") {
+                url += "type=" + string(curl_easy_escape(curl, request->type.c_str(), 0));
             }
         }
         

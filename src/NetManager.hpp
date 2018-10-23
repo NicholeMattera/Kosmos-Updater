@@ -34,7 +34,7 @@ class NetManager {
         static NetRequest * getLatestAppVersion();
         static NetRequest * getLatestApp();
         static NetRequest * getLatestSDFilesVersion(string channel);
-        static NetRequest * getLatestSDFiles(string bundle, string channel);
+        static NetRequest * getLatestSDFiles(string bundle, string channel, string type);
 
     private:
         static inline string _hostname;

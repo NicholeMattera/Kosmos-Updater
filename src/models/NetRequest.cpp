@@ -36,6 +36,7 @@ NetRequest::NetRequest(string method, string url) {
     errorMessage = "";
     bundle = "";
     channel = "";
+    type = "";
 }
 
 NetRequest::~NetRequest() {

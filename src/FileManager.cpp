@@ -21,7 +21,6 @@
 #include <algorithm>
 #include "FileManager.hpp"
 #include "ConfigManager.hpp"
-#include "microtar/microtar.h"
 
 bool FileManager::writeFile(string filename, NetRequest * request) {
     if (!deleteFile(filename)) {
@@ -93,97 +92,108 @@ bool FileManager::createSubfolder(string path) {
     return bSuccess;
 }
 
-void FileManager::extract(Tar * tar) {
-    _createThread(_extract, tar);
+void FileManager::extract(Zip * zip) {
+    _createThread(_extract, zip);
 }
 
-Result FileManager::_createThread(ThreadFunc func, Tar * tar) {
+Result FileManager::_createThread(ThreadFunc func, Zip * zip) {
     Thread thread;
     Result res;
 
-    if (R_FAILED( res = threadCreate(&thread, func, (void *) tar, 0x2000, 0x2B, -2)))
+    if (R_FAILED( res = threadCreate(&thread, func, (void *) zip, 0x2000, 0x2B, -2)))
         return res;
     if (R_FAILED( res = threadStart(&thread)))
         return res;
 
-    tar->thread = thread;
+    zip->thread = thread;
     _threads.push_back(thread);
 
     return 0;
 }
 
 void FileManager::_extract(void * ptr) {
-    Tar * tarObj = (Tar *) ptr;
-
-    mtar_t tar;
-    mtar_header_t h;
-    char * buffer;
-    vector<string> filesToIgnore = ConfigManager::getFilesToIgnore();
-
-    mtar_open(&tar, tarObj->getFilename().c_str(), "r");
-
+    Zip * zipObj = (Zip *) ptr;
+    unzFile unz = unzOpen(zipObj->getFilename().c_str());
+    
     int i = 0;
-    int numberOfFiles = tarObj->getNumberOfFiles();
-    while ((mtar_read_header(&tar, &h)) != MTAR_ENULLRECORD) {
-        mutexLock(&tarObj->mutexRequest);
-        tarObj->progress = (i <= numberOfFiles) ? ((double) i / (double) numberOfFiles) : 1;
-        mutexUnlock(&tarObj->mutexRequest);
+    for (;;) {
+        int code;
+		if (i == 0) {
+			code = unzGoToFirstFile(unz);
+			i++;
+		} else {
+			code = unzGoToNextFile(unz);
+		}
 
-        string path = tarObj->getDestination() + string(h.name);
+		if (code == UNZ_END_OF_LIST_OF_FILE) {
+            mutexLock(&zipObj->mutexRequest);
+            zipObj->progress = 1;
+            zipObj->isComplete = (i > 1);
+            zipObj->hasError = (i <= 0);
+    
+            if (i <= 0) {
+                zipObj->errorMessage = "There was no files to extract.";
+            }
+            mutexUnlock(&zipObj->mutexRequest);
+            return;
+        } else {
+            unz_file_pos pos;
+            unzGetFilePos(unz, &pos);
 
-        if (find(begin(filesToIgnore), end(filesToIgnore), path) != end(filesToIgnore)) {
-            mtar_next(&tar);
-            i++;
-            continue;
+            mutexLock(&zipObj->mutexRequest);
+            zipObj->progress = (double) i / (double) zipObj->getNumberOfFiles();
+            mutexUnlock(&zipObj->mutexRequest);
         }
 
-        // Is the path just a directory?
-        if (path.back() == '/') {
-            _makeDirectoryParents(path);
-            mtar_next(&tar);
-            continue;
-        }
+        unz_file_info_s * fileInfo = _getFileInfo(unz);
 
-        // Do we need to create any subdirectories for the file?
-        size_t found = path.find_last_of("/");
-        if (found != string::npos) {
-            _makeDirectoryParents(path.substr(0, found));
-        }
+		std::string fileName(zipObj->getDestination());
+		fileName += '/';
+		fileName += _getFullFileName(unz, fileInfo);
 
-        // Create and set the buffer.
-        buffer = (char *) calloc(1, h.size + 1);
-        if (!buffer) {
-            printf("Unable to alloc buffer.\n");
-            break;
-        }
-        mtar_read_data(&tar, buffer, h.size);
+		if (fileInfo->uncompressed_size != 0 && fileInfo->compression_method != 0) {
+            int result = _extractFile(fileName.c_str(), unz, fileInfo);
 
-        // Open the file pointer.
-        FILE * fp = fopen(path.c_str(), "wb");
-        if (!fp) {
-            printf("Failed to open.\n");
-            free(buffer);
-            break;
-        }
+		 	if (result < 0) {
+                mutexLock(&zipObj->mutexRequest);
+                zipObj->progress = 1;
+                zipObj->isComplete = false;
+                zipObj->hasError = true;
+                zipObj->errorMessage = "There was an error while trying to extract files.";
+                mutexUnlock(&zipObj->mutexRequest);
 
-        // Write the buffer to the file pointer
-        fwrite(buffer, 1, h.size, fp);
+		        free(fileInfo);
 
-        fflush(fp);
-        fclose(fp);
-        free(buffer);
-        mtar_next(&tar);
+                return;
+             }
+		}
 
-        i++;
+        free(fileInfo);
     }
 
-    mtar_close(&tar);
+    mutexLock(&zipObj->mutexRequest);
+    zipObj->progress = 1;
+    zipObj->isComplete = true;
+    zipObj->hasError = false;
+    mutexUnlock(&zipObj->mutexRequest);
+}
 
-    mutexLock(&tarObj->mutexRequest);
-    tarObj->progress = 1;
-    tarObj->isComplete = true;
-    tarObj->hasError = false;
-    mutexUnlock(&tarObj->mutexRequest);
+unz_file_info_s * FileManager::_getFileInfo(unzFile unz) {
+    unz_file_info_s * fileInfo = (unz_file_info_s*) malloc(sizeof(unz_file_info_s));
+    unzGetCurrentFileInfo(unz, fileInfo, NULL, 0, NULL, 0, NULL, 0);
+    return fileInfo;
+}
+
+string FileManager::_getFullFileName(unzFile unz, unz_file_info_s * fileInfo) {
+    char filePath[fileInfo->size_filename + 1];
+    
+    unzGetCurrentFileInfo(unz, fileInfo, filePath, fileInfo->size_filename, NULL, 0, NULL, 0);
+    filePath[fileInfo->size_filename] = '\0';
+    
+    string path(filePath);
+    path.resize(fileInfo->size_filename);
+
+    return path;
 }
 
 bool FileManager::_makeDirectoryParents(string path)
@@ -215,4 +225,56 @@ bool FileManager::_makeDirectoryParents(string path)
         bSuccess = true;
     
     return bSuccess;
+}
+
+int FileManager::_extractFile(const char * path, unzFile unz, unz_file_info_s * fileInfo) {
+	//check to make sure filepath or fileInfo isnt null
+	if (path == NULL || fileInfo == NULL)
+		return -1;
+		
+	if (unzOpenCurrentFile(unz) != UNZ_OK)
+		return -2;
+	
+	char folderPath[strlen(path) + 1];
+	strcpy(folderPath, path);
+	char * pos = strrchr(folderPath, '/');
+	if (pos != NULL) {
+		*pos = '\0';
+		_makeDirectoryParents(string(folderPath));
+	}
+	
+	u32 blocksize = 0x8000;
+	u8 * buffer = (u8*) malloc(blocksize);
+	if (buffer == NULL)
+		return -3;
+	u32 done = 0;
+	int writeBytes = 0;
+	FILE * fp = fopen(path, "w");
+	if (fp == NULL) {
+		free(buffer);
+		return -4;		
+	}
+		
+	while (done < fileInfo->uncompressed_size) {
+		if (done + blocksize > fileInfo->uncompressed_size) {
+			blocksize = fileInfo->uncompressed_size - done;
+		}
+		unzReadCurrentFile(unz, buffer, blocksize);
+		writeBytes = write(fileno(fp), buffer, blocksize);
+		if (writeBytes <= 0) {
+			break;
+		}
+		done += writeBytes;
+	}
+	
+    fflush(fp);
+    fsync(fileno(fp));
+    fclose(fp);
+	
+	free(buffer);
+	if (done != fileInfo->uncompressed_size)
+		return -4;		
+	
+	unzCloseCurrentFile(unz);
+	return 0;
 }

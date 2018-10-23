@@ -47,7 +47,7 @@ PackageDownloadScene::PackageDownloadScene() {
     string bundle = ConfigManager::getBundle();
     string channel = ConfigManager::getChannel();
     
-    _packageRequest = NetManager::getLatestSDFiles(bundle, channel);
+    _packageRequest = NetManager::getLatestSDFiles(bundle, channel, "zip");
     _packageExtract = NULL;
 }
 
@@ -99,7 +99,7 @@ void PackageDownloadScene::_updatePackageRequest() {
 
     _updateView->setProgress(_packageRequest->progress);
     if (_packageRequest->isComplete) {
-        FileManager::writeFile("temp.tar", _packageRequest);
+        FileManager::writeFile("temp.zip", _packageRequest);
         _versionNumber = _packageRequest->getVersionNumber();
         string numberOfFiles = _packageRequest->getNumberOfFiles();
 
@@ -109,7 +109,7 @@ void PackageDownloadScene::_updatePackageRequest() {
         _updateView->setText("Extracting the latest SDFiles...");
         _updateView->setProgress(0);
 
-        _packageExtract = new Tar("temp.tar", "sdmc:/", stoi(numberOfFiles));
+        _packageExtract = new Zip("temp.zip", "sdmc:/", stoi(numberOfFiles));
         FileManager::extract(_packageExtract);
     }
     else if (_packageRequest->hasError) {
@@ -131,13 +131,13 @@ void PackageDownloadScene::_updatePackageExtract() {
         delete _packageExtract;
         _packageExtract = NULL;
 
-        FileManager::deleteFile("temp.tar");
+        FileManager::deleteFile("temp.zip");
         ConfigManager::setCurrentVersion(_versionNumber);
 
         _showStatus("SD Files has been updated to version " + _versionNumber + "!", "Please restart your Switch to run the latest SD Files.", true);
     }
     else if (_packageExtract->hasError) {
-        FileManager::deleteFile("temp.tar");
+        FileManager::deleteFile("temp.zip");
 
         _showStatus(_packageExtract->errorMessage, "Please restart the app to try again.", false);
 

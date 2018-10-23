@@ -15,35 +15,31 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <string.h>
-#include "Tar.hpp"
+#pragma once
 
-Tar::Tar(string filename, string dest, int numberOfFiles) {
-    mutexInit(&mutexRequest);
+#include <switch.h>
+#include <string>
 
-    _filename = filename;
-    _dest = dest;
-    _numberOfFiles = numberOfFiles;
+using namespace std;
 
-    progress = 0.f;
-    isComplete = false;
-    hasError = false;
-    errorMessage = "";
-}
+class Zip {
+    public:
+        Thread thread;
+        Mutex mutexRequest;
 
-Tar::~Tar() {
-    threadWaitForExit(&thread);
-    threadClose(&thread);
-}
+        double progress;
+        bool isComplete;
+        bool hasError;
+        string errorMessage;
 
-string Tar::getFilename() {
-    return _filename;
-}
+        Zip(string filename, string dest, int numberOfFiles);
+        ~Zip();
+        string getFilename();
+        string getDestination();
+        int getNumberOfFiles();
 
-string Tar::getDestination() {
-    return _dest;
-}
-
-int Tar::getNumberOfFiles() {
-    return _numberOfFiles;
-}
+    private:
+        string _filename;
+        string _dest;
+        int _numberOfFiles;
+};

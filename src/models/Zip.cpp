@@ -15,31 +15,35 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#pragma once
+#include <string.h>
+#include "Zip.hpp"
 
-#include <switch.h>
-#include <string>
+Zip::Zip(string filename, string dest, int numberOfFiles) {
+    mutexInit(&mutexRequest);
 
-using namespace std;
+    _filename = filename;
+    _dest = dest;
+    _numberOfFiles = numberOfFiles;
 
-class Tar {
-    public:
-        Thread thread;
-        Mutex mutexRequest;
+    progress = 0.f;
+    isComplete = false;
+    hasError = false;
+    errorMessage = "";
+}
 
-        double progress;
-        bool isComplete;
-        bool hasError;
-        string errorMessage;
+Zip::~Zip() {
+    threadWaitForExit(&thread);
+    threadClose(&thread);
+}
 
-        Tar(string filename, string dest, int numberOfFiles);
-        ~Tar();
-        string getFilename();
-        string getDestination();
-        int getNumberOfFiles();
+string Zip::getFilename() {
+    return _filename;
+}
 
-    private:
-        string _filename;
-        string _dest;
-        int _numberOfFiles;
-};
+string Zip::getDestination() {
+    return _dest;
+}
+
+int Zip::getNumberOfFiles() {
+    return _numberOfFiles;
+}

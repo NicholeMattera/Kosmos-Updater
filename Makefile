@@ -33,7 +33,7 @@ include $(DEVKITPRO)/libnx/switch_rules
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
 DIST		:=	dist
-SOURCES		:=	src src/microtar src/models src/scenes src/views
+SOURCES		:=	src src/minizip src/models src/scenes src/views
 DATA		:=	data
 INCLUDES	:=	include
 EXEFS_SRC	:=	exefs_src
@@ -55,7 +55,7 @@ ARCH		:=	-march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIE
 CFLAGS		:=	-g -Wall -O2 -ffunction-sections \
 				$(ARCH) $(DEFINES)
 
-CFLAGS		+=	$(INCLUDE) -D__SWITCH__ -DVERSION=\"$(APP_VERSION)\" -DAPI_VERSION=\"$(API_VERSION)\"
+CFLAGS		+=	$(INCLUDE) -D__SWITCH__ -DUSE_FILE32API -DVERSION=\"$(APP_VERSION)\" -DAPI_VERSION=\"$(API_VERSION)\"
 
 CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fexceptions -std=gnu++17
 
@@ -64,7 +64,7 @@ LDFLAGS		=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $
 
 LIBS		:=	-lSDL2_ttf -lSDL2_image -lSDL2_gfx -lSDL2_mixer \
 				-lpng -lturbojpeg -lvorbisidec -logg -lmpg123 -lmodplug \
-				-lconfig -lcurl -lnx `sdl2-config --libs` `freetype-config --libs`
+				-lconfig -lcurl -lz -lnx `sdl2-config --libs` `freetype-config --libs`
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

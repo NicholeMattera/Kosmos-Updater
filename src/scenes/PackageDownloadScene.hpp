@@ -19,7 +19,7 @@
 
 #include "../Scene.hpp"
 #include "../models/NetRequest.hpp"
-#include "../models/Tar.hpp"
+#include "../models/Zip.hpp"
 #include "../views/HeaderView.hpp"
 #include "../views/UpdateView.hpp"
 #include "../views/StatusView.hpp"
@@ -35,7 +35,7 @@ class PackageDownloadScene : public Scene {
 
     private:
         NetRequest * _packageRequest;
-        Tar * _packageExtract;
+        Zip * _packageExtract;
         string _versionNumber;
 
         HeaderView * _headerView;
