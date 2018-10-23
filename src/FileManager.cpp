@@ -120,22 +120,13 @@ void FileManager::_extract(void * ptr) {
         int code;
 		if (i == 0) {
 			code = unzGoToFirstFile(unz);
-			i++;
 		} else {
 			code = unzGoToNextFile(unz);
 		}
+		i++;
 
 		if (code == UNZ_END_OF_LIST_OF_FILE) {
-            mutexLock(&zipObj->mutexRequest);
-            zipObj->progress = 1;
-            zipObj->isComplete = (i > 1);
-            zipObj->hasError = (i <= 0);
-    
-            if (i <= 0) {
-                zipObj->errorMessage = "There was no files to extract.";
-            }
-            mutexUnlock(&zipObj->mutexRequest);
-            return;
+            break;
         } else {
             unz_file_pos pos;
             unzGetFilePos(unz, &pos);
@@ -173,8 +164,12 @@ void FileManager::_extract(void * ptr) {
 
     mutexLock(&zipObj->mutexRequest);
     zipObj->progress = 1;
-    zipObj->isComplete = true;
-    zipObj->hasError = false;
+    zipObj->isComplete = (i >= 1);
+    zipObj->hasError = (i <= 0);
+
+    if (i <= 0) {
+        zipObj->errorMessage = "There was no files to extract.";
+    }
     mutexUnlock(&zipObj->mutexRequest);
 }
 
