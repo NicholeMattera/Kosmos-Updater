@@ -60,6 +60,8 @@ PackageSelectScene::PackageSelectScene() {
     string bundle = ConfigManager::getBundle();
     if (bundle == "hekate") {
         _bundleSelected = "Hekate";
+    } else if (bundle == "hekate-nogc") {
+        _bundleSelected = "Hekate (No Gamecard)";
     } else if (bundle == "atmosphere") {
         _bundleSelected = "Atmosphere";
     } else if (bundle == "reinx") {
@@ -85,6 +87,7 @@ PackageSelectScene::PackageSelectScene() {
     vector<string> bundleOptions;
     bundleOptions.push_back("SDFiles");
     bundleOptions.push_back("Hekate");
+    bundleOptions.push_back("Hekate (No Gamecard)");
     bundleOptions.push_back("Atmosphere");
     bundleOptions.push_back("ReiNX");
 
@@ -370,6 +373,8 @@ void PackageSelectScene::_handleButtonsForBundleMutliSelect(u32 buttons) {
             ConfigManager::setBundle("hekate");
         } else if (bundle == "Atmosphere") {
             ConfigManager::setBundle("atmosphere");
+        } else if (bundle == "Hekate (No Gamecard)") {
+            ConfigManager::setBundle("hekate-nogc");
         } else if (bundle == "ReiNX") {
             ConfigManager::setBundle("reinx");
         } else {
@@ -403,7 +408,7 @@ void PackageSelectScene::_handleButtonsForBundleMutliSelect(u32 buttons) {
         Mix_PlayChannel(-1, AssetManager::select, 0);
     }
 
-    if (buttons & KEY_DOWN && _bundleMultiSelectView->goUp()) {
+    if (buttons & KEY_DOWN && _bundleMultiSelectView->goDown()) {
         Mix_PlayChannel(-1, AssetManager::select, 0);
     }
 }

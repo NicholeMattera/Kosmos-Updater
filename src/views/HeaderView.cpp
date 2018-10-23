@@ -41,6 +41,10 @@ HeaderView::~HeaderView() {
 }
 
 void HeaderView::render(SDL_Rect rect, double dTime) {
+    // Draw Background
+    AssetManager::setRenderColor(AssetManager::background);
+    SDL_RenderFillRect(SceneDirector::renderer, &rect);
+
     if (_showIcon) {
         // Icon
         SDL_Rect iconFrame = { rect.x + 74, rect.y + 29, 30, 44 };

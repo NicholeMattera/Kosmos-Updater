@@ -64,6 +64,10 @@ FooterView::~FooterView() {
 }
 
 void FooterView::render(SDL_Rect rect, double dTime) {
+    // Draw Background
+    AssetManager::setRenderColor(AssetManager::background);
+    SDL_RenderFillRect(SceneDirector::renderer, &rect);
+
     // Divider.
     AssetManager::setRenderColor(AssetManager::header_footer_divider);
     SDL_RenderDrawLine(SceneDirector::renderer, rect.x + 30, rect.y, rect.w - 30, rect.y);

@@ -25,10 +25,6 @@ MultiSelectView::MultiSelectView(string title, vector<string> options, string se
     _options = options;
     hidden = true;
 
-    _headerView = new HeaderView(title.c_str(), false);
-    _headerView->frame = { 0, _startY, 1280, 88 };
-    addSubView(_headerView);
-
     for (vector<string>::iterator it = options.begin(); it != options.end(); it++) {
         string option = *it;
 
@@ -42,6 +38,10 @@ MultiSelectView::MultiSelectView(string title, vector<string> options, string se
         addSubView(rowView);
     }
     _listRowViews.back()->isLast = true;
+
+    _headerView = new HeaderView(title.c_str(), false);
+    _headerView->frame = { 0, _startY, 1280, 88 };
+    addSubView(_headerView);
 
     _footerView = new FooterView();
     _footerView->frame = { 0, 647, 1280, 73 };
@@ -86,8 +86,15 @@ bool MultiSelectView::goUp() {
     if (_focusSelection != 0) {
         _focusSelection--;
 
+        int index = 0;
         for (vector<ListRowView *>::iterator it = _listRowViews.begin(); it != _listRowViews.end(); it++) {
             (*it)->hasFocus = false;
+
+            if (_focusSelection >= 3) {
+                (*it)->frame.y = (_startY + 120 + index * 71) - ((_focusSelection - 3) * 71);
+            }
+
+            index++;
         }
 
         _listRowViews[_focusSelection]->hasFocus = true;
@@ -101,11 +108,19 @@ bool MultiSelectView::goDown() {
     if (_focusSelection != _listRowViews.size() -1) {
         _focusSelection++;
         
+        int index = 0;
         for (vector<ListRowView *>::iterator it = _listRowViews.begin(); it != _listRowViews.end(); it++) {
             (*it)->hasFocus = false;
+
+            if (_focusSelection >= 3) {
+                (*it)->frame.y = (_startY + 120 + index * 71) - ((_focusSelection - 3) * 71);
+            }
+
+            index++;
         }
 
         _listRowViews[_focusSelection]->hasFocus = true;
+
         return true;
     }
 

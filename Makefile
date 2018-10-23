@@ -41,7 +41,7 @@ ROMFS		:=	romfs
 
 APP_TITLE	:= SDFiles Updater
 APP_AUTHOR	:= Steven Mattera
-APP_VERSION := 2.0.0
+APP_VERSION := 2.1.0
 API_VERSION := v3
 
 ICON		:= Icon.jpg
