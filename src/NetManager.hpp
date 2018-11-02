@@ -37,6 +37,10 @@ class NetManager {
         static NetRequest * getLatestSDFiles(string bundle, string channel, string type);
 
     private:
+        static inline bool _shouldUseProxy;
+        static inline string _proxyURL;
+        static inline string _proxyUsername;
+        static inline string _proxyPassword;
         static inline string _hostname;
         static inline vector<Thread> _threads;
         

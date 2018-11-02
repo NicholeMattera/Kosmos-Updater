@@ -28,6 +28,10 @@ void NetManager::initialize() {
     
     curl_global_init(CURL_GLOBAL_ALL);
     _hostname = ConfigManager::getHost();
+    _shouldUseProxy = ConfigManager::shouldUseProxy();
+    _proxyURL = ConfigManager::getProxy();
+    _proxyUsername = ConfigManager::getProxyUsername();
+    _proxyPassword = ConfigManager::getProxyPassword();
 }
 
 void NetManager::dealloc() {
@@ -121,6 +125,16 @@ void NetManager::_request(void * ptr) {
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, (void *) request);
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
         curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent.c_str());
+
+        if (_shouldUseProxy && _proxyURL.size() > 0) {
+            curl_easy_setopt(curl, CURLOPT_PROXY, _proxyURL.c_str());
+
+            if (_proxyUsername.size() > 0)
+                curl_easy_setopt(curl, CURLOPT_PROXYUSERNAME, _proxyUsername.c_str());
+                
+            if (_proxyPassword.size() > 0)
+                curl_easy_setopt(curl, CURLOPT_PROXYPASSWORD, _proxyPassword.c_str());
+        }
 
         res = curl_easy_perform(curl);
         if (res != CURLE_OK) {

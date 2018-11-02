@@ -41,6 +41,18 @@ void ConfigManager::initialize() {
         setting = config_setting_add(root, "autoupdate", CONFIG_TYPE_BOOL);
         config_setting_set_bool(setting, true);
 
+        setting = config_setting_add(root, "proxy_enabled", CONFIG_TYPE_BOOL);
+        config_setting_set_bool(setting, false);
+        
+        setting = config_setting_add(root, "proxy_url", CONFIG_TYPE_STRING);
+        config_setting_set_string(setting, "");
+
+        setting = config_setting_add(root, "proxy_username", CONFIG_TYPE_STRING);
+        config_setting_set_string(setting, "");
+
+        setting = config_setting_add(root, "proxy_password", CONFIG_TYPE_STRING);
+        config_setting_set_string(setting, "");
+
         config_write_file(&_cfg, "settings.cfg");
     }
 }
@@ -87,6 +99,27 @@ bool ConfigManager::shouldAutoUpdate() {
         return true;
 
     return autoupdate;
+}
+
+bool ConfigManager::shouldUseProxy() {
+    int proxyEnabled;
+
+    if (!config_lookup_bool(&_cfg, "proxy_enabled", &proxyEnabled))
+        return false;
+
+    return proxyEnabled;
+}
+
+string ConfigManager::getProxy() {
+    return _read("proxy_url", "");
+}
+
+string ConfigManager::getProxyUsername() {
+    return _read("proxy_username", "");
+}
+
+string ConfigManager::getProxyPassword() {
+    return _read("proxy_password", "");
 }
 
 bool ConfigManager::setChannel(string channel) {

@@ -34,6 +34,10 @@ class ConfigManager {
         static string getCurrentVersion();
         static vector<string> getFilesToIgnore();
         static bool shouldAutoUpdate();
+        static bool shouldUseProxy();
+        static string getProxy();
+        static string getProxyUsername();
+        static string getProxyPassword();
 
         static bool setChannel(string channel);
         static bool setBundle(string bundle);
