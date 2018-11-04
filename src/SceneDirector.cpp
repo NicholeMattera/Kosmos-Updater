@@ -146,8 +146,23 @@ bool SceneDirector::direct() {
             break;
     }
 
-    _currentScene->handleButton(kDown);
+    if (modal != NULL) {
+        modal->handleButton(kDown);
+    } else {
+        _currentScene->handleButton(kDown);
+    }
+
     _currentScene->render({ 0, 0, 1280, 720 }, dTime);
+
+    if (modal != NULL) {
+        // Draw Faded background.
+        AssetManager::setRenderColor(AssetManager::modal_faded_background);
+        SDL_Rect fadedBGFrame = { 0, 0, 1280, 720 };
+        SDL_SetRenderDrawBlendMode(SceneDirector::renderer, SDL_BLENDMODE_BLEND);
+        SDL_RenderFillRect(SceneDirector::renderer, &fadedBGFrame);
+
+        modal->render({ 0, 0, 1280, 720 }, dTime);
+    }
 
     SDL_RenderPresent(SceneDirector::renderer);
 

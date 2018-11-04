@@ -17,34 +17,15 @@
 
 #pragma once
 
-#include <string>
 #include <vector>
-#include "../ModalView.hpp"
-#include "HeaderView.hpp"
-#include "ListRowView.hpp"
-#include "FooterView.hpp"
+#include <string>
 
-using namespace std;
-
-class MultiSelectView : public ModalView {
+class IniOption {
     public:
-        MultiSelectView(string title, vector<string> options, string selectedOption);
-        ~MultiSelectView();
+        std::string key;
+        std::string value;
 
-        void handleButton(u32 buttons);
-        void render(SDL_Rect rect, double dTime);
-        string getSelectedOption();
-        void reset(string selectedOption);
-
-    private:
-        int _startY;
-        long unsigned int _focusSelection;
-        vector<string> _options;
-
-        HeaderView * _headerView;
-        vector<ListRowView *> _listRowViews;
-        FooterView * _footerView;
-
-        bool _goUp();
-        bool _goDown();
+        IniOption(std::string name, std::string val);
+        std::string build();
+        static IniOption * parse(std::string line);
 };

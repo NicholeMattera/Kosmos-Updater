@@ -19,11 +19,10 @@
 #include "../AssetManager.hpp"
 #include "../SceneDirector.hpp"
 
-MultiSelectView::MultiSelectView(string title, vector<string> options, string selectedOption) {
+MultiSelectView::MultiSelectView(string title, vector<string> options, string selectedOption) : ModalView() {
     _startY = 720 - (224 + min((int) options.size(), 4) * 71);
     _focusSelection = 0;
     _options = options;
-    hidden = true;
 
     for (vector<string>::iterator it = options.begin(); it != options.end(); it++) {
         string option = *it;
@@ -66,13 +65,27 @@ MultiSelectView::~MultiSelectView() {
         delete _footerView;
 }
 
-void MultiSelectView::render(SDL_Rect rect, double dTime) {
-    // Draw Faded background.
-    AssetManager::setRenderColor(AssetManager::modal_faded_background);
-    SDL_Rect fadedBGFrame = { 0, 0, 1280, 720 };
-    SDL_SetRenderDrawBlendMode(SceneDirector::renderer, SDL_BLENDMODE_BLEND);
-    SDL_RenderFillRect(SceneDirector::renderer, &fadedBGFrame);
+void MultiSelectView::handleButton(u32 buttons) {
+    if (buttons & KEY_A) {
+        Mix_PlayChannel(-1, AssetManager::enter, 0);
+        dismiss(true);
+    }
 
+    if (buttons & KEY_B) {
+        Mix_PlayChannel(-1, AssetManager::back, 0);
+        dismiss(false);
+    }
+
+    if (buttons & KEY_UP && _goUp()) {
+        Mix_PlayChannel(-1, AssetManager::select, 0);
+    }
+
+    if (buttons & KEY_DOWN && _goDown()) {
+        Mix_PlayChannel(-1, AssetManager::select, 0);
+    }
+}
+
+void MultiSelectView::render(SDL_Rect rect, double dTime) {
     // Draw background.
     AssetManager::setRenderColor(AssetManager::background);
     SDL_Rect bgFrame = { 0, _startY, 1280, 720 - _startY };
@@ -82,7 +95,20 @@ void MultiSelectView::render(SDL_Rect rect, double dTime) {
     View::render(rect, dTime);
 }
 
-bool MultiSelectView::goUp() {
+string MultiSelectView::getSelectedOption() {
+    return _options[_focusSelection];
+}
+
+void MultiSelectView::reset(string selectedOption) {
+    _focusSelection = 0;
+
+    for (long unsigned int i = 0; i < _listRowViews.size(); i++) {
+        _listRowViews[i]->hasFocus = (i == 0);
+        _listRowViews[i]->hasCheckmark = _options[i].compare(selectedOption) == 0;
+    }
+}
+
+bool MultiSelectView::_goUp() {
     if (_focusSelection != 0) {
         _focusSelection--;
 
@@ -104,7 +130,7 @@ bool MultiSelectView::goUp() {
     return false;
 }
 
-bool MultiSelectView::goDown() {
+bool MultiSelectView::_goDown() {
     if (_focusSelection != _listRowViews.size() -1) {
         _focusSelection++;
         
@@ -125,17 +151,4 @@ bool MultiSelectView::goDown() {
     }
 
     return false;
-}
-
-string MultiSelectView::select() {
-    return _options[_focusSelection];
-}
-
-void MultiSelectView::reset(string selectedOption) {
-    _focusSelection = 0;
-
-    for (long unsigned int i = 0; i < _listRowViews.size(); i++) {
-        _listRowViews[i]->hasFocus = (i == 0);
-        _listRowViews[i]->hasCheckmark = _options[i].compare(selectedOption) == 0;
-    }
 }

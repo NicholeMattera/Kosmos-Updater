@@ -20,6 +20,8 @@
 #include "../NetManager.hpp"
 #include "../ConfigManager.hpp"
 
+using namespace std::placeholders;
+
 PackageSelectScene::PackageSelectScene() {
     _channelOpen = false;
     _bundleOpen = false;
@@ -60,8 +62,6 @@ PackageSelectScene::PackageSelectScene() {
     string bundle = ConfigManager::getBundle();
     if (bundle == "hekate") {
         _bundleSelected = "Hekate";
-    } else if (bundle == "hekate-nogc") {
-        _bundleSelected = "Hekate (No Gamecard)";
     } else if (bundle == "atmosphere") {
         _bundleSelected = "Atmosphere";
     } else if (bundle == "reinx") {
@@ -83,15 +83,16 @@ PackageSelectScene::PackageSelectScene() {
     channelOptions.push_back("Bleeding Edge");
 
     _channelMultiSelectView = new MultiSelectView("Channel", channelOptions, _channelSelected);
+    _channelMultiSelectView->onDismiss = bind(&PackageSelectScene::_onMultiSelectDismiss, this, _1, _2);
 
     vector<string> bundleOptions;
     bundleOptions.push_back("SDFiles");
     bundleOptions.push_back("Hekate");
-    bundleOptions.push_back("Hekate (No Gamecard)");
     bundleOptions.push_back("Atmosphere");
     bundleOptions.push_back("ReiNX");
 
     _bundleMultiSelectView = new MultiSelectView("Bundle", bundleOptions, _bundleSelected);
+    _bundleMultiSelectView->onDismiss = bind(&PackageSelectScene::_onMultiSelectDismiss, this, _1, _2);
 
     addSubView(_headerView);
     addSubView(_installRowView);
@@ -99,8 +100,6 @@ PackageSelectScene::PackageSelectScene() {
     addSubView(_channelRowView);
     addSubView(_bundleRowView);
     addSubView(_footerView);
-    addSubView(_channelMultiSelectView);
-    addSubView(_bundleMultiSelectView);
 
     _showUpdateView();
     _versionRequest = NetManager::getLatestSDFilesVersion(channel);
@@ -142,11 +141,7 @@ PackageSelectScene::~PackageSelectScene() {
 }
 
 void PackageSelectScene::handleButton(u32 buttons) {
-    if (_channelOpen) {
-        _handleButtonsForChannelMutliSelect(buttons);
-    } else if (_bundleOpen) {
-        _handleButtonsForBundleMutliSelect(buttons);
-    } else if (_versionRequest == NULL) {
+    if (_versionRequest == NULL) {
         if (buttons & KEY_A) {
             Mix_PlayChannel(-1, AssetManager::enter, 0);
 
@@ -159,16 +154,14 @@ void PackageSelectScene::handleButton(u32 buttons) {
                     _focusSelection = -1;
                     _manageFocus();
 
-                    _channelOpen = true;
-                    _channelMultiSelectView->hidden = false;
+                    _channelMultiSelectView->show();
                     break;
                 
                 case 2:
                     _focusSelection = -1;
                     _manageFocus();
 
-                    _bundleOpen = true;
-                    _bundleMultiSelectView->hidden = false;
+                    _bundleMultiSelectView->show();
                     break;
             }
         }
@@ -315,102 +308,47 @@ void PackageSelectScene::_manageFocus() {
     }
 }
 
-void PackageSelectScene::_handleButtonsForChannelMutliSelect(u32 buttons) {
-    if (buttons & KEY_A) {
-        Mix_PlayChannel(-1, AssetManager::enter, 0);
+void PackageSelectScene::_onMultiSelectDismiss(ModalView * view, bool success) {
+    if (success) {
+        if (view == _channelMultiSelectView) {
+            string channel = _channelMultiSelectView->getSelectedOption();
+            if (channel == "Bleeding Edge") {
+                ConfigManager::setChannel("bleeding-edge");
+            } else {
+                ConfigManager::setChannel("stable");
+            }
 
-        _focusSelection = 1;
-        _manageFocus();
+            if (channel.compare(_channelSelected) != 0) {
+                _resetVersion(true);
+            }
 
-        string channel = _channelMultiSelectView->select();
-        if (channel == "Bleeding Edge") {
-            ConfigManager::setChannel("bleeding-edge");
+            _channelSelected = channel;
+            _channelRowView->setSecondaryText(_channelSelected);
+            _channelMultiSelectView->reset(_channelSelected);
         } else {
-            ConfigManager::setChannel("stable");
+            string bundle = _bundleMultiSelectView->getSelectedOption();
+            if (bundle == "Hekate") {
+                ConfigManager::setBundle("hekate");
+            } else if (bundle == "Atmosphere") {
+                ConfigManager::setBundle("atmosphere");
+            } else if (bundle == "ReiNX") {
+                ConfigManager::setBundle("reinx");
+            } else {
+                ConfigManager::setBundle("sdfiles");
+            }
+
+            if (bundle.compare(_bundleSelected) != 0) {
+                _resetVersion(false);
+            }
+
+            _bundleSelected = bundle;
+            _bundleRowView->setSecondaryText(_bundleSelected);
+            _bundleMultiSelectView->reset(_bundleSelected);
         }
-
-        if (channel.compare(_channelSelected) != 0) {
-            _resetVersion(true);
-        }
-        _channelSelected = channel;
-
-        _channelRowView->setSecondaryText(_channelSelected);
-
-        _channelOpen = false;
-        _channelMultiSelectView->hidden = true;
-        _channelMultiSelectView->reset(_channelSelected);
     }
 
-    if (buttons & KEY_B) {
-        Mix_PlayChannel(-1, AssetManager::back, 0);
-
-        _focusSelection = 1;
-        _manageFocus();
-
-        _channelOpen = false;
-        _channelMultiSelectView->hidden = true;
-        _channelMultiSelectView->reset(_channelSelected);
-    }
-
-    if (buttons & KEY_UP && _channelMultiSelectView->goUp()) {
-        Mix_PlayChannel(-1, AssetManager::select, 0);
-    }
-
-    if (buttons & KEY_DOWN && _channelMultiSelectView->goDown()) {
-        Mix_PlayChannel(-1, AssetManager::select, 0);
-    }
-}
-
-void PackageSelectScene::_handleButtonsForBundleMutliSelect(u32 buttons) {
-    if (buttons & KEY_A) {
-        Mix_PlayChannel(-1, AssetManager::enter, 0);
-
-        _focusSelection = 2;
-        _manageFocus();
-
-        string bundle = _bundleMultiSelectView->select();
-        if (bundle == "Hekate") {
-            ConfigManager::setBundle("hekate");
-        } else if (bundle == "Atmosphere") {
-            ConfigManager::setBundle("atmosphere");
-        } else if (bundle == "Hekate (No Gamecard)") {
-            ConfigManager::setBundle("hekate-nogc");
-        } else if (bundle == "ReiNX") {
-            ConfigManager::setBundle("reinx");
-        } else {
-            ConfigManager::setBundle("sdfiles");
-        }
-
-        if (bundle.compare(_bundleSelected) != 0) {
-            _resetVersion(false);
-        }
-        _bundleSelected = bundle;
-
-        _bundleRowView->setSecondaryText(_bundleSelected);
-
-        _bundleOpen = false;
-        _bundleMultiSelectView->hidden = true;
-        _bundleMultiSelectView->reset(_bundleSelected);
-    }
-
-    if (buttons & KEY_B) {
-        Mix_PlayChannel(-1, AssetManager::back, 0);
-
-        _focusSelection = 2;
-        _manageFocus();
-        
-        _bundleOpen = false;
-        _bundleMultiSelectView->hidden = true;
-        _bundleMultiSelectView->reset(_bundleSelected);
-    }
-
-    if (buttons & KEY_UP && _bundleMultiSelectView->goUp()) {
-        Mix_PlayChannel(-1, AssetManager::select, 0);
-    }
-
-    if (buttons & KEY_DOWN && _bundleMultiSelectView->goDown()) {
-        Mix_PlayChannel(-1, AssetManager::select, 0);
-    }
+    _focusSelection = (view == _channelMultiSelectView) ? 1 : 2;
+    _manageFocus();
 }
 
 void PackageSelectScene::_resetVersion(bool channelChange) {

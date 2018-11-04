@@ -18,7 +18,7 @@
 #include "UpdateView.hpp"
 #include "../AssetManager.hpp"
 
-UpdateView::UpdateView(string text) {
+UpdateView::UpdateView(string text) : View() {
     frame = { 0, 0, 1280, 325 };
 
     if (AssetManager::downloading == NULL) {

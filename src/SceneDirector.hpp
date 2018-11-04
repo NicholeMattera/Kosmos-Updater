@@ -20,6 +20,7 @@
 #include <SDL2/SDL.h>
 #include "AssetManager.hpp"
 #include "Scene.hpp"
+#include "ModalView.hpp"
 
 #include "scenes/AppUpdateScene.hpp"
 #include "scenes/PackageSelectScene.hpp"
@@ -37,6 +38,7 @@ class SceneDirector {
     public:
         static inline SDL_Window * window = NULL;
         static inline SDL_Renderer * renderer = NULL;
+        static inline ModalView * modal = NULL;
         static inline Scenes currentScene = SCENE_APP_UPDATE;
         static inline bool exitApp = false;
         

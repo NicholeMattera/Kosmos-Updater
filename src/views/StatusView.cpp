@@ -18,7 +18,7 @@
 #include "StatusView.hpp"
 #include "../AssetManager.hpp"
 
-StatusView::StatusView(string text, string subtext) {
+StatusView::StatusView(string text, string subtext) : View() {
     frame = { 0, 0, 1280, 100 };
 
     _textView = new TextView(AssetManager::body_font, text, AssetManager::text);

@@ -26,6 +26,7 @@
 #include "../views/FooterView.hpp"
 #include "../views/MultiSelectView.hpp"
 #include "../models/NetRequest.hpp"
+#include "../ModalView.hpp"
 
 class PackageSelectScene : public Scene {
     public:
@@ -64,6 +65,7 @@ class PackageSelectScene : public Scene {
         
         void _manageFocus();
 
+        void _onMultiSelectDismiss(ModalView * view, bool success);
         void _handleButtonsForChannelMutliSelect(u32 buttons);
         void _handleButtonsForBundleMutliSelect(u32 buttons);
         void _resetVersion(bool channelChange);

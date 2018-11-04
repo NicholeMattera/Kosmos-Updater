@@ -70,7 +70,13 @@ string ConfigManager::getChannel() {
 }
 
 string ConfigManager::getBundle() {
-    return _read("bundle", "sdfiles");
+    string bundle = _read("bundle", "sdfiles");
+    if (bundle == "hekate-nogc") {
+        setBundle("hekate");
+        return "hekate";
+    }
+
+    return bundle;
 }
 
 string ConfigManager::getCurrentVersion() {

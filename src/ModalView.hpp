@@ -17,34 +17,20 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-#include "../ModalView.hpp"
-#include "HeaderView.hpp"
-#include "ListRowView.hpp"
-#include "FooterView.hpp"
+#include <switch.h>
+#include <list>
+#include <functional>
+#include <SDL2/SDL.h>
+#include "View.hpp"
 
 using namespace std;
 
-class MultiSelectView : public ModalView {
+class ModalView : public View {
     public:
-        MultiSelectView(string title, vector<string> options, string selectedOption);
-        ~MultiSelectView();
+        function<void(ModalView *, bool)> onDismiss;
+    
+        virtual void handleButton(u32 buttons);
 
-        void handleButton(u32 buttons);
-        void render(SDL_Rect rect, double dTime);
-        string getSelectedOption();
-        void reset(string selectedOption);
-
-    private:
-        int _startY;
-        long unsigned int _focusSelection;
-        vector<string> _options;
-
-        HeaderView * _headerView;
-        vector<ListRowView *> _listRowViews;
-        FooterView * _footerView;
-
-        bool _goUp();
-        bool _goDown();
+        void show();
+        void dismiss(bool success);
 };

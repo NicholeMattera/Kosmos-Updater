@@ -18,7 +18,6 @@
 #pragma once
 
 #include <curl/curl.h>
-#include <functional>
 #include <switch.h>
 #include <string>
 #include <vector>
