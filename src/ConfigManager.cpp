@@ -19,6 +19,7 @@
 
 void ConfigManager::initialize() {
     config_init(&_cfg);
+    config_init(&_fileDb);
 
     if(!config_read_file(&_cfg, "settings.cfg")) {
         config_setting_t * root, * setting;
@@ -55,10 +56,20 @@ void ConfigManager::initialize() {
 
         config_write_file(&_cfg, "settings.cfg");
     }
+
+    if(!config_read_file(&_fileDb, "files.db")) {
+        config_setting_t * root;
+        root = config_root_setting(&_fileDb);
+
+        config_setting_add(root, "installed_files", CONFIG_TYPE_ARRAY);
+
+        config_write_file(&_fileDb, "files.db");
+    }
 }
 
 void ConfigManager::dealloc() {
     config_destroy(&_cfg);
+    config_destroy(&_fileDb);
 }
 
 string ConfigManager::getHost() {
@@ -128,6 +139,21 @@ string ConfigManager::getProxyPassword() {
     return _read("proxy_password", "");
 }
 
+vector<string> ConfigManager::getInstalledFiles() {
+    vector<string> result;
+    
+    config_setting_t * array = config_lookup(&_fileDb, "installed_files");
+    if (array == NULL)
+        return result;
+
+    int count = config_setting_length(array);
+    for (int i = 0; i < count; i++) {
+        result.push_back(string(config_setting_get_string_elem(array, i)));
+    }
+
+    return result;
+}
+
 bool ConfigManager::setChannel(string channel) {
     return _write("channel", channel);
 }
@@ -138,6 +164,18 @@ bool ConfigManager::setBundle(string bundle) {
 
 bool ConfigManager::setCurrentVersion(string version) {
     return _write("version", version);
+}
+
+bool ConfigManager::setInstalledFiles(vector<string> files) {
+    config_setting_t * root = config_root_setting(&_fileDb);
+    config_setting_remove(root, "installed_files");
+
+    config_setting_t * array = config_setting_add(root, "installed_files", CONFIG_TYPE_ARRAY);
+    for (vector<string>::iterator it = files.begin(); it != files.end(); it++) {
+        config_setting_set_string_elem(array, -1, (*it).c_str());
+    }
+
+    return config_write_file(&_fileDb, "files.db");
 }
 
 string ConfigManager::_read(string key, string def) {

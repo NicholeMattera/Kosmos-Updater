@@ -96,6 +96,12 @@ void FileManager::extract(Zip * zip) {
     _createThread(_extract, zip);
 }
 
+void FileManager::cleanUpFiles(vector<string> files) {
+    for (vector<string>::iterator it = files.begin(); it != files.end(); it++) {
+        deleteFile(*it);
+    }
+}
+
 Result FileManager::_createThread(ThreadFunc func, Zip * zip) {
     Thread thread;
     Result res;
@@ -112,9 +118,12 @@ Result FileManager::_createThread(ThreadFunc func, Zip * zip) {
 }
 
 void FileManager::_extract(void * ptr) {
+    cleanUpFiles(ConfigManager::getInstalledFiles());
+
     Zip * zipObj = (Zip *) ptr;
     unzFile unz = unzOpen(zipObj->getFilename().c_str());
     vector<string> filesToIgnore = ConfigManager::getFilesToIgnore();
+    vector<string> filesInstalled;
     
     int i = 0;
     for (;;) {
@@ -148,6 +157,8 @@ void FileManager::_extract(void * ptr) {
             continue;
         }
 
+        filesInstalled.push_back(fileName);
+
 		if (fileInfo->uncompressed_size != 0 && fileInfo->compression_method != 0) {
             int result = _extractFile(fileName.c_str(), unz, fileInfo);
 
@@ -162,7 +173,7 @@ void FileManager::_extract(void * ptr) {
 		        free(fileInfo);
 
                 return;
-             }
+            }
 		}
 
         free(fileInfo);
@@ -175,7 +186,10 @@ void FileManager::_extract(void * ptr) {
 
     if (i <= 0) {
         zipObj->errorMessage = "There was no files to extract.";
+    } else {
+        ConfigManager::setInstalledFiles(filesInstalled);
     }
+
     mutexUnlock(&zipObj->mutexRequest);
 }
 

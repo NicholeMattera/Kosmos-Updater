@@ -39,12 +39,16 @@ class ConfigManager {
         static string getProxyUsername();
         static string getProxyPassword();
 
+        static vector<string> getInstalledFiles();
+
         static bool setChannel(string channel);
         static bool setBundle(string bundle);
         static bool setCurrentVersion(string version);
+        static bool setInstalledFiles(vector<string> files);
 
     private:
         static inline config_t _cfg;
+        static inline config_t _fileDb;
         static string _read(string key, string def);
         static bool _write(string key, string value);
 };

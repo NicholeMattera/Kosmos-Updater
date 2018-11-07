@@ -32,6 +32,7 @@ class FileManager {
         static bool fileExists(string filename);
         static bool createSubfolder(string path);
         static void extract(Zip * zip);
+        static void cleanUpFiles(vector<string> files);
 
     private:
         static inline vector<Thread> _threads;
