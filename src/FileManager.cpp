@@ -114,6 +114,7 @@ Result FileManager::_createThread(ThreadFunc func, Zip * zip) {
 void FileManager::_extract(void * ptr) {
     Zip * zipObj = (Zip *) ptr;
     unzFile unz = unzOpen(zipObj->getFilename().c_str());
+    vector<string> filesToIgnore = ConfigManager::getFilesToIgnore();
     
     int i = 0;
     for (;;) {
@@ -141,6 +142,11 @@ void FileManager::_extract(void * ptr) {
 		std::string fileName(zipObj->getDestination());
 		fileName += '/';
 		fileName += _getFullFileName(unz, fileInfo);
+
+        if (find(begin(filesToIgnore), end(filesToIgnore), fileName) != end(filesToIgnore)) {
+            free(fileInfo);
+            continue;
+        }
 
 		if (fileInfo->uncompressed_size != 0 && fileInfo->compression_method != 0) {
             int result = _extractFile(fileName.c_str(), unz, fileInfo);
