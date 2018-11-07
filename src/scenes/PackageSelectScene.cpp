@@ -95,6 +95,8 @@ PackageSelectScene::PackageSelectScene() {
     _bundleMultiSelectView->onDismiss = bind(&PackageSelectScene::_onMultiSelectDismiss, this, _1, _2);
 
     addSubView(_headerView);
+    addSubView(_updateView);
+    addSubView(_statusView);
     addSubView(_installRowView);
     addSubView(_settingHeaderView);
     addSubView(_channelRowView);
@@ -141,7 +143,11 @@ PackageSelectScene::~PackageSelectScene() {
 }
 
 void PackageSelectScene::handleButton(u32 buttons) {
-    if (_versionRequest == NULL) {
+    if (!_statusView->hidden && buttons & KEY_A) {
+        Mix_PlayChannel(-1, AssetManager::back, 0);
+        SceneDirector::exitApp = true;
+    }
+    else if (!_updateView->hidden && !_statusView->hidden) {
         if (buttons & KEY_A) {
             Mix_PlayChannel(-1, AssetManager::enter, 0);
 
