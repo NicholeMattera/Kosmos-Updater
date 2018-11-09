@@ -79,15 +79,15 @@ void ConfigManager::dealloc() {
 }
 
 string ConfigManager::getHost() {
-    return _readString(HOST_KEY.c_str(), HOST_DEF.c_str(), _cfg);
+    return _readString(HOST_KEY, HOST_DEF, _cfg);
 }
 
 string ConfigManager::getChannel() {
-    return _readString(CHANNEL_KEY.c_str(), CHANNEL_DEF.c_str(), _cfg);
+    return _readString(CHANNEL_KEY, CHANNEL_DEF, _cfg);
 }
 
 string ConfigManager::getBundle() {
-    string bundle = _readString(BUNDLE_KEY.c_str(), BUNDLE_DEF.c_str(), _cfg);
+    string bundle = _readString(BUNDLE_KEY, BUNDLE_DEF, _cfg);
 
     if (bundle == "hekate-nogc") {
         setBundle("hekate");
@@ -98,69 +98,69 @@ string ConfigManager::getBundle() {
 }
 
 string ConfigManager::getCurrentVersion() {
-    return _readString(VERSION_KEY.c_str(), VERSION_DEF.c_str(), _cfg);
+    return _readString(VERSION_KEY, VERSION_DEF, _cfg);
 }
 
 vector<string> ConfigManager::getFilesToIgnore() {
     vector<string> defaultValue;
-    return _readArrayOfStrings(IGNORE_KEY.c_str(), defaultValue, _cfg);
+    return _readArrayOfStrings(IGNORE_KEY, defaultValue, _cfg);
 }
 
 bool ConfigManager::shouldAutoUpdate() {
-    return _readBoolean(AUTOUPDATE_KEY.c_str(), AUTOUPDATE_DEF, _cfg);
+    return _readBoolean(AUTOUPDATE_KEY, AUTOUPDATE_DEF, _cfg);
 }
 
 bool ConfigManager::shouldUseProxy() {
-    return _readBoolean(PROXY_ENABLED_KEY.c_str(), PROXY_ENABLED_DEF, _cfg);
+    return _readBoolean(PROXY_ENABLED_KEY, PROXY_ENABLED_DEF, _cfg);
 }
 
 string ConfigManager::getProxy() {
-    return _readString(PROXY_URL_KEY.c_str(), PROXY_URL_DEF.c_str(), _cfg);
+    return _readString(PROXY_URL_KEY, PROXY_URL_DEF, _cfg);
 }
 
 string ConfigManager::getProxyUsername() {
-    return _readString(PROXY_USERNAME_KEY.c_str(), PROXY_USERNAME_DEF.c_str(), _cfg);
+    return _readString(PROXY_USERNAME_KEY, PROXY_USERNAME_DEF, _cfg);
 }
 
 string ConfigManager::getProxyPassword() {
-    return _readString(PROXY_PASSWORD_KEY.c_str(), PROXY_PASSWORD_DEF.c_str(), _cfg);
+    return _readString(PROXY_PASSWORD_KEY, PROXY_PASSWORD_DEF, _cfg);
 }
 
 bool ConfigManager::setChannel(string channel) {
-    return _writeString(CHANNEL_KEY.c_str(), channel, _cfg, CONFIG_FILENAME);
+    return _writeString(CHANNEL_KEY, channel, _cfg, CONFIG_FILENAME);
 }
 
 bool ConfigManager::setBundle(string bundle) {
-    return _writeString(BUNDLE_KEY.c_str(), bundle, _cfg, CONFIG_FILENAME);
+    return _writeString(BUNDLE_KEY, bundle, _cfg, CONFIG_FILENAME);
 }
 
 bool ConfigManager::setCurrentVersion(string version) {
-    return _writeString(VERSION_KEY.c_str(), version, _cfg, CONFIG_FILENAME);
+    return _writeString(VERSION_KEY, version, _cfg, CONFIG_FILENAME);
 }
 
 vector<string> ConfigManager::getInstalledFiles() {
     vector<string> defaultValue;
-    return _readArrayOfStrings(INSTALLED_FILES_KEY.c_str(), defaultValue, _internalDb);
+    return _readArrayOfStrings(INSTALLED_FILES_KEY, defaultValue, _internalDb);
 }
 
 bool ConfigManager::getDisabledGameCart() {
-    return _readBoolean(DISABLED_GAME_CART_KEY.c_str(), false, _internalDb);
+    return _readBoolean(DISABLED_GAME_CART_KEY, false, _internalDb);
 }
 
 bool ConfigManager::getReceivedExFATWarning() {
-    return _readBoolean(RECEIVED_EXFAT_WARNING_KEY.c_str(), false, _internalDb);
+    return _readBoolean(RECEIVED_EXFAT_WARNING_KEY, false, _internalDb);
 }
 
 bool ConfigManager::setInstalledFiles(vector<string> files) {
-    return _writeArrayOfStrings(INSTALLED_FILES_KEY.c_str(), files, _internalDb, INTERNAL_FILENAME);
+    return _writeArrayOfStrings(INSTALLED_FILES_KEY, files, _internalDb, INTERNAL_FILENAME);
 }
 
 bool ConfigManager::setDisabledGameCart(bool disabled) {
-    return _writeBoolean(DISABLED_GAME_CART_KEY.c_str(), disabled, _internalDb, INTERNAL_FILENAME);
+    return _writeBoolean(DISABLED_GAME_CART_KEY, disabled, _internalDb, INTERNAL_FILENAME);
 }
 
 bool ConfigManager::setReceivedExFATWarning(bool received) {
-    return _writeBoolean(RECEIVED_EXFAT_WARNING_KEY.c_str(), received, _internalDb, INTERNAL_FILENAME);
+    return _writeBoolean(RECEIVED_EXFAT_WARNING_KEY, received, _internalDb, INTERNAL_FILENAME);
 }
 
 // Private Methods
@@ -183,7 +183,7 @@ string ConfigManager::_readString(string key, string def, config_t config) {
     return string(result);
 }
 
-vector<string> _readArrayOfStrings(string key, vector<string> def, config_t config) {
+vector<string> ConfigManager::_readArrayOfStrings(string key, vector<string> def, config_t config) {
     vector<string> result;
     
     config_setting_t * array = config_lookup(&config, key.c_str());
@@ -226,7 +226,7 @@ bool ConfigManager::_writeString(string key, string value, config_t config, stri
     return config_write_file(&_cfg, filename.c_str());
 }
 
-bool _writeArrayOfStrings(string key, vector<string> value, config_t config, string filename) {
+bool ConfigManager::_writeArrayOfStrings(string key, vector<string> value, config_t config, string filename) {
     config_setting_t * root = config_root_setting(&config);
     config_setting_remove(root, key.c_str());
 

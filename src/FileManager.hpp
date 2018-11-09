@@ -21,6 +21,7 @@
 #include <vector>
 #include "models/NetRequest.hpp"
 #include "models/Zip.hpp"
+#include "models/ThreadObj.hpp"
 #include "minizip/unzip.h"
 
 using namespace std;
@@ -32,13 +33,14 @@ class FileManager {
         static bool fileExists(string filename);
         static bool createSubfolder(string path);
         static void extract(Zip * zip);
-        static void cleanUpFiles(vector<string> files, vector<string> filesToIgnore);
+        static void cleanUpFiles(ThreadObj * status);
 
     private:
         static inline vector<Thread> _threads;
 
-        static Result _createThread(ThreadFunc func, Zip * zip);
+        static Result _createThread(ThreadFunc func, ThreadObj * arg);
         static void _extract(void * ptr);
+        static void _cleanUpFiles(void * ptr);
         static unz_file_info_s * _getFileInfo(unzFile unz);
         static string _getFullFileName(unzFile unz, unz_file_info_s * fileInfo);
         static bool _makeDirectoryParents(string path);

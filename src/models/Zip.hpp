@@ -20,20 +20,14 @@
 #include <switch.h>
 #include <string>
 
+#include "ThreadObj.hpp"
+
 using namespace std;
 
-class Zip {
+class Zip : public ThreadObj {
     public:
-        Thread thread;
-        Mutex mutexRequest;
-
-        double progress;
-        bool isComplete;
-        bool hasError;
-        string errorMessage;
-
         Zip(string filename, string dest, int numberOfFiles);
-        ~Zip();
+
         string getFilename();
         string getDestination();
         int getNumberOfFiles();

@@ -18,9 +18,7 @@
 #include <string.h>
 #include "NetRequest.hpp"
 
-NetRequest::NetRequest(string method, string url) {
-    mutexInit(&mutexRequest);
-
+NetRequest::NetRequest(string method, string url) : ThreadObj() {
     _method = method;
     _url = url;
     _size = 0;
@@ -30,10 +28,6 @@ NetRequest::NetRequest(string method, string url) {
     _versionNumber = "";
     _numberOfFiles = "";
 
-    progress = 0.f;
-    isComplete = false;
-    hasError = false;
-    errorMessage = "";
     bundle = "";
     channel = "";
     type = "";
@@ -42,9 +36,6 @@ NetRequest::NetRequest(string method, string url) {
 NetRequest::~NetRequest() {
     free(_data);
     free(_headerData);
-
-    threadWaitForExit(&thread);
-    threadClose(&thread);
 }
 
 string NetRequest::getMethod() {

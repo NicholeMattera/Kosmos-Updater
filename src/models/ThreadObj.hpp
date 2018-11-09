@@ -15,23 +15,24 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <string.h>
-#include "Zip.hpp"
+#pragma once
 
-Zip::Zip(string filename, string dest, int numberOfFiles) : ThreadObj() {
-    _filename = filename;
-    _dest = dest;
-    _numberOfFiles = numberOfFiles;
-}
+#include <switch.h>
+#include <string>
 
-string Zip::getFilename() {
-    return _filename;
-}
+using namespace std;
 
-string Zip::getDestination() {
-    return _dest;
-}
+class ThreadObj {
+    public:
+        Thread thread;
+        Mutex mutexRequest;
 
-int Zip::getNumberOfFiles() {
-    return _numberOfFiles;
-}
+        double progress;
+        bool isComplete;
+        bool hasError;
+        string errorMessage;
+
+        ThreadObj();
+        ~ThreadObj();
+    private:
+};

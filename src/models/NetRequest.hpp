@@ -20,18 +20,12 @@
 #include <switch.h>
 #include <string>
 
+#include "ThreadObj.hpp"
+
 using namespace std;
 
-class NetRequest {
+class NetRequest : public ThreadObj {
     public:
-        Thread thread;
-        Mutex mutexRequest;
-        
-        double progress;
-        bool isComplete;
-        bool hasError;
-        string errorMessage;
-    
         string bundle;
         string channel;
         string type;

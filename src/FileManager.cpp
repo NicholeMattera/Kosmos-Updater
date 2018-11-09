@@ -96,39 +96,29 @@ void FileManager::extract(Zip * zip) {
     _createThread(_extract, zip);
 }
 
-void FileManager::cleanUpFiles(vector<string> files, vector<string> filesToIgnore) {
-    for (vector<string>::iterator it = files.begin(); it != files.end(); it++) {
-        string fileName = *it;
-
-        if (find(begin(filesToIgnore), end(filesToIgnore), fileName) != end(filesToIgnore)) {
-            continue;
-        }
-
-        deleteFile(*it);
-    }
+void FileManager::cleanUpFiles(ThreadObj * status) {
+    _createThread(_cleanUpFiles, status);
 }
 
-Result FileManager::_createThread(ThreadFunc func, Zip * zip) {
+Result FileManager::_createThread(ThreadFunc func, ThreadObj * arg) {
     Thread thread;
     Result res;
 
-    if (R_FAILED( res = threadCreate(&thread, func, (void *) zip, 0x2000, 0x2B, -2)))
+    if (R_FAILED( res = threadCreate(&thread, func, (void *) arg, 0x2000, 0x2B, -2)))
         return res;
     if (R_FAILED( res = threadStart(&thread)))
         return res;
 
-    zip->thread = thread;
+    arg->thread = thread;
     _threads.push_back(thread);
 
     return 0;
 }
 
 void FileManager::_extract(void * ptr) {
-    vector<string> filesToIgnore = ConfigManager::getFilesToIgnore();
-    cleanUpFiles(ConfigManager::getInstalledFiles(), filesToIgnore);
-
     Zip * zipObj = (Zip *) ptr;
     unzFile unz = unzOpen(zipObj->getFilename().c_str());
+    vector<string> filesToIgnore = ConfigManager::getFilesToIgnore();
     vector<string> filesInstalled;
     
     int i = 0;
@@ -197,6 +187,34 @@ void FileManager::_extract(void * ptr) {
     }
 
     mutexUnlock(&zipObj->mutexRequest);
+}
+
+void FileManager::_cleanUpFiles(void * ptr) {
+    ThreadObj * threadObj = (ThreadObj *) ptr;
+    vector<string> installedFiles = ConfigManager::getInstalledFiles();
+    vector<string> filesToIgnore = ConfigManager::getFilesToIgnore();
+
+    int i = 0;
+    for (vector<string>::iterator it = installedFiles.begin(); it != installedFiles.end(); it++) {
+        string fileName = *it;
+        i++;
+
+        mutexLock(&threadObj->mutexRequest);
+        threadObj->progress = (double) i / (double) installedFiles.size();
+        threadObj->isComplete = false;
+        mutexUnlock(&threadObj->mutexRequest);
+
+        if (find(begin(filesToIgnore), end(filesToIgnore), fileName) != end(filesToIgnore)) {
+            continue;
+        }
+
+        deleteFile(*it);
+    }
+
+    mutexLock(&threadObj->mutexRequest);
+    threadObj->progress = 1;
+    threadObj->isComplete = false;
+    mutexUnlock(&threadObj->mutexRequest);
 }
 
 unz_file_info_s * FileManager::_getFileInfo(unzFile unz) {
