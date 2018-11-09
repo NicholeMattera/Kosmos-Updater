@@ -25,34 +25,34 @@ void ConfigManager::initialize() {
         config_setting_t * root, * setting;
         root = config_root_setting(&_cfg);
 
-        setting = config_setting_add(root, "host", CONFIG_TYPE_STRING);
-        config_setting_set_string(setting, "http://sdfu.stevenmattera.com");
+        setting = config_setting_add(root, HOST_KEY.c_str(), CONFIG_TYPE_STRING);
+        config_setting_set_string(setting, HOST_DEF.c_str());
 
-        setting = config_setting_add(root, "channel", CONFIG_TYPE_STRING);
-        config_setting_set_string(setting, "stable");
+        setting = config_setting_add(root, CHANNEL_KEY.c_str(), CONFIG_TYPE_STRING);
+        config_setting_set_string(setting, CHANNEL_DEF.c_str());
 
-        setting = config_setting_add(root, "bundle", CONFIG_TYPE_STRING);
-        config_setting_set_string(setting, "sdfiles");
+        setting = config_setting_add(root, BUNDLE_KEY.c_str(), CONFIG_TYPE_STRING);
+        config_setting_set_string(setting, BUNDLE_DEF.c_str());
 
-        setting = config_setting_add(root, "version", CONFIG_TYPE_STRING);
-        config_setting_set_string(setting, "");
+        setting = config_setting_add(root, VERSION_KEY.c_str(), CONFIG_TYPE_STRING);
+        config_setting_set_string(setting, VERSION_DEF.c_str());
 
-        setting = config_setting_add(root, "ignore", CONFIG_TYPE_ARRAY);
+        setting = config_setting_add(root, IGNORE_KEY.c_str(), CONFIG_TYPE_ARRAY);
 
-        setting = config_setting_add(root, "autoupdate", CONFIG_TYPE_BOOL);
-        config_setting_set_bool(setting, true);
+        setting = config_setting_add(root, AUTOUPDATE_KEY.c_str(), CONFIG_TYPE_BOOL);
+        config_setting_set_bool(setting, AUTOUPDATE_DEF);
 
-        setting = config_setting_add(root, "proxy_enabled", CONFIG_TYPE_BOOL);
-        config_setting_set_bool(setting, false);
+        setting = config_setting_add(root, PROXY_ENABLED_KEY.c_str(), CONFIG_TYPE_BOOL);
+        config_setting_set_bool(setting, PROXY_ENABLED_DEF);
         
-        setting = config_setting_add(root, "proxy_url", CONFIG_TYPE_STRING);
-        config_setting_set_string(setting, "");
+        setting = config_setting_add(root, PROXY_URL_KEY.c_str(), CONFIG_TYPE_STRING);
+        config_setting_set_string(setting, PROXY_URL_DEF.c_str());
 
-        setting = config_setting_add(root, "proxy_username", CONFIG_TYPE_STRING);
-        config_setting_set_string(setting, "");
+        setting = config_setting_add(root, PROXY_USERNAME_KEY.c_str(), CONFIG_TYPE_STRING);
+        config_setting_set_string(setting, PROXY_USERNAME_DEF.c_str());
 
-        setting = config_setting_add(root, "proxy_password", CONFIG_TYPE_STRING);
-        config_setting_set_string(setting, "");
+        setting = config_setting_add(root, PROXY_PASSWORD_KEY.c_str(), CONFIG_TYPE_STRING);
+        config_setting_set_string(setting, PROXY_PASSWORD_DEF.c_str());
 
         config_write_file(&_cfg, CONFIG_FILENAME.c_str());
     }
@@ -61,13 +61,13 @@ void ConfigManager::initialize() {
         config_setting_t * root, * setting;
         root = config_root_setting(&_internalDb);
 
-        setting = config_setting_add(root, "installed_files", CONFIG_TYPE_ARRAY);
+        setting = config_setting_add(root, INSTALLED_FILES_KEY.c_str(), CONFIG_TYPE_ARRAY);
         
-        setting = config_setting_add(root, "disabled_game_cart", CONFIG_TYPE_BOOL);
-        config_setting_set_bool(setting, false);
+        setting = config_setting_add(root, DISABLED_GAME_CART_KEY.c_str(), CONFIG_TYPE_BOOL);
+        config_setting_set_bool(setting, DISABLED_GAME_CART_DEF);
         
-        setting = config_setting_add(root, "received_exfat_warning", CONFIG_TYPE_BOOL);
-        config_setting_set_bool(setting, false);
+        setting = config_setting_add(root, RECEIVED_EXFAT_WARNING_KEY.c_str(), CONFIG_TYPE_BOOL);
+        config_setting_set_bool(setting, RECEIVED_EXFAT_WARNING_DEF);
 
         config_write_file(&_internalDb, INTERNAL_FILENAME.c_str());
     }
@@ -79,15 +79,15 @@ void ConfigManager::dealloc() {
 }
 
 string ConfigManager::getHost() {
-    return _readString("host", "http://sdfu.stevenmattera.com", _cfg);
+    return _readString(HOST_KEY.c_str(), HOST_DEF.c_str(), _cfg);
 }
 
 string ConfigManager::getChannel() {
-    return _readString("channel", "stable", _cfg);
+    return _readString(CHANNEL_KEY.c_str(), CHANNEL_DEF.c_str(), _cfg);
 }
 
 string ConfigManager::getBundle() {
-    string bundle = _readString("bundle", "sdfiles", _cfg);
+    string bundle = _readString(BUNDLE_KEY.c_str(), BUNDLE_DEF.c_str(), _cfg);
 
     if (bundle == "hekate-nogc") {
         setBundle("hekate");
@@ -98,69 +98,69 @@ string ConfigManager::getBundle() {
 }
 
 string ConfigManager::getCurrentVersion() {
-    return _readString("version", "", _cfg);
+    return _readString(VERSION_KEY.c_str(), VERSION_DEF.c_str(), _cfg);
 }
 
 vector<string> ConfigManager::getFilesToIgnore() {
     vector<string> defaultValue;
-    return _readArrayOfStrings("ignore", defaultValue, _cfg);
+    return _readArrayOfStrings(IGNORE_KEY.c_str(), defaultValue, _cfg);
 }
 
 bool ConfigManager::shouldAutoUpdate() {
-    return _readBoolean("autoupdate", true, _cfg);
+    return _readBoolean(AUTOUPDATE_KEY.c_str(), AUTOUPDATE_DEF, _cfg);
 }
 
 bool ConfigManager::shouldUseProxy() {
-    return _readBoolean("proxy_enabled", false, _cfg);
+    return _readBoolean(PROXY_ENABLED_KEY.c_str(), PROXY_ENABLED_DEF, _cfg);
 }
 
 string ConfigManager::getProxy() {
-    return _readString("proxy_url", "", _cfg);
+    return _readString(PROXY_URL_KEY.c_str(), PROXY_URL_DEF.c_str(), _cfg);
 }
 
 string ConfigManager::getProxyUsername() {
-    return _readString("proxy_username", "", _cfg);
+    return _readString(PROXY_USERNAME_KEY.c_str(), PROXY_USERNAME_DEF.c_str(), _cfg);
 }
 
 string ConfigManager::getProxyPassword() {
-    return _readString("proxy_password", "", _cfg);
+    return _readString(PROXY_PASSWORD_KEY.c_str(), PROXY_PASSWORD_DEF.c_str(), _cfg);
 }
 
 bool ConfigManager::setChannel(string channel) {
-    return _writeString("channel", channel, _cfg, CONFIG_FILENAME);
+    return _writeString(CHANNEL_KEY.c_str(), channel, _cfg, CONFIG_FILENAME);
 }
 
 bool ConfigManager::setBundle(string bundle) {
-    return _writeString("bundle", bundle, _cfg, CONFIG_FILENAME);
+    return _writeString(BUNDLE_KEY.c_str(), bundle, _cfg, CONFIG_FILENAME);
 }
 
 bool ConfigManager::setCurrentVersion(string version) {
-    return _writeString("version", version, _cfg, CONFIG_FILENAME);
+    return _writeString(VERSION_KEY.c_str(), version, _cfg, CONFIG_FILENAME);
 }
 
 vector<string> ConfigManager::getInstalledFiles() {
     vector<string> defaultValue;
-    return _readArrayOfStrings("installed_files", defaultValue, _internalDb);
+    return _readArrayOfStrings(INSTALLED_FILES_KEY.c_str(), defaultValue, _internalDb);
 }
 
 bool ConfigManager::getDisabledGameCart() {
-    return _readBoolean("disabled_game_cart", false, _internalDb);
+    return _readBoolean(DISABLED_GAME_CART_KEY.c_str(), false, _internalDb);
 }
 
 bool ConfigManager::getReceivedExFATWarning() {
-    return _readBoolean("received_exfat_warning", false, _internalDb);
+    return _readBoolean(RECEIVED_EXFAT_WARNING_KEY.c_str(), false, _internalDb);
 }
 
 bool ConfigManager::setInstalledFiles(vector<string> files) {
-    return _writeArrayOfStrings("installed_files", files, _internalDb, INTERNAL_FILENAME);
+    return _writeArrayOfStrings(INSTALLED_FILES_KEY.c_str(), files, _internalDb, INTERNAL_FILENAME);
 }
 
 bool ConfigManager::setDisabledGameCart(bool disabled) {
-    return _writeBoolean("disabled_game_cart", disabled, _internalDb, INTERNAL_FILENAME);
+    return _writeBoolean(DISABLED_GAME_CART_KEY.c_str(), disabled, _internalDb, INTERNAL_FILENAME);
 }
 
 bool ConfigManager::setReceivedExFATWarning(bool received) {
-    return _writeBoolean("received_exfat_warning", received, _internalDb, INTERNAL_FILENAME);
+    return _writeBoolean(RECEIVED_EXFAT_WARNING_KEY.c_str(), received, _internalDb, INTERNAL_FILENAME);
 }
 
 // Private Methods

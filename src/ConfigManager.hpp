@@ -52,9 +52,6 @@ class ConfigManager {
         static bool setReceivedExFATWarning(bool received);
 
     private:
-        static inline const string CONFIG_FILENAME = "settings.cfg";
-        static inline const string INTERNAL_FILENAME = "internal.db";
-
         static inline config_t _cfg;
         static inline config_t _internalDb;
 
@@ -65,4 +62,44 @@ class ConfigManager {
         static bool _writeBoolean(string key, bool value, config_t config, string filename);
         static bool _writeString(string key, string value, config_t config, string filename);
         static bool _writeArrayOfStrings(string key, vector<string> value, config_t config, string filename);
+
+        static inline const string CONFIG_FILENAME = "settings.cfg";
+        static inline const string INTERNAL_FILENAME = "internal.db";
+
+        static inline const string HOST_KEY = "host";
+        static inline const string HOST_DEF = "http://sdfu.stevenmattera.com";
+
+        static inline const string CHANNEL_KEY = "channel";
+        static inline const string CHANNEL_DEF = "stable";
+
+        static inline const string BUNDLE_KEY = "bundle";
+        static inline const string BUNDLE_DEF = "sdfiles";
+
+        static inline const string VERSION_KEY = "version";
+        static inline const string VERSION_DEF = "";
+
+        static inline const string IGNORE_KEY = "ignore";
+
+        static inline const string AUTOUPDATE_KEY = "autoupdate";
+        static inline const bool AUTOUPDATE_DEF = true;
+
+        static inline const string PROXY_ENABLED_KEY = "proxy_enabled";
+        static inline const bool PROXY_ENABLED_DEF = false;
+
+        static inline const string PROXY_URL_KEY = "proxy_url";
+        static inline const string PROXY_URL_DEF = "";
+
+        static inline const string PROXY_USERNAME_KEY = "proxy_username";
+        static inline const string PROXY_USERNAME_DEF = "";
+
+        static inline const string PROXY_PASSWORD_KEY = "proxy_password";
+        static inline const string PROXY_PASSWORD_DEF = "";
+
+        static inline const string INSTALLED_FILES_KEY = "installed_files";
+
+        static inline const string DISABLED_GAME_CART_KEY = "disabled_game_cart";
+        static inline const bool DISABLED_GAME_CART_DEF = false;
+        
+        static inline const string RECEIVED_EXFAT_WARNING_KEY = "received_exfat_warning";
+        static inline const bool RECEIVED_EXFAT_WARNING_DEF = false;
 };
