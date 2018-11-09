@@ -21,40 +21,21 @@
 #include "../View.hpp"
 #include "TextView.hpp"
 
-typedef enum {
-    DEFAULT,
-    SUBTITLE,
-    VALUE,
-    BOOLEAN
-} ListRowStyle;
-
 using namespace std;
 
-class ListRowView : public View {
+class AlertButtonView : public View {
     public:
-        bool isLast;
-        bool hasCheckmark;
-        
-        ListRowView(string primaryText, string secondaryText, ListRowStyle style);
-        ~ListRowView();
+        AlertButtonView(string title);
+        ~AlertButtonView();
 
         void render(SDL_Rect rect, double dTime);
-
-        void setPrimaryText(string text);
-        void setSecondaryText(string text);
-        void setIsOn(bool isOn);
+        void setTitle(string title);
+        
     private:
         double _timeElapsed;
-        bool _isOn;
 
-        TextView * _primaryTextView;
-        TextView * _secondaryTextView;
-
-        ListRowStyle _style;
+        TextView * _textView;
 
         SDL_Color _generateSelectionColor();
         void _drawBorders(int x1, int y1, int x2, int y2, SDL_Color color);
-        void _renderDefaultStyle(SDL_Rect rect);
-        void _renderSubtitleStyle(SDL_Rect rect);
-        void _renderValueStyle(SDL_Rect rect);
 };

@@ -43,6 +43,7 @@ class PackageSelectScene : public Scene {
         bool _bundleOpen;
         string _bundleSelected;
         int _focusSelection;
+        bool _disabledGameCart;
         
         NetRequest * _versionRequest;
 
@@ -53,6 +54,7 @@ class PackageSelectScene : public Scene {
         ListHeaderView * _settingHeaderView;
         ListRowView * _channelRowView;
         ListRowView * _bundleRowView;
+        ListRowView * _disableGCRowView;
         FooterView * _footerView;
 
         MultiSelectView * _channelMultiSelectView;

@@ -25,6 +25,7 @@ ListRowView::ListRowView(string primaryText, string secondaryText, ListRowStyle 
     frame = { 0, 0, 850, 71 };
 
     _timeElapsed = 0;
+    _isOn = false;
     _style = style;
 
     _primaryTextView = new TextView(AssetManager::body_font, primaryText, AssetManager::text);
@@ -37,7 +38,12 @@ ListRowView::ListRowView(string primaryText, string secondaryText, ListRowStyle 
     addSubView(_primaryTextView);
 
     if (style != DEFAULT) {
-        _secondaryTextView = new TextView(AssetManager::subbody_font, secondaryText, (style == SUBTITLE) ? AssetManager::disabled_text : AssetManager::active_text);
+        if (style == BOOLEAN) {
+            _secondaryTextView = new TextView(AssetManager::subbody_font, "Off", AssetManager::disabled_text);
+        } else {
+            _secondaryTextView = new TextView(AssetManager::subbody_font, secondaryText, (style == SUBTITLE) ? AssetManager::disabled_text : AssetManager::active_text);
+        }
+
         if (style != SUBTITLE) {
             _secondaryTextView->textAlignment = RIGHT_ALIGN;
             _secondaryTextView->frame = { 21, 29, 808, 0 };
@@ -107,6 +113,11 @@ void ListRowView::setPrimaryText(string text) {
 
 void ListRowView::setSecondaryText(string text) {
     _secondaryTextView->setText(text);
+}
+
+void ListRowView::setIsOn(bool isOn) {
+    _secondaryTextView->setText((isOn) ? "On" : "Off");
+    _secondaryTextView->setTextColor((isOn) ? AssetManager::active_text : AssetManager::disabled_text);
 }
 
 SDL_Color ListRowView::_generateSelectionColor() {

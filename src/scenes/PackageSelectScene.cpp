@@ -73,7 +73,13 @@ PackageSelectScene::PackageSelectScene() {
     _bundleRowView = new ListRowView("Bundle", _bundleSelected, VALUE);
     _bundleRowView->frame.x = 215;
     _bundleRowView->frame.y = 359;
-    _bundleRowView->isLast = true;
+
+    _disabledGameCart = ConfigManager::getDisabledGameCart();
+    _disableGCRowView = new ListRowView("Disable Game Cart", "", BOOLEAN);
+    _disableGCRowView->frame.x = 215;
+    _disableGCRowView->frame.y = 430;
+    _disableGCRowView->isLast = true;
+    _disableGCRowView->setIsOn(_disabledGameCart);
 
     _footerView = new FooterView();
     _footerView->frame = { 0, 647, 1280, 73 };
@@ -101,6 +107,7 @@ PackageSelectScene::PackageSelectScene() {
     addSubView(_settingHeaderView);
     addSubView(_channelRowView);
     addSubView(_bundleRowView);
+    addSubView(_disableGCRowView);
     addSubView(_footerView);
 
     _showUpdateView();
@@ -147,7 +154,7 @@ void PackageSelectScene::handleButton(u32 buttons) {
         Mix_PlayChannel(-1, AssetManager::back, 0);
         SceneDirector::exitApp = true;
     }
-    else if (!_updateView->hidden && !_statusView->hidden) {
+    else if (_updateView->hidden && _statusView->hidden) {
         if (buttons & KEY_A) {
             Mix_PlayChannel(-1, AssetManager::enter, 0);
 
@@ -169,6 +176,17 @@ void PackageSelectScene::handleButton(u32 buttons) {
 
                     _bundleMultiSelectView->show();
                     break;
+
+                case 3:
+                    if (_disabledGameCart) {
+                        // TODO: Display Alert View.
+                    } else {
+                        _disabledGameCart = !_disabledGameCart;
+                        _disableGCRowView->setIsOn(_disabledGameCart);
+                        ConfigManager::setDisabledGameCart(_disabledGameCart);
+                    }
+
+                    break;
             }
         }
 
@@ -183,7 +201,7 @@ void PackageSelectScene::handleButton(u32 buttons) {
             _manageFocus();
         }
 
-        if (buttons & KEY_DOWN && _focusSelection != 2) {
+        if (buttons & KEY_DOWN && _focusSelection != 3) {
             Mix_PlayChannel(-1, AssetManager::select, 0);
             _focusSelection++;
             _manageFocus();
@@ -298,6 +316,7 @@ void PackageSelectScene::_manageFocus() {
     _installRowView->hasFocus = false;
     _channelRowView->hasFocus = false;
     _bundleRowView->hasFocus = false;
+    _disableGCRowView->hasFocus = false;
 
     switch(_focusSelection) {
         case 0:
@@ -310,6 +329,10 @@ void PackageSelectScene::_manageFocus() {
 
         case 2:
             _bundleRowView->hasFocus = true;
+            break;
+
+        case 3:
+            _disableGCRowView->hasFocus = true;
             break;
     }
 }

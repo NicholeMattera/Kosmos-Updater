@@ -19,9 +19,9 @@
 
 void ConfigManager::initialize() {
     config_init(&_cfg);
-    config_init(&_fileDb);
+    config_init(&_internalDb);
 
-    if(!config_read_file(&_cfg, "settings.cfg")) {
+    if(!config_read_file(&_cfg, CONFIG_FILENAME.c_str())) {
         config_setting_t * root, * setting;
         root = config_root_setting(&_cfg);
 
@@ -54,34 +54,41 @@ void ConfigManager::initialize() {
         setting = config_setting_add(root, "proxy_password", CONFIG_TYPE_STRING);
         config_setting_set_string(setting, "");
 
-        config_write_file(&_cfg, "settings.cfg");
+        config_write_file(&_cfg, CONFIG_FILENAME.c_str());
     }
 
-    if(!config_read_file(&_fileDb, "files.db")) {
-        config_setting_t * root;
-        root = config_root_setting(&_fileDb);
+    if(!config_read_file(&_internalDb, INTERNAL_FILENAME.c_str())) {
+        config_setting_t * root, * setting;
+        root = config_root_setting(&_internalDb);
 
-        config_setting_add(root, "installed_files", CONFIG_TYPE_ARRAY);
+        setting = config_setting_add(root, "installed_files", CONFIG_TYPE_ARRAY);
+        
+        setting = config_setting_add(root, "disabled_game_cart", CONFIG_TYPE_BOOL);
+        config_setting_set_bool(setting, false);
+        
+        setting = config_setting_add(root, "received_exfat_warning", CONFIG_TYPE_BOOL);
+        config_setting_set_bool(setting, false);
 
-        config_write_file(&_fileDb, "files.db");
+        config_write_file(&_internalDb, INTERNAL_FILENAME.c_str());
     }
 }
 
 void ConfigManager::dealloc() {
     config_destroy(&_cfg);
-    config_destroy(&_fileDb);
+    config_destroy(&_internalDb);
 }
 
 string ConfigManager::getHost() {
-    return _read("host", "http://sdfu.stevenmattera.com");
+    return _readString("host", "http://sdfu.stevenmattera.com", _cfg);
 }
 
 string ConfigManager::getChannel() {
-    return _read("channel", "stable");
+    return _readString("channel", "stable", _cfg);
 }
 
 string ConfigManager::getBundle() {
-    string bundle = _read("bundle", "sdfiles");
+    string bundle = _readString("bundle", "sdfiles", _cfg);
+
     if (bundle == "hekate-nogc") {
         setBundle("hekate");
         return "hekate";
@@ -91,60 +98,97 @@ string ConfigManager::getBundle() {
 }
 
 string ConfigManager::getCurrentVersion() {
-    return _read("version", "");
+    return _readString("version", "", _cfg);
 }
 
 vector<string> ConfigManager::getFilesToIgnore() {
-    vector<string> result;
-    
-    config_setting_t * array = config_lookup(&_cfg, "ignore");
-    if (array == NULL)
-        return result;
-
-    int count = config_setting_length(array);
-    for (int i = 0; i < count; i++) {
-        result.push_back(string(config_setting_get_string_elem(array, i)));
-    }
-
-    return result;
+    vector<string> defaultValue;
+    return _readArrayOfStrings("ignore", defaultValue, _cfg);
 }
 
 bool ConfigManager::shouldAutoUpdate() {
-    int autoupdate;
-
-    if (!config_lookup_bool(&_cfg, "autoupdate", &autoupdate))
-        return true;
-
-    return autoupdate;
+    return _readBoolean("autoupdate", true, _cfg);
 }
 
 bool ConfigManager::shouldUseProxy() {
-    int proxyEnabled;
-
-    if (!config_lookup_bool(&_cfg, "proxy_enabled", &proxyEnabled))
-        return false;
-
-    return proxyEnabled;
+    return _readBoolean("proxy_enabled", false, _cfg);
 }
 
 string ConfigManager::getProxy() {
-    return _read("proxy_url", "");
+    return _readString("proxy_url", "", _cfg);
 }
 
 string ConfigManager::getProxyUsername() {
-    return _read("proxy_username", "");
+    return _readString("proxy_username", "", _cfg);
 }
 
 string ConfigManager::getProxyPassword() {
-    return _read("proxy_password", "");
+    return _readString("proxy_password", "", _cfg);
+}
+
+bool ConfigManager::setChannel(string channel) {
+    return _writeString("channel", channel, _cfg, CONFIG_FILENAME);
+}
+
+bool ConfigManager::setBundle(string bundle) {
+    return _writeString("bundle", bundle, _cfg, CONFIG_FILENAME);
+}
+
+bool ConfigManager::setCurrentVersion(string version) {
+    return _writeString("version", version, _cfg, CONFIG_FILENAME);
 }
 
 vector<string> ConfigManager::getInstalledFiles() {
+    vector<string> defaultValue;
+    return _readArrayOfStrings("installed_files", defaultValue, _internalDb);
+}
+
+bool ConfigManager::getDisabledGameCart() {
+    return _readBoolean("disabled_game_cart", false, _internalDb);
+}
+
+bool ConfigManager::getReceivedExFATWarning() {
+    return _readBoolean("received_exfat_warning", false, _internalDb);
+}
+
+bool ConfigManager::setInstalledFiles(vector<string> files) {
+    return _writeArrayOfStrings("installed_files", files, _internalDb, INTERNAL_FILENAME);
+}
+
+bool ConfigManager::setDisabledGameCart(bool disabled) {
+    return _writeBoolean("disabled_game_cart", disabled, _internalDb, INTERNAL_FILENAME);
+}
+
+bool ConfigManager::setReceivedExFATWarning(bool received) {
+    return _writeBoolean("received_exfat_warning", received, _internalDb, INTERNAL_FILENAME);
+}
+
+// Private Methods
+
+bool ConfigManager::_readBoolean(string key, bool def, config_t config) {
+    int result;
+
+    if (!config_lookup_bool(&_cfg, key.c_str(), &result))
+        return def;
+
+    return result;
+}
+
+string ConfigManager::_readString(string key, string def, config_t config) {
+    const char * result;
+
+    if (!config_lookup_string(&config, key.c_str(), &result))
+        return def;
+
+    return string(result);
+}
+
+vector<string> _readArrayOfStrings(string key, vector<string> def, config_t config) {
     vector<string> result;
     
-    config_setting_t * array = config_lookup(&_fileDb, "installed_files");
+    config_setting_t * array = config_lookup(&config, key.c_str());
     if (array == NULL)
-        return result;
+        return def;
 
     int count = config_setting_length(array);
     for (int i = 0; i < count; i++) {
@@ -154,45 +198,42 @@ vector<string> ConfigManager::getInstalledFiles() {
     return result;
 }
 
-bool ConfigManager::setChannel(string channel) {
-    return _write("channel", channel);
-}
-
-bool ConfigManager::setBundle(string bundle) {
-    return _write("bundle", bundle);
-}
-
-bool ConfigManager::setCurrentVersion(string version) {
-    return _write("version", version);
-}
-
-bool ConfigManager::setInstalledFiles(vector<string> files) {
-    config_setting_t * root = config_root_setting(&_fileDb);
-    config_setting_remove(root, "installed_files");
-
-    config_setting_t * array = config_setting_add(root, "installed_files", CONFIG_TYPE_ARRAY);
-    for (vector<string>::iterator it = files.begin(); it != files.end(); it++) {
-        config_setting_set_string_elem(array, -1, (*it).c_str());
-    }
-
-    return config_write_file(&_fileDb, "files.db");
-}
-
-string ConfigManager::_read(string key, string def) {
-    const char * str;
-
-    if (!config_lookup_string(&_cfg, key.c_str(), &str))
-        return def;
-
-    return string(str);
-}
-
-bool ConfigManager::_write(string key, string value) {
+bool ConfigManager::_writeBoolean(string key, bool value, config_t config, string filename) {
     config_setting_t * root, * setting;
     root = config_root_setting(&_cfg);
 
     setting = config_setting_get_member(root, key.c_str());
+    if (setting == NULL) {
+        setting = config_setting_add(root, key.c_str(), CONFIG_TYPE_BOOL);
+    }
+
+    config_setting_set_bool(setting, value);
+
+    return config_write_file(&_cfg, filename.c_str());
+}
+
+bool ConfigManager::_writeString(string key, string value, config_t config, string filename) {
+    config_setting_t * root, * setting;
+    root = config_root_setting(&_cfg);
+
+    setting = config_setting_get_member(root, key.c_str());
+    if (setting == NULL) {
+        setting = config_setting_add(root, key.c_str(), CONFIG_TYPE_STRING);
+    }
+
     config_setting_set_string(setting, value.c_str());
 
-    return config_write_file(&_cfg, "settings.cfg");
+    return config_write_file(&_cfg, filename.c_str());
+}
+
+bool _writeArrayOfStrings(string key, vector<string> value, config_t config, string filename) {
+    config_setting_t * root = config_root_setting(&config);
+    config_setting_remove(root, key.c_str());
+
+    config_setting_t * array = config_setting_add(root, key.c_str(), CONFIG_TYPE_ARRAY);
+    for (vector<string>::iterator it = value.begin(); it != value.end(); it++) {
+        config_setting_set_string_elem(array, -1, (*it).c_str());
+    }
+
+    return config_write_file(&config, filename.c_str());
 }

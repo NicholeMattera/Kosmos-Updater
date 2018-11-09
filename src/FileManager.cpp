@@ -96,8 +96,14 @@ void FileManager::extract(Zip * zip) {
     _createThread(_extract, zip);
 }
 
-void FileManager::cleanUpFiles(vector<string> files) {
+void FileManager::cleanUpFiles(vector<string> files, vector<string> filesToIgnore) {
     for (vector<string>::iterator it = files.begin(); it != files.end(); it++) {
+        string fileName = *it;
+
+        if (find(begin(filesToIgnore), end(filesToIgnore), fileName) != end(filesToIgnore)) {
+            continue;
+        }
+
         deleteFile(*it);
     }
 }
@@ -118,11 +124,11 @@ Result FileManager::_createThread(ThreadFunc func, Zip * zip) {
 }
 
 void FileManager::_extract(void * ptr) {
-    cleanUpFiles(ConfigManager::getInstalledFiles());
+    vector<string> filesToIgnore = ConfigManager::getFilesToIgnore();
+    cleanUpFiles(ConfigManager::getInstalledFiles(), filesToIgnore);
 
     Zip * zipObj = (Zip *) ptr;
     unzFile unz = unzOpen(zipObj->getFilename().c_str());
-    vector<string> filesToIgnore = ConfigManager::getFilesToIgnore();
     vector<string> filesInstalled;
     
     int i = 0;

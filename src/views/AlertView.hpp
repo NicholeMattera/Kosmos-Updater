@@ -18,43 +18,22 @@
 #pragma once
 
 #include <string>
-#include "../View.hpp"
-#include "TextView.hpp"
-
-typedef enum {
-    DEFAULT,
-    SUBTITLE,
-    VALUE,
-    BOOLEAN
-} ListRowStyle;
+#include <vector>
+#include "../ModalView.hpp"
+#include "HeaderView.hpp"
+#include "ListRowView.hpp"
+#include "FooterView.hpp"
 
 using namespace std;
 
-class ListRowView : public View {
+class AlertView : public ModalView {
     public:
-        bool isLast;
-        bool hasCheckmark;
-        
-        ListRowView(string primaryText, string secondaryText, ListRowStyle style);
-        ~ListRowView();
+        AlertView(string title, string message, vector<string> buttons);
+        ~AlertView();
 
+        void handleButton(u32 buttons);
         void render(SDL_Rect rect, double dTime);
 
-        void setPrimaryText(string text);
-        void setSecondaryText(string text);
-        void setIsOn(bool isOn);
     private:
-        double _timeElapsed;
-        bool _isOn;
-
-        TextView * _primaryTextView;
-        TextView * _secondaryTextView;
-
-        ListRowStyle _style;
-
-        SDL_Color _generateSelectionColor();
-        void _drawBorders(int x1, int y1, int x2, int y2, SDL_Color color);
-        void _renderDefaultStyle(SDL_Rect rect);
-        void _renderSubtitleStyle(SDL_Rect rect);
-        void _renderValueStyle(SDL_Rect rect);
+        long unsigned int _focusSelection;
 };

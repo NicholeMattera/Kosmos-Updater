@@ -39,16 +39,30 @@ class ConfigManager {
         static string getProxyUsername();
         static string getProxyPassword();
 
-        static vector<string> getInstalledFiles();
-
         static bool setChannel(string channel);
         static bool setBundle(string bundle);
         static bool setCurrentVersion(string version);
+
+        static vector<string> getInstalledFiles();
+        static bool getDisabledGameCart();
+        static bool getReceivedExFATWarning();
+
         static bool setInstalledFiles(vector<string> files);
+        static bool setDisabledGameCart(bool disabled);
+        static bool setReceivedExFATWarning(bool received);
 
     private:
+        static inline const string CONFIG_FILENAME = "settings.cfg";
+        static inline const string INTERNAL_FILENAME = "internal.db";
+
         static inline config_t _cfg;
-        static inline config_t _fileDb;
-        static string _read(string key, string def);
-        static bool _write(string key, string value);
+        static inline config_t _internalDb;
+
+        static bool _readBoolean(string key, bool def, config_t config);
+        static string _readString(string key, string def, config_t config);
+        static vector<string> _readArrayOfStrings(string key, vector<string> def, config_t config);
+
+        static bool _writeBoolean(string key, bool value, config_t config, string filename);
+        static bool _writeString(string key, string value, config_t config, string filename);
+        static bool _writeArrayOfStrings(string key, vector<string> value, config_t config, string filename);
 };
