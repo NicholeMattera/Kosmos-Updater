@@ -38,6 +38,7 @@ class PackageDownloadScene : public Scene {
         ThreadObj * _packageDelete;
         NetRequest * _packageRequest;
         Zip * _packageExtract;
+        ThreadObj * _packageDisableGC;
         string _versionNumber;
         int _numberOfFiles;
 
@@ -49,5 +50,6 @@ class PackageDownloadScene : public Scene {
         void _updatePackageDelete();
         void _updatePackageRequest();
         void _updatePackageExtract();
+        void _updatePackageDisableGC();
         void _showStatus(string text, string subtext, bool wasSuccessful);
 };

@@ -50,6 +50,7 @@ PackageDownloadScene::PackageDownloadScene() {
     _packageRequest = NetManager::getLatestSDFiles(bundle, channel, "zip");
     _packageDelete = NULL;
     _packageExtract = NULL;
+    _packageDisableGC = NULL;
 }
 
 PackageDownloadScene::~PackageDownloadScene() {
@@ -68,8 +69,14 @@ PackageDownloadScene::~PackageDownloadScene() {
     if (_packageRequest != NULL)
         delete _packageRequest;
 
+    if (_packageDelete != NULL)
+        delete _packageDelete;
+
     if (_packageExtract != NULL)
         delete _packageExtract;
+
+    if (_packageDisableGC != NULL)
+        delete _packageDisableGC;
 
     bpcExit();
 }
@@ -93,6 +100,9 @@ void PackageDownloadScene::render(SDL_Rect rect, double dTime) {
     }
     else if (_packageExtract != NULL) {
         _updatePackageExtract();
+    }
+    else if (_packageDisableGC != NULL) {
+        _updatePackageDisableGC();
     }
 
     Scene::render(rect, dTime);
@@ -157,7 +167,16 @@ void PackageDownloadScene::_updatePackageExtract() {
         FileManager::deleteFile("temp.zip");
         ConfigManager::setCurrentVersion(_versionNumber);
 
-        _showStatus("SD Files has been updated to version " + _versionNumber + "!", "Please restart your Switch to run the latest SD Files.", true);
+        if (ConfigManager::getDisabledGameCart()) {
+            _updateView->setText("Applying disabled game cart patch...");
+            _updateView->setProgress(0);
+
+            _packageDisableGC = new ThreadObj();
+            FileManager::applyNoGC(_packageDisableGC);
+        }
+        else {
+            _showStatus("SD Files has been updated to version " + _versionNumber + "!", "Please restart your Switch to run the latest SD Files.", true);
+        }
     }
     else if (_packageExtract->hasError) {
         delete _packageExtract;
@@ -170,6 +189,24 @@ void PackageDownloadScene::_updatePackageExtract() {
 
     if (_packageExtract != NULL)
         mutexUnlock(&_packageExtract->mutexRequest);
+}
+
+void PackageDownloadScene::_updatePackageDisableGC() {
+    mutexLock(&_packageDisableGC->mutexRequest);
+
+    _updateView->setProgress(_packageDisableGC->progress);
+    if (_packageDisableGC->isComplete) {
+        delete _packageDisableGC;
+        _packageDisableGC = NULL;
+
+        FileManager::deleteFile("temp.zip");
+        ConfigManager::setCurrentVersion(_versionNumber);
+
+        _showStatus("SD Files has been updated to version " + _versionNumber + "!", "Please restart your Switch to run the latest SD Files.", true);
+    }
+
+    if (_packageDisableGC != NULL)
+        mutexUnlock(&_packageDisableGC->mutexRequest);
 }
 
 void PackageDownloadScene::_showStatus(string text, string subtext, bool wasSuccessful) {

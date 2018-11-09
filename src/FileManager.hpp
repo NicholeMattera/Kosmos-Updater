@@ -34,6 +34,7 @@ class FileManager {
         static bool createSubfolder(string path);
         static void extract(Zip * zip);
         static void cleanUpFiles(ThreadObj * status);
+        static void applyNoGC(ThreadObj * status);
 
     private:
         static inline vector<Thread> _threads;
@@ -41,8 +42,12 @@ class FileManager {
         static Result _createThread(ThreadFunc func, ThreadObj * arg);
         static void _extract(void * ptr);
         static void _cleanUpFiles(void * ptr);
+        static void _applyNoGC(void * ptr);
         static unz_file_info_s * _getFileInfo(unzFile unz);
         static string _getFullFileName(unzFile unz, unz_file_info_s * fileInfo);
         static bool _makeDirectoryParents(string path);
         static int _extractFile(const char * path, unzFile unz, unz_file_info_s * fileInfo);
+
+        static inline const string HEKATE_FILE = "sdmc:/bootloader/hekate_ipl.ini";
+        static inline const string HEKATE_INI_DIRECTORY = "sdmc:/bootloader/ini/";
 };
