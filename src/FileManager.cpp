@@ -23,13 +23,10 @@
 #include "ConfigManager.hpp"
 
 bool FileManager::writeFile(string filename, NetRequest * request) {
-    if (!deleteFile(filename)) {
-        printf("Unable to delete file.");
-    }
+    deleteFile(filename);
 
     FILE * file = fopen(filename.c_str(), "wb");
     if (!file) {
-        printf("Unable to open file.");
         return false;
     }
 
