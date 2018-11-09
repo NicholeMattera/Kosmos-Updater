@@ -19,6 +19,7 @@
 
 #include "../Scene.hpp"
 #include "../models/NetRequest.hpp"
+#include "../models/ThreadObj.hpp"
 #include "../models/Zip.hpp"
 #include "../views/HeaderView.hpp"
 #include "../views/UpdateView.hpp"
@@ -34,15 +35,18 @@ class PackageDownloadScene : public Scene {
         void render(SDL_Rect rect, double dTime);
 
     private:
+        ThreadObj * _packageDelete;
         NetRequest * _packageRequest;
         Zip * _packageExtract;
         string _versionNumber;
+        int _numberOfFiles;
 
         HeaderView * _headerView;
         UpdateView * _updateView;
         StatusView * _statusView;
         FooterView * _footerView;
 
+        void _updatePackageDelete();
         void _updatePackageRequest();
         void _updatePackageExtract();
         void _showStatus(string text, string subtext, bool wasSuccessful);

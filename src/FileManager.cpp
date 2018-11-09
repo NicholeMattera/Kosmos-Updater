@@ -153,9 +153,9 @@ void FileManager::_extract(void * ptr) {
             continue;
         }
 
-        filesInstalled.push_back(fileName);
-
 		if (fileInfo->uncompressed_size != 0 && fileInfo->compression_method != 0) {
+            filesInstalled.push_back(fileName);
+
             int result = _extractFile(fileName.c_str(), unz, fileInfo);
 
 		 	if (result < 0) {
@@ -187,6 +187,8 @@ void FileManager::_extract(void * ptr) {
     }
 
     mutexUnlock(&zipObj->mutexRequest);
+
+    unzClose(unz);
 }
 
 void FileManager::_cleanUpFiles(void * ptr) {
@@ -213,7 +215,7 @@ void FileManager::_cleanUpFiles(void * ptr) {
 
     mutexLock(&threadObj->mutexRequest);
     threadObj->progress = 1;
-    threadObj->isComplete = false;
+    threadObj->isComplete = true;
     mutexUnlock(&threadObj->mutexRequest);
 }
 

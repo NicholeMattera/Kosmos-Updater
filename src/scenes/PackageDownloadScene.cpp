@@ -48,6 +48,7 @@ PackageDownloadScene::PackageDownloadScene() {
     string channel = ConfigManager::getChannel();
     
     _packageRequest = NetManager::getLatestSDFiles(bundle, channel, "zip");
+    _packageDelete = NULL;
     _packageExtract = NULL;
 }
 
@@ -87,6 +88,9 @@ void PackageDownloadScene::render(SDL_Rect rect, double dTime) {
     if (_packageRequest != NULL) {
         _updatePackageRequest();
     }
+    else if (_packageDelete != NULL) {
+        _updatePackageDelete();
+    }
     else if (_packageExtract != NULL) {
         _updatePackageExtract();
     }
@@ -101,16 +105,16 @@ void PackageDownloadScene::_updatePackageRequest() {
     if (_packageRequest->isComplete) {
         FileManager::writeFile("temp.zip", _packageRequest);
         _versionNumber = _packageRequest->getVersionNumber();
-        string numberOfFiles = _packageRequest->getNumberOfFiles();
+        _numberOfFiles = stoi(_packageRequest->getNumberOfFiles());
 
         delete _packageRequest;
         _packageRequest = NULL;
 
-        _updateView->setText("Extracting the latest SDFiles...");
+        _updateView->setText("Removing old package...");
         _updateView->setProgress(0);
 
-        _packageExtract = new Zip("temp.zip", "sdmc:/", stoi(numberOfFiles));
-        FileManager::extract(_packageExtract);
+        _packageDelete = new ThreadObj();
+        FileManager::cleanUpFiles(_packageDelete);
     }
     else if (_packageRequest->hasError) {
         _showStatus(_packageRequest->errorMessage, "Please restart the app to try again.", false);
@@ -121,6 +125,25 @@ void PackageDownloadScene::_updatePackageRequest() {
 
     if (_packageRequest != NULL)
         mutexUnlock(&_packageRequest->mutexRequest);
+}
+
+void PackageDownloadScene::_updatePackageDelete() {
+    mutexLock(&_packageDelete->mutexRequest);
+
+    _updateView->setProgress(_packageDelete->progress);
+    if (_packageDelete->isComplete) {
+        delete _packageDelete;
+        _packageDelete = NULL;
+
+        _updateView->setText("Extracting the latest package...");
+        _updateView->setProgress(0);
+
+        _packageExtract = new Zip("temp.zip", "sdmc:/", _numberOfFiles);
+        FileManager::extract(_packageExtract);
+    }
+
+    if (_packageDelete != NULL)
+        mutexUnlock(&_packageDelete->mutexRequest);
 }
 
 void PackageDownloadScene::_updatePackageExtract() {
@@ -137,12 +160,12 @@ void PackageDownloadScene::_updatePackageExtract() {
         _showStatus("SD Files has been updated to version " + _versionNumber + "!", "Please restart your Switch to run the latest SD Files.", true);
     }
     else if (_packageExtract->hasError) {
+        delete _packageExtract;
+        _packageExtract = NULL;
+
         FileManager::deleteFile("temp.zip");
 
         _showStatus(_packageExtract->errorMessage, "Please restart the app to try again.", false);
-
-        delete _packageExtract;
-        _packageExtract = NULL;
     }
 
     if (_packageExtract != NULL)
