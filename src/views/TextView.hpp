@@ -50,6 +50,7 @@ class TextView : public View {
         ~TextView();
 
         void render(SDL_Rect rect, double dTime);
+        int getTextHeight();
         void setFont(TTF_Font * theFont);
         void setText(string theText);
         void setTextColor(SDL_Color theTextColor);

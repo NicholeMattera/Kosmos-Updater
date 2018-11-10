@@ -70,6 +70,10 @@ void TextView::render(SDL_Rect rect, double dTime) {
     View::render(rect, dTime);
 }
 
+int TextView::getTextHeight() {
+    return _textLines.size() * lineHeight;
+}
+
 void TextView::setFont(TTF_Font * theFont) {
     font = theFont;
     _reset();

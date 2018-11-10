@@ -97,6 +97,12 @@ PackageSelectScene::PackageSelectScene() {
     _bundleMultiSelectView = new MultiSelectView("Bundle", bundleOptions, _bundleSelected);
     _bundleMultiSelectView->onDismiss = bind(&PackageSelectScene::_onMultiSelectDismiss, this, _1, _2);
 
+    vector<string> buttons;
+    buttons.push_back("Yes");
+    buttons.push_back("No");
+    _disabledGameCartAlertView = new AlertView("Are you sure?", "Enabling the game cart after you have updated with\nChoiDujourNX could cause your game cart firmware to\nupgrade, if this happens there is no way to\ndowngrade it later.", buttons);
+    _disabledGameCartAlertView->onDismiss = bind(&PackageSelectScene::_onAlertViewDismiss, this, _1, _2);
+
     addSubView(_headerView);
     addSubView(_updateView);
     addSubView(_statusView);
@@ -142,6 +148,9 @@ PackageSelectScene::~PackageSelectScene() {
     if (_bundleMultiSelectView != NULL)
         delete _bundleMultiSelectView;
 
+    if (_disabledGameCartAlertView != NULL)
+        delete _disabledGameCartAlertView;
+
     if (_versionRequest != NULL)
         delete _versionRequest;
 }
@@ -176,7 +185,8 @@ void PackageSelectScene::handleButton(u32 buttons) {
 
                 case 3:
                     if (_disabledGameCart) {
-                        // TODO: Display Alert View.
+                        _disabledGameCartAlertView->reset();
+                        _disabledGameCartAlertView->show();
                     } else {
                         _disabledGameCart = !_disabledGameCart;
                         _disableGCRowView->setIsOn(_disabledGameCart);
@@ -373,6 +383,14 @@ void PackageSelectScene::_onMultiSelectDismiss(ModalView * view, bool success) {
 
     _focusSelection = (view == _channelMultiSelectView) ? 1 : 2;
     _manageFocus();
+}
+
+void PackageSelectScene::_onAlertViewDismiss(ModalView * view, bool success) {
+    if (success && _disabledGameCartAlertView->getSelectedOption() == 0) {
+        _disabledGameCart = false;
+        _disableGCRowView->setIsOn(false);
+        ConfigManager::setDisabledGameCart(false);
+    }
 }
 
 void PackageSelectScene::_resetVersion(bool channelChange) {

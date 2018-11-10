@@ -25,6 +25,7 @@
 #include "../views/ListRowView.hpp"
 #include "../views/FooterView.hpp"
 #include "../views/MultiSelectView.hpp"
+#include "../views/AlertView.hpp"
 #include "../models/NetRequest.hpp"
 #include "../ModalView.hpp"
 
@@ -59,6 +60,7 @@ class PackageSelectScene : public Scene {
 
         MultiSelectView * _channelMultiSelectView;
         MultiSelectView * _bundleMultiSelectView;
+        AlertView * _disabledGameCartAlertView;
         
         void _updateVersionRequest();
         void _showUpdateView();
@@ -68,6 +70,7 @@ class PackageSelectScene : public Scene {
         void _manageFocus();
 
         void _onMultiSelectDismiss(ModalView * view, bool success);
+        void _onAlertViewDismiss(ModalView * view, bool success);
         void _handleButtonsForChannelMutliSelect(u32 buttons);
         void _handleButtonsForBundleMutliSelect(u32 buttons);
         void _resetVersion(bool channelChange);

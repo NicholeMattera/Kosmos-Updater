@@ -241,6 +241,10 @@ void FileManager::_applyNoGC(void * ptr) {
         threadObj->isComplete = false;
         mutexUnlock(&threadObj->mutexRequest);
 
+        if (!fileExists(fileName)) {
+            continue;
+        }
+
         Ini * ini = Ini::parseFile(fileName);
         for (auto const& section : ini->sections) {
             if (section->isCaption() || section->isComment() || (i == 1 && section->value == "config"))

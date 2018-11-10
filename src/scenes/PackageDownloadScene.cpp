@@ -21,6 +21,8 @@
 #include "../ConfigManager.hpp"
 #include "../FileManager.hpp"
 
+using namespace std::placeholders;
+
 PackageDownloadScene::PackageDownloadScene() {
     bpcInitialize();
     
@@ -38,6 +40,12 @@ PackageDownloadScene::PackageDownloadScene() {
 
     _footerView = new FooterView();
     _footerView->frame = { 0, 647, 1280, 73 };
+
+    vector<string> buttons;
+    buttons.push_back("Restart");
+    buttons.push_back("Quit");
+    _restartAlertView = new AlertView("Are you sure?", "Restarting while using an ExFAT formatted SD card\nwill cause it to corrupt. It is recommended that if\nyou have an ExFAT formatted SD card to quit,\npress the home button, and restart the switch.", buttons);
+    _restartAlertView->onDismiss = bind(&PackageDownloadScene::_onAlertViewDismiss, this, _1, _2);
 
     addSubView(_headerView);
     addSubView(_updateView);
@@ -87,7 +95,8 @@ void PackageDownloadScene::handleButton(u32 buttons) {
     }
 
     if (!_statusView->hidden && _footerView->actions.size() == 2 && buttons & KEY_X) {
-        bpcRebootSystem();
+        _restartAlertView->reset();
+        _restartAlertView->show();
     }
 }
 
@@ -219,5 +228,16 @@ void PackageDownloadScene::_showStatus(string text, string subtext, bool wasSucc
     _footerView->actions.push_back(new Action(A_BUTTON, "Quit"));
     if (wasSuccessful) {
         _footerView->actions.push_back(new Action(X_BUTTON, "Restart"));
+    }
+}
+
+void PackageDownloadScene::_onAlertViewDismiss(ModalView * view, bool success) {
+    if (success) {
+        if (_restartAlertView->getSelectedOption() == 0) {
+            bpcRebootSystem();
+        }
+        else {
+            SceneDirector::exitApp = true;
+        }
     }
 }

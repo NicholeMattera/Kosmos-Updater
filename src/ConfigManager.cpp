@@ -85,7 +85,7 @@ string ConfigManager::getHost() {
 string ConfigManager::getChannel() {
     string channel = _readString(CHANNEL_KEY, CHANNEL_DEF, _cfg);
 
-    if (channel != "stable" || channel != "bleeding-edge") {
+    if (channel != "stable" && channel != "bleeding-edge") {
         return CHANNEL_DEF;
     }
 
@@ -95,7 +95,7 @@ string ConfigManager::getChannel() {
 string ConfigManager::getBundle() {
     string bundle = _readString(BUNDLE_KEY, BUNDLE_DEF, _cfg);
 
-    if (bundle != "kosmos" || bundle != "hekate" || bundle != "atmosphere") {
+    if (bundle != "kosmos" && bundle != "hekate" && bundle != "atmosphere") {
         setBundle(BUNDLE_DEF);
         return BUNDLE_DEF;
     }
@@ -113,6 +113,10 @@ vector<string> ConfigManager::getFilesToIgnore() {
 }
 
 bool ConfigManager::shouldAutoUpdate() {
+    #ifdef DEBUG
+        return false;
+    #endif
+
     return _readBoolean(AUTOUPDATE_KEY, AUTOUPDATE_DEF, _cfg);
 }
 

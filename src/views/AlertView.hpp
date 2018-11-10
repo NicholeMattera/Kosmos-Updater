@@ -21,7 +21,8 @@
 #include <vector>
 #include "../ModalView.hpp"
 #include "HeaderView.hpp"
-#include "ListRowView.hpp"
+#include "TextView.hpp"
+#include "AlertButtonView.hpp"
 #include "FooterView.hpp"
 
 using namespace std;
@@ -33,7 +34,15 @@ class AlertView : public ModalView {
 
         void handleButton(u32 buttons);
         void render(SDL_Rect rect, double dTime);
+        int getSelectedOption();
+        void reset();
 
     private:
-        long unsigned int _focusSelection;
+        int _focusSelection;
+        int _alertY;
+        int _alertHeight;
+
+        TextView * _titleTextView;
+        TextView * _messageTextView;
+        vector<AlertButtonView *> _buttons;
 };

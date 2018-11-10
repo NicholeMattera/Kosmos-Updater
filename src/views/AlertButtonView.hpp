@@ -18,24 +18,22 @@
 #pragma once
 
 #include <string>
-#include "../View.hpp"
+#include "ControlView.hpp"
 #include "TextView.hpp"
 
 using namespace std;
 
-class AlertButtonView : public View {
+class AlertButtonView : public ControlView {
     public:
-        AlertButtonView(string title);
+        bool isLast;
+
+        AlertButtonView(string title, bool hasFocus, SDL_Rect rect);
         ~AlertButtonView();
 
+        void setHasFocus(bool focus);
+
         void render(SDL_Rect rect, double dTime);
-        void setTitle(string title);
         
     private:
-        double _timeElapsed;
-
         TextView * _textView;
-
-        SDL_Color _generateSelectionColor();
-        void _drawBorders(int x1, int y1, int x2, int y2, SDL_Color color);
 };

@@ -25,6 +25,8 @@
 #include "../views/UpdateView.hpp"
 #include "../views/StatusView.hpp"
 #include "../views/FooterView.hpp"
+#include "../views/AlertView.hpp"
+#include "../ModalView.hpp"
 
 class PackageDownloadScene : public Scene {
     public:
@@ -47,9 +49,12 @@ class PackageDownloadScene : public Scene {
         StatusView * _statusView;
         FooterView * _footerView;
 
+        AlertView * _restartAlertView;
+
         void _updatePackageDelete();
         void _updatePackageRequest();
         void _updatePackageExtract();
         void _updatePackageDisableGC();
         void _showStatus(string text, string subtext, bool wasSuccessful);
+        void _onAlertViewDismiss(ModalView * view, bool success);
 };

@@ -18,40 +18,14 @@
 #pragma once
 
 #include <string>
-#include "ControlView.hpp"
-#include "TextView.hpp"
-
-typedef enum {
-    DEFAULT,
-    SUBTITLE,
-    VALUE,
-    BOOLEAN
-} ListRowStyle;
+#include "../View.hpp"
 
 using namespace std;
 
-class ListRowView : public ControlView {
-    public:
-        bool isLast;
-        bool hasCheckmark;
+class ControlView : public View {
+    protected:
+        double _timeElapsed;
         
-        ListRowView(string primaryText, string secondaryText, ListRowStyle style);
-        ~ListRowView();
-
-        void render(SDL_Rect rect, double dTime);
-
-        void setPrimaryText(string text);
-        void setSecondaryText(string text);
-        void setIsOn(bool isOn);
-    private:
-        bool _isOn;
-
-        TextView * _primaryTextView;
-        TextView * _secondaryTextView;
-
-        ListRowStyle _style;
-
-        void _renderDefaultStyle(SDL_Rect rect);
-        void _renderSubtitleStyle(SDL_Rect rect);
-        void _renderValueStyle(SDL_Rect rect);
+        SDL_Color _generateSelectionColor();
+        void _drawBorders(int x1, int y1, int x2, int y2, SDL_Color color);
 };
