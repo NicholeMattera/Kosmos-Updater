@@ -1,4 +1,4 @@
-// SDFiles Updater
+// Kosmos Updater
 // Copyright (C) 2018 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
@@ -27,10 +27,10 @@ PackageSelectScene::PackageSelectScene() {
     _bundleOpen = false;
     _focusSelection = 0;
 
-    _headerView = new HeaderView("SDFiles Updater", true);
+    _headerView = new HeaderView("Kosmos Updater", true);
     _headerView->frame = { 0, 0, 1280, 88 };
 
-    _updateView = new UpdateView("Checking for updates to SDFiles...");
+    _updateView = new UpdateView("Checking for updates to Kosmos...");
     _updateView->frame.x = 0;
     _updateView->frame.y = 200;
 
@@ -38,7 +38,7 @@ PackageSelectScene::PackageSelectScene() {
     _statusView->frame.x = 0;
     _statusView->frame.y = 323;
 
-    _installRowView = new ListRowView("Install Latest SDFiles", "", SUBTITLE);
+    _installRowView = new ListRowView("Install Latest Kosmos", "", SUBTITLE);
     _installRowView->frame.x = 215;
     _installRowView->frame.y = 137;
     _installRowView->isLast = true;
@@ -65,7 +65,7 @@ PackageSelectScene::PackageSelectScene() {
     } else if (bundle == "atmosphere") {
         _bundleSelected = "Atmosphere";
     } else {
-        _bundleSelected = "SDFiles";
+        _bundleSelected = "Kosmos";
     }
 
     _bundleRowView = new ListRowView("Bundle", _bundleSelected, VALUE);
@@ -90,7 +90,7 @@ PackageSelectScene::PackageSelectScene() {
     _channelMultiSelectView->onDismiss = bind(&PackageSelectScene::_onMultiSelectDismiss, this, _1, _2);
 
     vector<string> bundleOptions;
-    bundleOptions.push_back("SDFiles");
+    bundleOptions.push_back("Kosmos");
     bundleOptions.push_back("Hekate");
     bundleOptions.push_back("Atmosphere");
 
@@ -108,7 +108,7 @@ PackageSelectScene::PackageSelectScene() {
     addSubView(_footerView);
 
     _showUpdateView();
-    _versionRequest = NetManager::getLatestSDFilesVersion(channel);
+    _versionRequest = NetManager::getLatestKosmosVersion(channel);
 }
 
 PackageSelectScene::~PackageSelectScene() {
@@ -263,9 +263,9 @@ void PackageSelectScene::_showPackageSelectViews() {
 
     string version = ConfigManager::getCurrentVersion();
     if (version.compare(_latestVersion) == 0) {
-        _installRowView->setPrimaryText("Reinstall SDFiles");
+        _installRowView->setPrimaryText("Reinstall Kosmos");
     } else {
-        _installRowView->setPrimaryText("Install Latest SDFiles");
+        _installRowView->setPrimaryText("Install Latest Kosmos");
     }
 
     if (version == "" || version.compare(_latestVersion) == 0) {
@@ -358,7 +358,7 @@ void PackageSelectScene::_onMultiSelectDismiss(ModalView * view, bool success) {
             } else if (bundle == "Atmosphere") {
                 ConfigManager::setBundle("atmosphere");
             } else {
-                ConfigManager::setBundle("sdfiles");
+                ConfigManager::setBundle("kosmos");
             }
 
             if (bundle.compare(_bundleSelected) != 0) {
@@ -382,6 +382,6 @@ void PackageSelectScene::_resetVersion(bool channelChange) {
         _showUpdateView();
 
         string channel = ConfigManager::getChannel();
-        _versionRequest = NetManager::getLatestSDFilesVersion(channel);
+        _versionRequest = NetManager::getLatestKosmosVersion(channel);
     }
 }

@@ -39,7 +39,7 @@ INCLUDES	:=	include
 EXEFS_SRC	:=	exefs_src
 ROMFS		:=	romfs
 
-APP_TITLE	:= SDFiles Updater
+APP_TITLE	:= Kosmos Updater
 APP_AUTHOR	:= Steven Mattera
 APP_VERSION := 2.1.0
 API_VERSION := v3

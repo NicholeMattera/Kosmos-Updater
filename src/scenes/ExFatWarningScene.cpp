@@ -1,4 +1,4 @@
-// SDFiles Updater
+// Kosmos Updater
 // Copyright (C) 2018 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
@@ -28,7 +28,7 @@ ExFatWarningScene::ExFatWarningScene() {
     _headerTextView->frame = { 0, 122, 1280, 1 };
     _headerTextView->textAlignment = CENTER_ALIGN;
 
-    _bodyTextView = new TextView(AssetManager::body_font, "SDFiles Updater may cause corruption to your SD card if it is formatted as ExFAT. This\nis due to an issue with Nintendo's ExFAT drivers built into the Switch. It is recommended\nthat you use an SD card formatted as FAT32, however if you wish to continue and you are\nusing ExFAT you do so at your own risk. This warning will not show up again.", AssetManager::text);
+    _bodyTextView = new TextView(AssetManager::body_font, "Kosmos Updater may cause corruption to your SD card if it is formatted as ExFAT. This\nis due to an issue with Nintendo's ExFAT drivers built into the Switch. It is recommended\nthat you use an SD card formatted as FAT32, however if you wish to continue and you are\nusing ExFAT you do so at your own risk. This warning will not show up again.", AssetManager::text);
     _bodyTextView->frame = { 0, 272, 1280, 1 };
     _bodyTextView->textAlignment = CENTER_ALIGN;
     _bodyTextView->lineHeight = 50;

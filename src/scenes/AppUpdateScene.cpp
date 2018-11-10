@@ -1,4 +1,4 @@
-// SDFiles Updater
+// Kosmos Updater
 // Copyright (C) 2018 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
@@ -21,10 +21,10 @@
 #include "../FileManager.hpp"
 
 AppUpdateScene::AppUpdateScene() {
-    _headerView = new HeaderView("SDFiles Updater", true);
+    _headerView = new HeaderView("Kosmos Updater", true);
     _headerView->frame = { 0, 0, 1280, 88 };
 
-    _updateView = new UpdateView("Checking for updates to SDFiles Updater...");
+    _updateView = new UpdateView("Checking for updates to Kosmos Updater...");
     _updateView->frame.x = 0;
     _updateView->frame.y = 200;
 
@@ -99,7 +99,7 @@ void AppUpdateScene::_updateVersionRequest() {
             _versionRequest = NULL;
 
             _updateView->setProgress(0);
-            _updateView->setText("Getting the latest version of SDFiles Updater...");
+            _updateView->setText("Getting the latest version of Kosmos Updater...");
 
             _appRequest = NetManager::getLatestApp();
         }
@@ -121,12 +121,12 @@ void AppUpdateScene::_updateAppRequest() {
     _updateView->setProgress(_appRequest->progress);
     if (_appRequest->isComplete) {
         romfsExit();
-        FileManager::writeFile("SDFilesUpdater.nro", _appRequest);
+        FileManager::writeFile("KosmosUpdater.nro", _appRequest);
 
         delete _appRequest;
         _appRequest = NULL;
 
-        _showStatus("SDFiles Updater has been updated to version " + _latestAppVersion + "!", "Please restart the app to update your files.");
+        _showStatus("Kosmos Updater has been updated to version " + _latestAppVersion + "!", "Please restart the app to update your files.");
     }
     else if (_appRequest->hasError) {
         _showStatus(_appRequest->errorMessage, "Please restart the app to try again.");

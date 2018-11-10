@@ -1,4 +1,4 @@
-// SDFiles Updater
+// Kosmos Updater
 // Copyright (C) 2018 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
@@ -73,7 +73,7 @@ class ConfigManager {
         static inline const string CHANNEL_DEF = "stable";
 
         static inline const string BUNDLE_KEY = "bundle";
-        static inline const string BUNDLE_DEF = "sdfiles";
+        static inline const string BUNDLE_DEF = "kosmos";
 
         static inline const string VERSION_KEY = "version";
         static inline const string VERSION_DEF = "";

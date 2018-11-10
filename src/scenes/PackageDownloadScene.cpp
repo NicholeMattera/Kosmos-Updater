@@ -1,4 +1,4 @@
-// SDFiles Updater
+// Kosmos Updater
 // Copyright (C) 2018 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
@@ -24,10 +24,10 @@
 PackageDownloadScene::PackageDownloadScene() {
     bpcInitialize();
     
-    _headerView = new HeaderView("SDFiles Updater", true);
+    _headerView = new HeaderView("Kosmos Updater", true);
     _headerView->frame = { 0, 0, 1280, 88 };
 
-    _updateView = new UpdateView("Downloading the latest SDFiles...");
+    _updateView = new UpdateView("Downloading the latest Kosmos...");
     _updateView->frame.x = 0;
     _updateView->frame.y = 200;
 
@@ -47,7 +47,7 @@ PackageDownloadScene::PackageDownloadScene() {
     string bundle = ConfigManager::getBundle();
     string channel = ConfigManager::getChannel();
     
-    _packageRequest = NetManager::getLatestSDFiles(bundle, channel, "zip");
+    _packageRequest = NetManager::getLatestKosmos(bundle, channel, "zip");
     _packageDelete = NULL;
     _packageExtract = NULL;
     _packageDisableGC = NULL;

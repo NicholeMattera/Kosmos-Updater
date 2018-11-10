@@ -1,4 +1,4 @@
-// SDFiles Updater
+// Kosmos Updater
 // Copyright (C) 2018 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
@@ -32,8 +32,8 @@ class NetManager {
 
         static NetRequest * getLatestAppVersion();
         static NetRequest * getLatestApp();
-        static NetRequest * getLatestSDFilesVersion(string channel);
-        static NetRequest * getLatestSDFiles(string bundle, string channel, string type);
+        static NetRequest * getLatestKosmosVersion(string channel);
+        static NetRequest * getLatestKosmos(string bundle, string channel, string type);
 
     private:
         static inline bool _shouldUseProxy;

@@ -1,4 +1,4 @@
-// SDFiles Updater
+// Kosmos Updater
 // Copyright (C) 2018 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
@@ -51,14 +51,14 @@ NetRequest * NetManager::getLatestApp() {
     return request;
 }
 
-NetRequest * NetManager::getLatestSDFilesVersion(string channel) {
+NetRequest * NetManager::getLatestKosmosVersion(string channel) {
     NetRequest * request = new NetRequest("GET", _hostname + "/" + API_VERSION + "/package/version-number");
     request->channel = channel;
     _createThread(_request, request);
     return request;
 }
 
-NetRequest * NetManager::getLatestSDFiles(string bundle, string channel, string type) {
+NetRequest * NetManager::getLatestKosmos(string bundle, string channel, string type) {
     NetRequest * request = new NetRequest("GET", _hostname + "/" + API_VERSION + "/package");
     request->bundle = bundle;
     request->channel = channel;
@@ -86,7 +86,7 @@ void NetManager::_request(void * ptr) {
     NetRequest * request = (NetRequest *) ptr;
     CURL * curl;
     CURLcode res;
-    string userAgent = string("sdfiles-updater/") + VERSION;
+    string userAgent = string("kosmos-updater/") + VERSION;
 
     curl = curl_easy_init();
 

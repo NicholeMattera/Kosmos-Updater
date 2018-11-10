@@ -1,4 +1,4 @@
-// SDFiles Updater
+// Kosmos Updater
 // Copyright (C) 2018 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
@@ -95,7 +95,7 @@ string ConfigManager::getChannel() {
 string ConfigManager::getBundle() {
     string bundle = _readString(BUNDLE_KEY, BUNDLE_DEF, _cfg);
 
-    if (bundle != "sdfiles" || bundle != "hekate" || bundle != "atmosphere") {
+    if (bundle != "kosmos" || bundle != "hekate" || bundle != "atmosphere") {
         setBundle(BUNDLE_DEF);
         return BUNDLE_DEF;
     }
