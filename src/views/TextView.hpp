@@ -19,6 +19,7 @@
 
 #include <SDL2/SDL_ttf.h>
 #include <string>
+#include <vector>
 #include "../View.hpp"
 
 typedef enum {
@@ -29,6 +30,13 @@ typedef enum {
 
 using namespace std;
 
+class TextLine {
+    public:
+        SDL_Texture * textTexture;
+        int textWidth;
+        int textHeight;
+};
+
 class TextView : public View {
     public:
         TTF_Font * font;
@@ -36,6 +44,7 @@ class TextView : public View {
         SDL_Color textColor;
         TextAlignment textAlignment;
         int alpha;
+        int lineHeight;
 
         TextView(TTF_Font * theFont, string theText, SDL_Color theTextColor);
         ~TextView();
@@ -44,11 +53,9 @@ class TextView : public View {
         void setFont(TTF_Font * theFont);
         void setText(string theText);
         void setTextColor(SDL_Color theTextColor);
+        void setLineHeight(int lineHeight);
 
     private:
-        SDL_Texture * _textTexture;
-        int _textWidth;
-        int _textHeight;
-
+        vector<TextLine *> _textLines;
         void _reset();
 };

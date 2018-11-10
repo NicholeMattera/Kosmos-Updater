@@ -28,21 +28,10 @@ ExFatWarningScene::ExFatWarningScene() {
     _headerTextView->frame = { 0, 122, 1280, 1 };
     _headerTextView->textAlignment = CENTER_ALIGN;
 
-    _bodyOneTextView = new TextView(AssetManager::body_font, "SDFiles Updater may cause corruption to your SD card if it is formatted as ExFAT. This", AssetManager::text);
-    _bodyOneTextView->frame = { 0, 272, 1280, 1 };
-    _bodyOneTextView->textAlignment = CENTER_ALIGN;
-
-    _bodyTwoTextView = new TextView(AssetManager::body_font, "is due to an issue with Nintendo's ExFAT drivers built into the Switch. It is recommended", AssetManager::text);
-    _bodyTwoTextView->frame = { 0, 322, 1280, 1 };
-    _bodyTwoTextView->textAlignment = CENTER_ALIGN;
-
-    _bodyThreeTextView = new TextView(AssetManager::body_font, "that you use an SD card formatted as FAT32, however if you wish to continue and you are", AssetManager::text);
-    _bodyThreeTextView->frame = { 0, 372, 1280, 1 };
-    _bodyThreeTextView->textAlignment = CENTER_ALIGN;
-
-    _bodyFourTextView = new TextView(AssetManager::body_font, "using ExFAT you do so at your own risk. This warning will not show up again.", AssetManager::text);
-    _bodyFourTextView->frame = { 0, 422, 1280, 1 };
-    _bodyFourTextView->textAlignment = CENTER_ALIGN;
+    _bodyTextView = new TextView(AssetManager::body_font, "SDFiles Updater may cause corruption to your SD card if it is formatted as ExFAT. This\nis due to an issue with Nintendo's ExFAT drivers built into the Switch. It is recommended\nthat you use an SD card formatted as FAT32, however if you wish to continue and you are\nusing ExFAT you do so at your own risk. This warning will not show up again.", AssetManager::text);
+    _bodyTextView->frame = { 0, 272, 1280, 1 };
+    _bodyTextView->textAlignment = CENTER_ALIGN;
+    _bodyTextView->lineHeight = 50;
 
     _footerTextView = new TextView(AssetManager::header_font, "Press any button to contine.", AssetManager::text);
     _footerTextView->frame = { 0, 567, 1280, 1 };
@@ -50,10 +39,7 @@ ExFatWarningScene::ExFatWarningScene() {
     _footerTextView->alpha = 0;
 
     addSubView(_headerTextView);
-    addSubView(_bodyOneTextView);
-    addSubView(_bodyTwoTextView);
-    addSubView(_bodyThreeTextView);
-    addSubView(_bodyFourTextView);
+    addSubView(_bodyTextView);
     addSubView(_footerTextView);
 }
 
@@ -61,17 +47,8 @@ ExFatWarningScene::~ExFatWarningScene() {
     if (_headerTextView != NULL)
         delete _headerTextView;
 
-    if (_bodyOneTextView != NULL)
-        delete _bodyOneTextView;
-
-    if (_bodyTwoTextView != NULL)
-        delete _bodyTwoTextView;
-
-    if (_bodyThreeTextView != NULL)
-        delete _bodyThreeTextView;
-
-    if (_bodyFourTextView != NULL)
-        delete _bodyFourTextView;
+    if (_bodyTextView != NULL)
+        delete _bodyTextView;
 
     if (_footerTextView != NULL)
         delete _footerTextView;

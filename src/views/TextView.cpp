@@ -16,6 +16,7 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "TextView.hpp"
+#include <sstream>
 #include "../SceneDirector.hpp"
 
 TextView::TextView(TTF_Font * theFont, string theText, SDL_Color theTextColor) : View() {
@@ -23,52 +24,46 @@ TextView::TextView(TTF_Font * theFont, string theText, SDL_Color theTextColor) :
     isTouchable = false;
     textAlignment = LEFT_ALIGN;
     alpha = 255;
-    _textTexture = NULL;
+    lineHeight = TTF_FontHeight(theFont);
     
     font = theFont;
     text = theText;
     textColor = theTextColor;
+    _reset();
 }
 
 TextView::~TextView() {
-    if (_textTexture != NULL)
-        SDL_DestroyTexture(_textTexture);
+    for (auto const& textLine : _textLines) {
+        SDL_DestroyTexture(textLine->textTexture);
+    }
+    _textLines.clear();
 }
 
 void TextView::render(SDL_Rect rect, double dTime) {
-    // Create texture if it doesn't already exists.
-    if (_textTexture == NULL) {
-        SDL_Surface *surface = TTF_RenderText_Blended(font, text.c_str(), textColor);
-        if (surface != NULL) {
-            _textTexture = SDL_CreateTextureFromSurface(SceneDirector::renderer, surface);
-            _textWidth = surface->w;
-            _textHeight = surface->h;
-            SDL_FreeSurface(surface);
-        }
-    }
-
-    if (_textTexture != NULL) {
-        SDL_SetTextureAlphaMod(_textTexture, alpha);
+    int y = rect.y;
+    for (auto const& textLine : _textLines) {
+        SDL_SetTextureAlphaMod(textLine->textTexture, alpha);
 
         int x = 0;
-        int width = max(_textWidth, rect.w);
+        int width = max(textLine->textWidth, rect.w);
         switch (textAlignment) {
             case LEFT_ALIGN:
                 x = rect.x;
                 break;
 
             case CENTER_ALIGN:
-                x = rect.x + (width - _textWidth) / 2;
+                x = rect.x + (width - textLine->textWidth) / 2;
                 break;
 
             case RIGHT_ALIGN:
-                x = rect.x + width - _textWidth;
+                x = rect.x + width - textLine->textWidth;
                 break;
         }
-        
-        // Render the text.
-        SDL_Rect textFrame = { x, rect.y, _textWidth, _textHeight };
-        SDL_RenderCopy(SceneDirector::renderer, _textTexture, NULL, &textFrame);
+
+        SDL_Rect textFrame = { x, y, textLine->textWidth, textLine->textHeight };
+        SDL_RenderCopy(SceneDirector::renderer, textLine->textTexture, NULL, &textFrame);
+
+        y += lineHeight;
     }
 
     // Render any subviews.
@@ -91,11 +86,22 @@ void TextView::setTextColor(SDL_Color theTextColor) {
 }
 
 void TextView::_reset() {
-    if (_textTexture != NULL) {
-        SDL_DestroyTexture(_textTexture);
-        _textTexture = NULL;
+    for (auto const& textLine : _textLines) {
+        SDL_DestroyTexture(textLine->textTexture);
     }
+    _textLines.clear();
 
-    _textWidth = 0;
-    _textHeight = 0;
+    stringstream textStream = stringstream(text);
+    string text;
+    while(getline(textStream, text, '\n')) {
+        SDL_Surface *surface = TTF_RenderText_Blended(font, text.c_str(), textColor);
+        if (surface != NULL) {
+            TextLine * textLine = new TextLine();
+            textLine->textTexture = SDL_CreateTextureFromSurface(SceneDirector::renderer, surface);
+            textLine->textWidth = surface->w;
+            textLine->textHeight = surface->h;
+            SDL_FreeSurface(surface);
+            _textLines.push_back(textLine);
+        }
+    }
 }

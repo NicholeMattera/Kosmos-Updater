@@ -36,9 +36,6 @@ class ExFatWarningScene : public Scene {
         bool _footerVisible;
 
         TextView * _headerTextView;
-        TextView * _bodyOneTextView;
-        TextView * _bodyTwoTextView;
-        TextView * _bodyThreeTextView;
-        TextView * _bodyFourTextView;
+        TextView * _bodyTextView;
         TextView * _footerTextView;
 };
