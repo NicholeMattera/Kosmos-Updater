@@ -17,38 +17,28 @@
 
 #pragma once
 
-#include <SDL2/SDL_ttf.h>
 #include <string>
-#include "../View.hpp"
-
-typedef enum {
-    LEFT_ALIGN,
-    CENTER_ALIGN,
-    RIGHT_ALIGN
-} TextAlignment;
+#include "../Scene.hpp"
+#include "../views/TextView.hpp"
 
 using namespace std;
 
-class TextView : public View {
+class ExFatWarningScene : public Scene {
     public:
-        TTF_Font * font;
-        string text;
-        SDL_Color textColor;
-        TextAlignment textAlignment;
-        int alpha;
-
-        TextView(TTF_Font * theFont, string theText, SDL_Color theTextColor);
-        ~TextView();
-
+        ExFatWarningScene();
+        ~ExFatWarningScene();
+        
+        void handleButton(u32 buttons);
         void render(SDL_Rect rect, double dTime);
-        void setFont(TTF_Font * theFont);
-        void setText(string theText);
-        void setTextColor(SDL_Color theTextColor);
 
     private:
-        SDL_Texture * _textTexture;
-        int _textWidth;
-        int _textHeight;
+        double _timeSpent;
+        bool _footerVisible;
 
-        void _reset();
+        TextView * _headerTextView;
+        TextView * _bodyOneTextView;
+        TextView * _bodyTwoTextView;
+        TextView * _bodyThreeTextView;
+        TextView * _bodyFourTextView;
+        TextView * _footerTextView;
 };

@@ -168,7 +168,7 @@ bool ConfigManager::setReceivedExFATWarning(bool received) {
 bool ConfigManager::_readBoolean(string key, bool def, config_t config) {
     int result;
 
-    if (!config_lookup_bool(&_cfg, key.c_str(), &result))
+    if (!config_lookup_bool(&config, key.c_str(), &result))
         return def;
 
     return result;
@@ -200,7 +200,7 @@ vector<string> ConfigManager::_readArrayOfStrings(string key, vector<string> def
 
 bool ConfigManager::_writeBoolean(string key, bool value, config_t config, string filename) {
     config_setting_t * root, * setting;
-    root = config_root_setting(&_cfg);
+    root = config_root_setting(&config);
 
     setting = config_setting_get_member(root, key.c_str());
     if (setting == NULL) {
@@ -209,12 +209,12 @@ bool ConfigManager::_writeBoolean(string key, bool value, config_t config, strin
 
     config_setting_set_bool(setting, value);
 
-    return config_write_file(&_cfg, filename.c_str());
+    return config_write_file(&config, filename.c_str());
 }
 
 bool ConfigManager::_writeString(string key, string value, config_t config, string filename) {
     config_setting_t * root, * setting;
-    root = config_root_setting(&_cfg);
+    root = config_root_setting(&config);
 
     setting = config_setting_get_member(root, key.c_str());
     if (setting == NULL) {
@@ -223,7 +223,7 @@ bool ConfigManager::_writeString(string key, string value, config_t config, stri
 
     config_setting_set_string(setting, value.c_str());
 
-    return config_write_file(&_cfg, filename.c_str());
+    return config_write_file(&config, filename.c_str());
 }
 
 bool ConfigManager::_writeArrayOfStrings(string key, vector<string> value, config_t config, string filename) {

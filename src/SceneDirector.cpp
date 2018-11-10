@@ -44,17 +44,24 @@ SceneDirector::SceneDirector() {
 
     _now = SDL_GetPerformanceCounter();
     _last = 0;
+    _exFatWarningScene = NULL;
     _appUpdateScene = NULL;
     _packageSelectScene = NULL;
     _packageDownloadScene = NULL;
     _currentScene = NULL;
 
-    if (!ConfigManager::shouldAutoUpdate()) {
+    if (!ConfigManager::getReceivedExFATWarning()) {
+        currentScene = SCENE_EXFAT_WARNING;
+    }
+    else if (!ConfigManager::shouldAutoUpdate()) {
         currentScene = SCENE_PACKAGE_SELECT;
     }
 }
 
 SceneDirector::~SceneDirector() {
+    if (_exFatWarningScene != NULL)
+        delete _exFatWarningScene;
+
     if (_appUpdateScene != NULL)
         delete _appUpdateScene;
 
@@ -98,6 +105,13 @@ bool SceneDirector::direct() {
 
     // Unload previous scenes
     switch(SceneDirector::currentScene) {
+        case SCENE_APP_UPDATE:
+            if (_exFatWarningScene != NULL) {
+                delete _exFatWarningScene;
+                _exFatWarningScene = NULL;
+            }
+            break;
+
         case SCENE_PACKAGE_SELECT:
             if (_appUpdateScene != NULL) {
                 delete _appUpdateScene;
@@ -124,6 +138,13 @@ bool SceneDirector::direct() {
 
     // Load new scenes
     switch(SceneDirector::currentScene) {
+        case SCENE_EXFAT_WARNING:
+            if (_exFatWarningScene == NULL)
+                _exFatWarningScene = new ExFatWarningScene();
+
+            _currentScene = _exFatWarningScene;
+            break;
+
         case SCENE_APP_UPDATE:
             if (_appUpdateScene == NULL)
                 _appUpdateScene = new AppUpdateScene();

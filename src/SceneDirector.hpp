@@ -22,11 +22,13 @@
 #include "Scene.hpp"
 #include "ModalView.hpp"
 
+#include "scenes/ExFatWarningScene.hpp"
 #include "scenes/AppUpdateScene.hpp"
 #include "scenes/PackageSelectScene.hpp"
 #include "scenes/PackageDownloadScene.hpp"
 
 typedef enum {
+    SCENE_EXFAT_WARNING,
     SCENE_APP_UPDATE,
     SCENE_PACKAGE_SELECT,
     SCENE_PACKAGE_DOWNLOAD
@@ -52,6 +54,7 @@ class SceneDirector {
         Uint64 _last;
 
         Scene * _currentScene;
+        ExFatWarningScene * _exFatWarningScene;
         AppUpdateScene * _appUpdateScene;
         PackageSelectScene * _packageSelectScene;
         PackageDownloadScene * _packageDownloadScene;

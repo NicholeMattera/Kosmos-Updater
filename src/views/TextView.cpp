@@ -22,6 +22,7 @@ TextView::TextView(TTF_Font * theFont, string theText, SDL_Color theTextColor) :
     isFocusable = false;
     isTouchable = false;
     textAlignment = LEFT_ALIGN;
+    alpha = 255;
     _textTexture = NULL;
     
     font = theFont;
@@ -47,6 +48,8 @@ void TextView::render(SDL_Rect rect, double dTime) {
     }
 
     if (_textTexture != NULL) {
+        SDL_SetTextureAlphaMod(_textTexture, alpha);
+
         int x = 0;
         int width = max(_textWidth, rect.w);
         switch (textAlignment) {
