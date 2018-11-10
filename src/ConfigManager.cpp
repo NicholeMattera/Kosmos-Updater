@@ -83,15 +83,21 @@ string ConfigManager::getHost() {
 }
 
 string ConfigManager::getChannel() {
-    return _readString(CHANNEL_KEY, CHANNEL_DEF, _cfg);
+    string channel = _readString(CHANNEL_KEY, CHANNEL_DEF, _cfg);
+
+    if (channel != "stable" || channel != "bleeding-edge") {
+        return CHANNEL_DEF;
+    }
+
+    return channel;
 }
 
 string ConfigManager::getBundle() {
     string bundle = _readString(BUNDLE_KEY, BUNDLE_DEF, _cfg);
 
-    if (bundle == "hekate-nogc") {
-        setBundle("hekate");
-        return "hekate";
+    if (bundle != "sdfiles" || bundle != "hekate" || bundle != "atmosphere") {
+        setBundle(BUNDLE_DEF);
+        return BUNDLE_DEF;
     }
 
     return bundle;

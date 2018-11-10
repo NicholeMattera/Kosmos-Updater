@@ -64,8 +64,6 @@ PackageSelectScene::PackageSelectScene() {
         _bundleSelected = "Hekate";
     } else if (bundle == "atmosphere") {
         _bundleSelected = "Atmosphere";
-    } else if (bundle == "reinx") {
-        _bundleSelected = "ReiNX";
     } else {
         _bundleSelected = "SDFiles";
     }
@@ -95,7 +93,6 @@ PackageSelectScene::PackageSelectScene() {
     bundleOptions.push_back("SDFiles");
     bundleOptions.push_back("Hekate");
     bundleOptions.push_back("Atmosphere");
-    bundleOptions.push_back("ReiNX");
 
     _bundleMultiSelectView = new MultiSelectView("Bundle", bundleOptions, _bundleSelected);
     _bundleMultiSelectView->onDismiss = bind(&PackageSelectScene::_onMultiSelectDismiss, this, _1, _2);
@@ -360,8 +357,6 @@ void PackageSelectScene::_onMultiSelectDismiss(ModalView * view, bool success) {
                 ConfigManager::setBundle("hekate");
             } else if (bundle == "Atmosphere") {
                 ConfigManager::setBundle("atmosphere");
-            } else if (bundle == "ReiNX") {
-                ConfigManager::setBundle("reinx");
             } else {
                 ConfigManager::setBundle("sdfiles");
             }

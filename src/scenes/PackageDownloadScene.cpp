@@ -175,7 +175,7 @@ void PackageDownloadScene::_updatePackageExtract() {
             FileManager::applyNoGC(_packageDisableGC);
         }
         else {
-            _showStatus("SD Files has been updated to version " + _versionNumber + "!", "Please restart your Switch to run the latest SD Files.", true);
+            _showStatus("SD Files has been updated to version " + ((_versionNumber.size() > 7) ? _versionNumber.substr(0, 7) : _versionNumber) + "!", "Please restart your Switch to run the latest SD Files.", true);
         }
     }
     else if (_packageExtract->hasError) {
