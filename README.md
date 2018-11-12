@@ -10,7 +10,7 @@ A homebrew application for the Nintendo Switch that will automatically update yo
 | `channel = "stable";`                                                      | Stable (*stable*) will download the latest tag and bleeding edge (*bleeding-edge*) will download the latest commit.
 | `bundle = "kosmos";`                                                      | The bundle to install. (`kosmos`, `hekate`, or `atmosphere`)
 | `version = "";`                                                            | The version of Kosmos that is currently installed on your SD card.
-| `ignore = [ "sdmc:/fileToIgnore.nro", "sdmc:/anotherFileToIgnore.nro" ];`  | Array of files to ignore when extracting.
+| `ignore = [ "sdmc://fileToIgnore.nro", "sdmc://anotherFileToIgnore.nro" ];`  | Array of files to ignore when extracting.
 | `autoupdate = true;`                                                       | Whether or not to auto update Kosmos Updater.
 | `proxy_enabled = false;`                                                   | Whether or not to use a proxy for network calls.
 | `proxy_url = "http://example.com:8080";`                                   | The URL of the proxy server.
