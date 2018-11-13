@@ -67,7 +67,7 @@ class ConfigManager {
         static inline const string INTERNAL_FILENAME = "internal.db";
 
         static inline const string HOST_KEY = "host";
-        static inline const string HOST_DEF = "http://sdfu.stevenmattera.com";
+        static inline const string HOST_DEF = "http://kosmos-updater.teamatlasnx.com";
 
         static inline const string CHANNEL_KEY = "channel";
         static inline const string CHANNEL_DEF = "stable";

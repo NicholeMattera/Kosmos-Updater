@@ -79,13 +79,21 @@ void ConfigManager::dealloc() {
 }
 
 string ConfigManager::getHost() {
-    return _readString(HOST_KEY, HOST_DEF, _cfg);
+    string host = _readString(HOST_KEY, HOST_DEF, _cfg);
+
+    if (host == "http://sdfu.stevenmattera.com") {
+        _writeString(HOST_KEY, HOST_DEF, _cfg, CONFIG_FILENAME);
+        return HOST_DEF;
+    }
+
+    return host;
 }
 
 string ConfigManager::getChannel() {
     string channel = _readString(CHANNEL_KEY, CHANNEL_DEF, _cfg);
 
     if (channel != "stable" && channel != "bleeding-edge") {
+        setChannel(CHANNEL_DEF);
         return CHANNEL_DEF;
     }
 
