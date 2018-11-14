@@ -60,9 +60,7 @@ PackageSelectScene::PackageSelectScene() {
     _channelRowView->frame.y = 288;
 
     string bundle = ConfigManager::getBundle();
-    if (bundle == "hekate") {
-        _bundleSelected = "Hekate";
-    } else if (bundle == "atmosphere") {
+    if (bundle == "atmosphere") {
         _bundleSelected = "Atmosphere";
     } else {
         _bundleSelected = "Kosmos";
@@ -91,7 +89,6 @@ PackageSelectScene::PackageSelectScene() {
 
     vector<string> bundleOptions;
     bundleOptions.push_back("Kosmos");
-    bundleOptions.push_back("Hekate");
     bundleOptions.push_back("Atmosphere");
 
     _bundleMultiSelectView = new MultiSelectView("Bundle", bundleOptions, _bundleSelected);
@@ -363,9 +360,7 @@ void PackageSelectScene::_onMultiSelectDismiss(ModalView * view, bool success) {
             _channelMultiSelectView->reset(_channelSelected);
         } else {
             string bundle = _bundleMultiSelectView->getSelectedOption();
-            if (bundle == "Hekate") {
-                ConfigManager::setBundle("hekate");
-            } else if (bundle == "Atmosphere") {
+            if (bundle == "Atmosphere") {
                 ConfigManager::setBundle("atmosphere");
             } else {
                 ConfigManager::setBundle("kosmos");

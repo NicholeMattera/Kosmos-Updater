@@ -103,7 +103,7 @@ string ConfigManager::getChannel() {
 string ConfigManager::getBundle() {
     string bundle = _readString(BUNDLE_KEY, BUNDLE_DEF, _cfg);
 
-    if (bundle != "kosmos" && bundle != "hekate" && bundle != "atmosphere") {
+    if (bundle != "kosmos" && bundle != "atmosphere") {
         setBundle(BUNDLE_DEF);
         return BUNDLE_DEF;
     }
