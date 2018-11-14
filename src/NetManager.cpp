@@ -58,11 +58,10 @@ NetRequest * NetManager::getLatestKosmosVersion(string channel) {
     return request;
 }
 
-NetRequest * NetManager::getLatestKosmos(string bundle, string channel, string type) {
+NetRequest * NetManager::getLatestKosmos(string bundle, string channel) {
     NetRequest * request = new NetRequest("GET", _hostname + "/" + API_VERSION + "/package");
     request->bundle = bundle;
     request->channel = channel;
-    request->type = type;
     _createThread(_request, request);
     return request;
 }
@@ -97,24 +96,16 @@ void NetManager::_request(void * ptr) {
             if (request->bundle != "") {
                 url += "bundle=" + string(curl_easy_escape(curl, request->bundle.c_str(), 0));
                 
-                if (request->channel != "" || request->type != "") {
+                if (request->channel != "") {
                     url += "&";
                 }
             }
             
             if (request->channel != "") {
                 url += "channel=" + string(curl_easy_escape(curl, request->channel.c_str(), 0));
-
-                if (request->type != "") {
-                    url += "&";
-                }
-            }
-
-            if (request->type != "") {
-                url += "type=" + string(curl_easy_escape(curl, request->type.c_str(), 0));
             }
         }
-        
+
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, request->getMethod().c_str());
         curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION , _headerFunction);

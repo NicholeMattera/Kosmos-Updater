@@ -55,7 +55,7 @@ PackageDownloadScene::PackageDownloadScene() {
     string bundle = ConfigManager::getBundle();
     string channel = ConfigManager::getChannel();
     
-    _packageRequest = NetManager::getLatestKosmos(bundle, channel, "zip");
+    _packageRequest = NetManager::getLatestKosmos(bundle, channel);
     _packageDelete = NULL;
     _packageExtract = NULL;
     _packageDisableGC = NULL;

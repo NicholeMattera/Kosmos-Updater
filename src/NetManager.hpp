@@ -33,7 +33,7 @@ class NetManager {
         static NetRequest * getLatestAppVersion();
         static NetRequest * getLatestApp();
         static NetRequest * getLatestKosmosVersion(string channel);
-        static NetRequest * getLatestKosmos(string bundle, string channel, string type);
+        static NetRequest * getLatestKosmos(string bundle, string channel);
 
     private:
         static inline bool _shouldUseProxy;

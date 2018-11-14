@@ -30,7 +30,6 @@ NetRequest::NetRequest(string method, string url) : ThreadObj() {
 
     bundle = "";
     channel = "";
-    type = "";
 }
 
 NetRequest::~NetRequest() {

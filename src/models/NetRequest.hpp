@@ -28,7 +28,6 @@ class NetRequest : public ThreadObj {
     public:
         string bundle;
         string channel;
-        string type;
 
         NetRequest(string method, string url);
         ~NetRequest();
