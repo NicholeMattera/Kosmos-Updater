@@ -37,6 +37,9 @@ class AppUpdateScene : public Scene {
 
     private:
         string _latestAppVersion;
+        int _latestAppMajorVersion;
+        int _latestAppMinorVersion;
+        int _latestAppPatchVersion;
 
         NetRequest * _versionRequest;
         NetRequest * _appRequest;
@@ -49,4 +52,5 @@ class AppUpdateScene : public Scene {
         void _updateVersionRequest();
         void _updateAppRequest();
         void _showStatus(string text, string subtext);
+        void _parseLatestAppVersion();
 };

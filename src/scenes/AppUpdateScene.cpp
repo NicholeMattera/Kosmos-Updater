@@ -88,9 +88,15 @@ void AppUpdateScene::_updateVersionRequest() {
     _updateView->setProgress(_versionRequest->progress);
     if (_versionRequest->isComplete) {
         _latestAppVersion = string(_versionRequest->getData());
+        _parseLatestAppVersion();
 
         // No Update
-        if (string(VERSION).compare(_latestAppVersion) == 0) {
+        if (
+            VERSION_MAJOR > _latestAppMajorVersion ||
+            (VERSION_MAJOR == _latestAppMajorVersion && VERSION_MINOR > _latestAppMinorVersion) ||
+            (VERSION_MAJOR == _latestAppMajorVersion && VERSION_MINOR == _latestAppMinorVersion && VERSION_PATCH > _latestAppPatchVersion) ||
+            (VERSION_MAJOR == _latestAppMajorVersion && VERSION_MINOR == _latestAppMinorVersion && VERSION_PATCH == _latestAppPatchVersion)
+        ) {
             SceneDirector::currentScene = SCENE_PACKAGE_SELECT;
         }
         // Update
@@ -147,4 +153,31 @@ void AppUpdateScene::_showStatus(string text, string subtext) {
     _statusView->hidden = false;
 
     _footerView->actions.push_back(new Action(A_BUTTON, "Quit"));
+}
+
+void AppUpdateScene::_parseLatestAppVersion() {
+    size_t pos = 0;
+    int index = 0;
+    while (pos != string::npos) {
+        size_t end_pos = _latestAppVersion.find(".", pos);
+
+        int versionNumber = 0;
+        if (end_pos == string::npos) {
+            versionNumber = stoi(_latestAppVersion.substr(pos, string::npos));
+            pos = string::npos;
+        } else {
+            versionNumber = stoi(_latestAppVersion.substr(pos, end_pos - pos));
+            pos = end_pos + 1;
+        }
+
+        if (index == 0) {
+            _latestAppMajorVersion = versionNumber;
+        } else if (index == 1) {
+            _latestAppMinorVersion = versionNumber;
+        } else if (index == 2) {
+            _latestAppPatchVersion = versionNumber;
+        }
+
+        index++;
+    }
 }
