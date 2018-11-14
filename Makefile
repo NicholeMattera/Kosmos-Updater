@@ -39,10 +39,13 @@ INCLUDES	:=	include
 EXEFS_SRC	:=	exefs_src
 ROMFS		:=	romfs
 
-APP_TITLE	:= Kosmos Updater
-APP_AUTHOR	:= Steven Mattera
-APP_VERSION := 3.0.1
-API_VERSION := v3
+APP_TITLE			:= Kosmos Updater
+APP_AUTHOR			:= Steven Mattera
+APP_VERSION 		:= 3.0.2
+APP_VERSION_MAJOR	:= 3
+APP_VERSION_MINOR	:= 0
+APP_VERSION_PATCH	:= 2
+API_VERSION			:= v3
 
 ICON		:= Icon.jpg
 
@@ -55,7 +58,9 @@ ARCH		:=	-march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIE
 CFLAGS		:=	-g -Wall -O2 -ffunction-sections \
 				$(ARCH) $(DEFINES)
 
-CFLAGS		+=	$(INCLUDE) -D__SWITCH__ -DUSE_FILE32API -DVERSION=\"$(APP_VERSION)\" -DAPI_VERSION=\"$(API_VERSION)\"
+CFLAGS		+=	$(INCLUDE) -D__SWITCH__ -DUSE_FILE32API -DVERSION=\"$(APP_VERSION)\" \
+				-DVERSION_MAJOR=$(APP_VERSION_MAJOR) -DVERSION_MINOR=$(APP_VERSION_MINOR) \
+				-DVERSION_PATCH=$(APP_VERSION_PATCH) -DAPI_VERSION=\"$(API_VERSION)\"
 
 CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fexceptions -std=gnu++17
 
