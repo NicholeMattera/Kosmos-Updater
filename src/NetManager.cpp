@@ -144,6 +144,22 @@ void NetManager::_request(void * ptr) {
             request->errorMessage = string(curl_easy_strerror(res));
 
             mutexUnlock(&request->mutexRequest);
+
+            curl_easy_cleanup(curl);
+            return;
+        }
+
+        long http_code = 0;
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+        if (http_code != 200) {
+            mutexLock(&request->mutexRequest);
+
+            request->hasError = true;
+            request->errorMessage = "There was an error on the server, please try again later.";
+
+            mutexUnlock(&request->mutexRequest);
+
+            curl_easy_cleanup(curl);
             return;
         }
 
