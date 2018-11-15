@@ -156,7 +156,7 @@ void FileManager::_extract(void * ptr) {
             continue;
         }
 
-		if (fileInfo->uncompressed_size != 0 && fileInfo->compression_method != 0) {
+		if (fileName.back() != '/') {
             filesInstalled.push_back(fileName);
 
             int result = _extractFile(fileName.c_str(), unz, fileInfo);
