@@ -24,9 +24,7 @@ MultiSelectView::MultiSelectView(string title, vector<string> options, string se
     _focusSelection = 0;
     _options = options;
 
-    for (vector<string>::iterator it = options.begin(); it != options.end(); it++) {
-        string option = *it;
-
+    for (auto const& option : options) {
         ListRowView * rowView = new ListRowView(option, "", DEFAULT);
         rowView->frame.x = 215;
         rowView->frame.y = _startY + 120 + (_listRowViews.size() * 71);
@@ -53,9 +51,7 @@ MultiSelectView::~MultiSelectView() {
     if (_headerView != NULL)
         delete _headerView;
 
-    for (vector<ListRowView *>::iterator it = _listRowViews.begin(); it != _listRowViews.end(); it++) {
-        ListRowView * rowView = *it;
-        
+    for (auto const& rowView : _listRowViews) {
         if (rowView != NULL)
             delete rowView;
     }
@@ -113,11 +109,11 @@ bool MultiSelectView::_goUp() {
         _focusSelection--;
 
         int index = 0;
-        for (vector<ListRowView *>::iterator it = _listRowViews.begin(); it != _listRowViews.end(); it++) {
-            (*it)->hasFocus = false;
+        for (auto const& rowView : _listRowViews) {
+            rowView->hasFocus = false;
 
             if (_focusSelection >= 3) {
-                (*it)->frame.y = (_startY + 120 + index * 71) - ((_focusSelection - 3) * 71);
+                rowView->frame.y = (_startY + 120 + index * 71) - ((_focusSelection - 3) * 71);
             }
 
             index++;
@@ -135,11 +131,11 @@ bool MultiSelectView::_goDown() {
         _focusSelection++;
         
         int index = 0;
-        for (vector<ListRowView *>::iterator it = _listRowViews.begin(); it != _listRowViews.end(); it++) {
-            (*it)->hasFocus = false;
+        for (auto const& rowView : _listRowViews) {
+            rowView->hasFocus = false;
 
             if (_focusSelection >= 3) {
-                (*it)->frame.y = (_startY + 120 + index * 71) - ((_focusSelection - 3) * 71);
+                rowView->frame.y = (_startY + 120 + index * 71) - ((_focusSelection - 3) * 71);
             }
 
             index++;

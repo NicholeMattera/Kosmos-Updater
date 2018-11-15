@@ -244,13 +244,13 @@ bool ConfigManager::_writeString(string key, string value, config_t config, stri
     return config_write_file(&config, filename.c_str());
 }
 
-bool ConfigManager::_writeArrayOfStrings(string key, vector<string> value, config_t config, string filename) {
+bool ConfigManager::_writeArrayOfStrings(string key, vector<string> values, config_t config, string filename) {
     config_setting_t * root = config_root_setting(&config);
     config_setting_remove(root, key.c_str());
 
     config_setting_t * array = config_setting_add(root, key.c_str(), CONFIG_TYPE_ARRAY);
-    for (vector<string>::iterator it = value.begin(); it != value.end(); it++) {
-        config_setting_set_string_elem(array, -1, (*it).c_str());
+    for (auto const& value : values) {
+        config_setting_set_string_elem(array, -1, value.c_str());
     }
 
     return config_write_file(&config, filename.c_str());

@@ -28,10 +28,10 @@ View::~View() {
 }
 
 void View::render(SDL_Rect rect, double dTime) {
-    for (list<View *>::iterator it = subviews.begin(); it != subviews.end(); it++) {
-        if (!(*it)->hidden) {
-            SDL_Rect subviewFrame = (*it)->frame;
-            (*it)->render({ rect.x + subviewFrame.x, rect.y + subviewFrame.y, subviewFrame.w, subviewFrame.h }, dTime);
+    for (auto const& view : subviews) {
+        if (!view->hidden) {
+            SDL_Rect subviewFrame = view->frame;
+            view->render({ rect.x + subviewFrame.x, rect.y + subviewFrame.y, subviewFrame.w, subviewFrame.h }, dTime);
         }
     }
 }

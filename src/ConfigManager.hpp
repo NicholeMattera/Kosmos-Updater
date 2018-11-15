@@ -61,7 +61,7 @@ class ConfigManager {
 
         static bool _writeBoolean(string key, bool value, config_t config, string filename);
         static bool _writeString(string key, string value, config_t config, string filename);
-        static bool _writeArrayOfStrings(string key, vector<string> value, config_t config, string filename);
+        static bool _writeArrayOfStrings(string key, vector<string> values, config_t config, string filename);
 
         static inline const string CONFIG_FILENAME = "settings.cfg";
         static inline const string INTERNAL_FILENAME = "internal.db";

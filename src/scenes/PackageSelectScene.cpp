@@ -253,8 +253,8 @@ void PackageSelectScene::_showUpdateView() {
     _channelRowView->hidden = true;
     _bundleRowView->hidden = true;
 
-    for (list<Action *>::iterator it = _footerView->actions.begin(); it != _footerView->actions.end(); it++) {
-        delete (*it);
+    for (auto const& action : _footerView->actions) {
+        delete action;
     }
     _footerView->actions.clear();
 }
@@ -290,8 +290,8 @@ void PackageSelectScene::_showPackageSelectViews() {
     _bundleRowView->hidden = false;
     _bundleRowView->hasFocus = false;
 
-    for (list<Action *>::iterator it = _footerView->actions.begin(); it != _footerView->actions.end(); it++) {
-        delete (*it);
+    for (auto const& action : _footerView->actions) {
+        delete action;
     }
     _footerView->actions.clear();
     _footerView->actions.push_back(new Action(A_BUTTON, "OK"));
@@ -309,8 +309,8 @@ void PackageSelectScene::_showStatusView(string text, string subtext) {
     _channelRowView->hidden = true;
     _bundleRowView->hidden = true;
 
-    for (list<Action *>::iterator it = _footerView->actions.begin(); it != _footerView->actions.end(); it++) {
-        delete (*it);
+    for (auto const& action : _footerView->actions) {
+        delete action;
     }
     _footerView->actions.clear();
     _footerView->actions.push_back(new Action(A_BUTTON, "Quit"));

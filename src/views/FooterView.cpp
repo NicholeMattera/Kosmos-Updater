@@ -56,8 +56,8 @@ FooterView::FooterView() : View() {
 }
 
 FooterView::~FooterView() {
-    for (list<Action *>::iterator it = actions.begin(); it != actions.end(); it++) {
-        delete (*it);
+    for (auto const& action : actions) {
+        delete action;
     }
 
     actions.clear();
@@ -77,9 +77,7 @@ void FooterView::render(SDL_Rect rect, double dTime) {
 
     // Render Actions.
     int current_x = rect.w - 60;
-    for (list<Action *>::iterator it = actions.begin(); it != actions.end(); it++) {
-        Action * action = (*it);
-
+    for (auto const& action : actions) {
         // Create texture if it doesn't already exists.
         if (action->textTexture == NULL) {
             SDL_Surface *surface = TTF_RenderText_Blended(AssetManager::body_font, action->text.c_str(), AssetManager::text);
