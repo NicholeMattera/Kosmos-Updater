@@ -33,7 +33,7 @@ ExFatWarningScene::ExFatWarningScene() {
     _bodyTextView->textAlignment = CENTER_ALIGN;
     _bodyTextView->lineHeight = 50;
 
-    _footerTextView = new TextView(AssetManager::header_font, "Press any button to contine.", AssetManager::text);
+    _footerTextView = new TextView(AssetManager::header_font, "Press any button to continue.", AssetManager::text);
     _footerTextView->frame = { 0, 567, 1280, 1 };
     _footerTextView->textAlignment = CENTER_ALIGN;
     _footerTextView->alpha = 0;
