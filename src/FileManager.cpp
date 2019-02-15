@@ -223,57 +223,38 @@ void FileManager::_cleanUpFiles(void * ptr) {
 
 void FileManager::_applyNoGC(void * ptr) {
     ThreadObj * threadObj = (ThreadObj *) ptr;
+    bool disabled = ConfigManager::getDisabledGameCart()
 
-    DIR * dir = opendir(HEKATE_INI_DIRECTORY.c_str());
-    struct dirent * ent;
-    vector<std::string> iniFiles;
-    iniFiles.push_back(HEKATE_FILE);
-
-    while((ent = readdir(dir)) != nullptr)
-        iniFiles.push_back(HEKATE_INI_DIRECTORY + string(ent->d_name));
-
-    int i = 0;
-    for (auto const& fileName : iniFiles) {
-        i++;
-
-        mutexLock(&threadObj->mutexRequest);
-        threadObj->progress = (double) i / (double) iniFiles.size();
-        threadObj->isComplete = false;
-        mutexUnlock(&threadObj->mutexRequest);
-
-        if (!fileExists(fileName)) {
+    Ini * ini = Ini::parseFile(HEKATE_FILE);
+    for (auto const& section : ini->sections) {
+        if (section->isCaption() || section->isComment())
             continue;
-        }
 
-        Ini * ini = Ini::parseFile(fileName);
-        for (auto const& section : ini->sections) {
-            if (section->isCaption() || section->isComment() || (i == 1 && section->value == "config"))
-                continue;
-
+        if (section->value == "config") {
             bool patchApplied = false;
             for (auto const& option : section->options) {
-                if (option->key == "kip1patch") {
-                    option->value = (option->value.size() == 0) ? "nogc" : option->value + ",nogc";
+                if (option->key == "nogc") {
+                    option->value = (disabled) ? "1" : "0"
                     patchApplied = true;
                     break;
                 }
             }
 
             if (!patchApplied) {
-                section->options.push_back(new IniOption("kip1patch", "nogc"));
+                section->options.push_back(new IniOption("nogc", (disabled) ? "1" : "0"));
             }
-        }
 
-        ini->writeToFile(fileName);
-        delete ini;
+            break;
+        }
     }
+
+    ini->writeToFile(fileName);
+    delete ini;
 
     mutexLock(&threadObj->mutexRequest);
     threadObj->progress = 1;
     threadObj->isComplete = true;
     mutexUnlock(&threadObj->mutexRequest);
-
-    closedir(dir);
 }
 
 unz_file_info_s * FileManager::_getFileInfo(unzFile unz) {

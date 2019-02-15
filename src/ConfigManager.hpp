@@ -98,7 +98,7 @@ class ConfigManager {
         static inline const string INSTALLED_FILES_KEY = "installed_files";
 
         static inline const string DISABLED_GAME_CART_KEY = "disabled_game_cart";
-        static inline const bool DISABLED_GAME_CART_DEF = false;
+        static inline const bool DISABLED_GAME_CART_DEF = true;
         
         static inline const string RECEIVED_EXFAT_WARNING_KEY = "received_exfat_warning";
         static inline const bool RECEIVED_EXFAT_WARNING_DEF = false;

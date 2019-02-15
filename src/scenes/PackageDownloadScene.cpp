@@ -176,16 +176,11 @@ void PackageDownloadScene::_updatePackageExtract() {
         FileManager::deleteFile("temp.zip");
         ConfigManager::setCurrentVersion(_versionNumber);
 
-        if (ConfigManager::getDisabledGameCart()) {
-            _updateView->setText("Applying disabled game cart patch...");
-            _updateView->setProgress(0);
+        _updateView->setText("Applying disabled game cart option...");
+        _updateView->setProgress(0);
 
-            _packageDisableGC = new ThreadObj();
-            FileManager::applyNoGC(_packageDisableGC);
-        }
-        else {
-            _showStatus("SD Files has been updated to version " + ((_versionNumber.size() > 7) ? _versionNumber.substr(0, 7) : _versionNumber) + "!", "Please restart your Switch to run the latest SD Files.", true);
-        }
+        _packageDisableGC = new ThreadObj();
+        FileManager::applyNoGC(_packageDisableGC);
     }
     else if (_packageExtract->hasError) {
         delete _packageExtract;
@@ -211,7 +206,7 @@ void PackageDownloadScene::_updatePackageDisableGC() {
         FileManager::deleteFile("temp.zip");
         ConfigManager::setCurrentVersion(_versionNumber);
 
-        _showStatus("SD Files has been updated to version " + _versionNumber + "!", "Please restart your Switch to run the latest SD Files.", true);
+        _showStatus("SD Files has been updated to version " + ((_versionNumber.size() > 7) ? _versionNumber.substr(0, 7) : _versionNumber) + "!", "Please restart your Switch to run the latest SD Files.", true);
     }
 
     if (_packageDisableGC != NULL)

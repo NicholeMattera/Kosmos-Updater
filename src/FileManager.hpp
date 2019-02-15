@@ -49,5 +49,4 @@ class FileManager {
         static int _extractFile(const char * path, unzFile unz, unz_file_info_s * fileInfo);
 
         static inline const string HEKATE_FILE = "sdmc:/bootloader/hekate_ipl.ini";
-        static inline const string HEKATE_INI_DIRECTORY = "sdmc:/bootloader/ini/";
 };

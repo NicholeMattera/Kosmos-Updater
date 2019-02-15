@@ -71,11 +71,10 @@ PackageSelectScene::PackageSelectScene() {
     _bundleRowView->frame.y = 359;
 
     _disabledGameCart = ConfigManager::getDisabledGameCart();
-    _disableGCRowView = new ListRowView("Disable Game Cart", "", BOOLEAN);
+    _disableGCRowView = new ListRowView("Disable Game Cart", (_disabledGameCart) ? "Auto" : "Off", VALUE);
     _disableGCRowView->frame.x = 215;
     _disableGCRowView->frame.y = 430;
     _disableGCRowView->isLast = true;
-    _disableGCRowView->setIsOn(_disabledGameCart);
 
     _footerView = new FooterView();
     _footerView->frame = { 0, 647, 1280, 73 };
@@ -186,7 +185,7 @@ void PackageSelectScene::handleButton(u32 buttons) {
                         _disabledGameCartAlertView->show();
                     } else {
                         _disabledGameCart = !_disabledGameCart;
-                        _disableGCRowView->setIsOn(_disabledGameCart);
+                        _disableGCRowView->setSecondaryText((_disabledGameCart) ? "Auto" : "Off");
                         ConfigManager::setDisabledGameCart(_disabledGameCart);
                     }
 
@@ -383,7 +382,7 @@ void PackageSelectScene::_onMultiSelectDismiss(ModalView * view, bool success) {
 void PackageSelectScene::_onAlertViewDismiss(ModalView * view, bool success) {
     if (success && _disabledGameCartAlertView->getSelectedOption() == 0) {
         _disabledGameCart = false;
-        _disableGCRowView->setIsOn(false);
+        _disableGCRowView->setSecondaryText("Off");
         ConfigManager::setDisabledGameCart(false);
     }
 }
