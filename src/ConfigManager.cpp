@@ -180,7 +180,7 @@ void ConfigManager::_performMigration() {
         }
         _removeSetting(CHANNEL_KEY, _cfg, CONFIG_FILENAME);
     } else {
-        string channelString = string(channel);
+        string channelString = getChannel();
         if (channelString != "stable" && channelString != "bleeding-edge") {
             setChannel(CHANNEL_DEF);
         }
@@ -196,7 +196,7 @@ void ConfigManager::_performMigration() {
         }
         _removeSetting(BUNDLE_KEY, _cfg, CONFIG_FILENAME);
     } else {
-        string bundleString = string(bundle);
+        string bundleString = getChannel();
         if (bundleString != "kosmos" && bundleString != "atmosphere") {
             setBundle(BUNDLE_DEF);
         }

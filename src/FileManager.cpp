@@ -223,7 +223,7 @@ void FileManager::_cleanUpFiles(void * ptr) {
 
 void FileManager::_applyNoGC(void * ptr) {
     ThreadObj * threadObj = (ThreadObj *) ptr;
-    bool disabled = ConfigManager::getDisabledGameCart()
+    bool disabled = ConfigManager::getDisabledGameCart();
 
     Ini * ini = Ini::parseFile(HEKATE_FILE);
     for (auto const& section : ini->sections) {
@@ -234,7 +234,7 @@ void FileManager::_applyNoGC(void * ptr) {
             bool patchApplied = false;
             for (auto const& option : section->options) {
                 if (option->key == "nogc") {
-                    option->value = (disabled) ? "1" : "0"
+                    option->value = (disabled) ? "1" : "0";
                     patchApplied = true;
                     break;
                 }
@@ -248,7 +248,7 @@ void FileManager::_applyNoGC(void * ptr) {
         }
     }
 
-    ini->writeToFile(fileName);
+    ini->writeToFile(HEKATE_FILE);
     delete ini;
 
     mutexLock(&threadObj->mutexRequest);
