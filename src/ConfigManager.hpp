@@ -55,6 +55,8 @@ class ConfigManager {
         static inline config_t _cfg;
         static inline config_t _internalDb;
 
+        static void _performMigration();
+
         static bool _readBoolean(string key, bool def, config_t config);
         static string _readString(string key, string def, config_t config);
         static vector<string> _readArrayOfStrings(string key, vector<string> def, config_t config);
@@ -62,6 +64,8 @@ class ConfigManager {
         static bool _writeBoolean(string key, bool value, config_t config, string filename);
         static bool _writeString(string key, string value, config_t config, string filename);
         static bool _writeArrayOfStrings(string key, vector<string> values, config_t config, string filename);
+
+        static bool _removeSetting(string key, config_t config, string filename);
 
         static inline const string CONFIG_FILENAME = "settings.cfg";
         static inline const string INTERNAL_FILENAME = "internal.db";

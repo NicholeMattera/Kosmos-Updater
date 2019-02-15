@@ -28,15 +28,6 @@ void ConfigManager::initialize() {
         setting = config_setting_add(root, HOST_KEY.c_str(), CONFIG_TYPE_STRING);
         config_setting_set_string(setting, HOST_DEF.c_str());
 
-        setting = config_setting_add(root, CHANNEL_KEY.c_str(), CONFIG_TYPE_STRING);
-        config_setting_set_string(setting, CHANNEL_DEF.c_str());
-
-        setting = config_setting_add(root, BUNDLE_KEY.c_str(), CONFIG_TYPE_STRING);
-        config_setting_set_string(setting, BUNDLE_DEF.c_str());
-
-        setting = config_setting_add(root, VERSION_KEY.c_str(), CONFIG_TYPE_STRING);
-        config_setting_set_string(setting, VERSION_DEF.c_str());
-
         setting = config_setting_add(root, IGNORE_KEY.c_str(), CONFIG_TYPE_ARRAY);
 
         setting = config_setting_add(root, AUTOUPDATE_KEY.c_str(), CONFIG_TYPE_BOOL);
@@ -61,6 +52,15 @@ void ConfigManager::initialize() {
         config_setting_t * root, * setting;
         root = config_root_setting(&_internalDb);
 
+        setting = config_setting_add(root, CHANNEL_KEY.c_str(), CONFIG_TYPE_STRING);
+        config_setting_set_string(setting, CHANNEL_DEF.c_str());
+
+        setting = config_setting_add(root, BUNDLE_KEY.c_str(), CONFIG_TYPE_STRING);
+        config_setting_set_string(setting, BUNDLE_DEF.c_str());
+
+        setting = config_setting_add(root, VERSION_KEY.c_str(), CONFIG_TYPE_STRING);
+        config_setting_set_string(setting, VERSION_DEF.c_str());
+
         setting = config_setting_add(root, INSTALLED_FILES_KEY.c_str(), CONFIG_TYPE_ARRAY);
         
         setting = config_setting_add(root, DISABLED_GAME_CART_KEY.c_str(), CONFIG_TYPE_BOOL);
@@ -71,6 +71,8 @@ void ConfigManager::initialize() {
 
         config_write_file(&_internalDb, INTERNAL_FILENAME.c_str());
     }
+
+    _performMigration();
 }
 
 void ConfigManager::dealloc() {
@@ -79,40 +81,19 @@ void ConfigManager::dealloc() {
 }
 
 string ConfigManager::getHost() {
-    string host = _readString(HOST_KEY, HOST_DEF, _cfg);
-
-    if (host == "http://sdfu.stevenmattera.com") {
-        _writeString(HOST_KEY, HOST_DEF, _cfg, CONFIG_FILENAME);
-        return HOST_DEF;
-    }
-
-    return host;
+    return _readString(HOST_KEY, HOST_DEF, _cfg);
 }
 
 string ConfigManager::getChannel() {
-    string channel = _readString(CHANNEL_KEY, CHANNEL_DEF, _cfg);
-
-    if (channel != "stable" && channel != "bleeding-edge") {
-        setChannel(CHANNEL_DEF);
-        return CHANNEL_DEF;
-    }
-
-    return channel;
+    return _readString(CHANNEL_KEY, CHANNEL_DEF, _internalDb);
 }
 
 string ConfigManager::getBundle() {
-    string bundle = _readString(BUNDLE_KEY, BUNDLE_DEF, _cfg);
-
-    if (bundle != "kosmos" && bundle != "atmosphere") {
-        setBundle(BUNDLE_DEF);
-        return BUNDLE_DEF;
-    }
-
-    return bundle;
+    return _readString(BUNDLE_KEY, BUNDLE_DEF, _internalDb);
 }
 
 string ConfigManager::getCurrentVersion() {
-    return _readString(VERSION_KEY, VERSION_DEF, _cfg);
+    return _readString(VERSION_KEY, VERSION_DEF, _internalDb);
 }
 
 vector<string> ConfigManager::getFilesToIgnore() {
@@ -145,15 +126,15 @@ string ConfigManager::getProxyPassword() {
 }
 
 bool ConfigManager::setChannel(string channel) {
-    return _writeString(CHANNEL_KEY, channel, _cfg, CONFIG_FILENAME);
+    return _writeString(CHANNEL_KEY, channel, _internalDb, INTERNAL_FILENAME);
 }
 
 bool ConfigManager::setBundle(string bundle) {
-    return _writeString(BUNDLE_KEY, bundle, _cfg, CONFIG_FILENAME);
+    return _writeString(BUNDLE_KEY, bundle, _internalDb, INTERNAL_FILENAME);
 }
 
 bool ConfigManager::setCurrentVersion(string version) {
-    return _writeString(VERSION_KEY, version, _cfg, CONFIG_FILENAME);
+    return _writeString(VERSION_KEY, version, _internalDb, INTERNAL_FILENAME);
 }
 
 vector<string> ConfigManager::getInstalledFiles() {
@@ -162,11 +143,11 @@ vector<string> ConfigManager::getInstalledFiles() {
 }
 
 bool ConfigManager::getDisabledGameCart() {
-    return _readBoolean(DISABLED_GAME_CART_KEY, false, _internalDb);
+    return _readBoolean(DISABLED_GAME_CART_KEY, DISABLED_GAME_CART_DEF, _internalDb);
 }
 
 bool ConfigManager::getReceivedExFATWarning() {
-    return _readBoolean(RECEIVED_EXFAT_WARNING_KEY, false, _internalDb);
+    return _readBoolean(RECEIVED_EXFAT_WARNING_KEY, RECEIVED_EXFAT_WARNING_DEF, _internalDb);
 }
 
 bool ConfigManager::setInstalledFiles(vector<string> files) {
@@ -182,6 +163,51 @@ bool ConfigManager::setReceivedExFATWarning(bool received) {
 }
 
 // Private Methods
+
+void ConfigManager::_performMigration() {
+    string host = _readString(HOST_KEY, HOST_DEF, _cfg);
+    if (host == "http://sdfu.stevenmattera.com") {
+        _writeString(HOST_KEY, HOST_DEF, _cfg, CONFIG_FILENAME);
+    }
+
+    const char * channel;
+    if (config_lookup_string(&_cfg, CHANNEL_KEY.c_str(), &channel)) {
+        string channelString = string(channel);
+        if (channelString != "stable" && channelString != "bleeding-edge") {
+            setChannel(CHANNEL_DEF);
+        } else {
+            setChannel(channelString);
+        }
+        _removeSetting(CHANNEL_KEY, _cfg, CONFIG_FILENAME);
+    } else {
+        string channelString = string(channel);
+        if (channelString != "stable" && channelString != "bleeding-edge") {
+            setChannel(CHANNEL_DEF);
+        }
+    }
+
+    const char * bundle;
+    if (config_lookup_string(&_cfg, BUNDLE_KEY.c_str(), &bundle)) {
+        string bundleString = string(bundle);
+        if (bundleString != "kosmos" && bundleString != "atmosphere") {
+            setBundle(BUNDLE_DEF);
+        } else {
+            setBundle(bundleString);
+        }
+        _removeSetting(BUNDLE_KEY, _cfg, CONFIG_FILENAME);
+    } else {
+        string bundleString = string(bundle);
+        if (bundleString != "kosmos" && bundleString != "atmosphere") {
+            setBundle(BUNDLE_DEF);
+        }
+    }
+
+    const char * currentVersion;
+    if (config_lookup_string(&_cfg, VERSION_KEY.c_str(), &currentVersion)) {
+        setCurrentVersion(currentVersion);
+        _removeSetting(VERSION_KEY, _cfg, CONFIG_FILENAME);
+    }
+}
 
 bool ConfigManager::_readBoolean(string key, bool def, config_t config) {
     int result;
@@ -253,5 +279,11 @@ bool ConfigManager::_writeArrayOfStrings(string key, vector<string> values, conf
         config_setting_set_string_elem(array, -1, value.c_str());
     }
 
+    return config_write_file(&config, filename.c_str());
+}
+
+bool ConfigManager::_removeSetting(string key, config_t config, string filename) {
+    config_setting_t * root = config_root_setting(&config);
+    config_setting_remove(root, key.c_str());
     return config_write_file(&config, filename.c_str());
 }
