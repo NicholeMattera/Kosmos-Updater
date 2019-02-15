@@ -28,6 +28,11 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
+    #ifdef DEBUG
+        socketInitializeDefault();
+        nxlinkStdio();
+    #endif
+
     ConfigManager::initialize();
     
     SceneDirector * sceneDirector = new SceneDirector();
@@ -53,6 +58,10 @@ int main(int argc, char **argv)
     NetManager::dealloc();
     ConfigManager::dealloc();
     delete sceneDirector;
+
+    #ifdef DEBUG
+        socketExit();
+    #endif
 
     return 0;
 }

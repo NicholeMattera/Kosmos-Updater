@@ -21,9 +21,8 @@
 #include "models/NetRequest.hpp"
 
 void NetManager::initialize() {
-    socketInitializeDefault();
-    #ifdef DEBUG
-        nxlinkStdio();
+    #ifndef DEBUG
+        socketInitializeDefault();
     #endif
     
     curl_global_init(CURL_GLOBAL_ALL);
@@ -36,7 +35,9 @@ void NetManager::initialize() {
 
 void NetManager::dealloc() {
     curl_global_cleanup();
-    socketExit();
+    #ifndef DEBUG
+        socketExit();
+    #endif
 }
 
 NetRequest * NetManager::getLatestAppVersion() {
@@ -106,6 +107,10 @@ void NetManager::_request(void * ptr) {
             }
         }
 
+        struct curl_slist * headers = NULL;
+        headers = curl_slist_append(headers, "Cache-Control: no-cache");
+
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, request->getMethod().c_str());
         curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION , _headerFunction);
@@ -137,6 +142,7 @@ void NetManager::_request(void * ptr) {
             mutexUnlock(&request->mutexRequest);
 
             curl_easy_cleanup(curl);
+            curl_slist_free_all(headers);
             return;
         }
 
@@ -151,10 +157,12 @@ void NetManager::_request(void * ptr) {
             mutexUnlock(&request->mutexRequest);
 
             curl_easy_cleanup(curl);
+            curl_slist_free_all(headers);
             return;
         }
 
         curl_easy_cleanup(curl);
+        curl_slist_free_all(headers);
     }
 
     mutexLock(&request->mutexRequest);
