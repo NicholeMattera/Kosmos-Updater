@@ -38,10 +38,10 @@ ROMFS		:=	romfs
 
 APP_TITLE			:= Kosmos Updater
 APP_AUTHOR			:= Steven Mattera
-APP_VERSION 		:= 3.0.3
+APP_VERSION 		:= 3.0.4
 APP_VERSION_MAJOR	:= 3
 APP_VERSION_MINOR	:= 0
-APP_VERSION_PATCH	:= 3
+APP_VERSION_PATCH	:= 4
 API_VERSION			:= v3
 
 ICON		:= Icon.jpg
