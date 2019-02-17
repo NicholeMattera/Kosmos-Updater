@@ -233,7 +233,7 @@ void FileManager::_applyNoGC(void * ptr) {
         if (section->value == "config") {
             bool patchApplied = false;
             for (auto const& option : section->options) {
-                if (option->key == "nogc") {
+                if (option->key == "autonogc") {
                     option->value = (disabled) ? "1" : "0";
                     patchApplied = true;
                     break;
@@ -241,7 +241,7 @@ void FileManager::_applyNoGC(void * ptr) {
             }
 
             if (!patchApplied) {
-                section->options.push_back(new IniOption("nogc", (disabled) ? "1" : "0"));
+                section->options.push_back(new IniOption("autonogc", (disabled) ? "1" : "0"));
             }
 
             break;
