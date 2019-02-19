@@ -1,5 +1,5 @@
 // Kosmos Updater
-// Copyright (C) 2018 Steven Mattera
+// Copyright (C) 2019 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -68,6 +68,9 @@ void ConfigManager::initialize() {
         
         setting = config_setting_add(root, RECEIVED_EXFAT_WARNING_KEY.c_str(), CONFIG_TYPE_BOOL);
         config_setting_set_bool(setting, RECEIVED_EXFAT_WARNING_DEF);
+        
+        setting = config_setting_add(root, FORCE_ES_PATCHES_KEY.c_str(), CONFIG_TYPE_BOOL);
+        config_setting_set_bool(setting, FORCE_ES_PATCHES_DEF);
 
         config_write_file(&_internalDb, INTERNAL_FILENAME.c_str());
     }
@@ -82,18 +85,6 @@ void ConfigManager::dealloc() {
 
 string ConfigManager::getHost() {
     return _readString(HOST_KEY, HOST_DEF, _cfg);
-}
-
-string ConfigManager::getChannel() {
-    return _readString(CHANNEL_KEY, CHANNEL_DEF, _internalDb);
-}
-
-string ConfigManager::getBundle() {
-    return _readString(BUNDLE_KEY, BUNDLE_DEF, _internalDb);
-}
-
-string ConfigManager::getCurrentVersion() {
-    return _readString(VERSION_KEY, VERSION_DEF, _internalDb);
 }
 
 vector<string> ConfigManager::getFilesToIgnore() {
@@ -125,16 +116,17 @@ string ConfigManager::getProxyPassword() {
     return _readString(PROXY_PASSWORD_KEY, PROXY_PASSWORD_DEF, _cfg);
 }
 
-bool ConfigManager::setChannel(string channel) {
-    return _writeString(CHANNEL_KEY, channel, _internalDb, INTERNAL_FILENAME);
+
+string ConfigManager::getChannel() {
+    return _readString(CHANNEL_KEY, CHANNEL_DEF, _internalDb);
 }
 
-bool ConfigManager::setBundle(string bundle) {
-    return _writeString(BUNDLE_KEY, bundle, _internalDb, INTERNAL_FILENAME);
+string ConfigManager::getBundle() {
+    return _readString(BUNDLE_KEY, BUNDLE_DEF, _internalDb);
 }
 
-bool ConfigManager::setCurrentVersion(string version) {
-    return _writeString(VERSION_KEY, version, _internalDb, INTERNAL_FILENAME);
+string ConfigManager::getCurrentVersion() {
+    return _readString(VERSION_KEY, VERSION_DEF, _internalDb);
 }
 
 vector<string> ConfigManager::getInstalledFiles() {
@@ -150,6 +142,22 @@ bool ConfigManager::getReceivedExFATWarning() {
     return _readBoolean(RECEIVED_EXFAT_WARNING_KEY, RECEIVED_EXFAT_WARNING_DEF, _internalDb);
 }
 
+bool ConfigManager::getForceESPatches() {
+    return _readBoolean(FORCE_ES_PATCHES_KEY, FORCE_ES_PATCHES_DEF, _internalDb);
+}
+
+bool ConfigManager::setChannel(string channel) {
+    return _writeString(CHANNEL_KEY, channel, _internalDb, INTERNAL_FILENAME);
+}
+
+bool ConfigManager::setBundle(string bundle) {
+    return _writeString(BUNDLE_KEY, bundle, _internalDb, INTERNAL_FILENAME);
+}
+
+bool ConfigManager::setCurrentVersion(string version) {
+    return _writeString(VERSION_KEY, version, _internalDb, INTERNAL_FILENAME);
+}
+
 bool ConfigManager::setInstalledFiles(vector<string> files) {
     return _writeArrayOfStrings(INSTALLED_FILES_KEY, files, _internalDb, INTERNAL_FILENAME);
 }
@@ -160,6 +168,10 @@ bool ConfigManager::setDisabledGameCart(bool disabled) {
 
 bool ConfigManager::setReceivedExFATWarning(bool received) {
     return _writeBoolean(RECEIVED_EXFAT_WARNING_KEY, received, _internalDb, INTERNAL_FILENAME);
+}
+
+bool ConfigManager::setForceESPatches(bool enabled) {
+    return _writeBoolean(FORCE_ES_PATCHES_KEY, enabled, _internalDb, INTERNAL_FILENAME);
 }
 
 // Private Methods

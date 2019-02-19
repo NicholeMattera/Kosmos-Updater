@@ -1,5 +1,5 @@
 // Kosmos Updater
-// Copyright (C) 2018 Steven Mattera
+// Copyright (C) 2019 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -29,7 +29,7 @@ class Scene {
         Scene();
         virtual ~Scene();
 
-        virtual void handleButton(u32 buttons);
+        virtual void handleButton(u32 buttons, double dTime);
         virtual void render(SDL_Rect rect, double dTime);
 
         /* Touch Controls */

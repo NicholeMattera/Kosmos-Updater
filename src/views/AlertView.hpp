@@ -1,5 +1,5 @@
 // Kosmos Updater
-// Copyright (C) 2018 Steven Mattera
+// Copyright (C) 2019 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -32,7 +32,7 @@ class AlertView : public ModalView {
         AlertView(string title, string message, vector<string> buttons);
         ~AlertView();
 
-        void handleButton(u32 buttons);
+        void handleButton(u32 buttons, double dTime);
         void render(SDL_Rect rect, double dTime);
         int getSelectedOption();
         void reset();

@@ -15,23 +15,20 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <string.h>
-#include "Zip.hpp"
+#pragma once
 
-Zip::Zip(string filename, string dest, int numberOfFiles) : ThreadObj() {
-    _filename = filename;
-    _dest = dest;
-    _numberOfFiles = numberOfFiles;
-}
+#include "../ModalView.hpp"
 
-string Zip::getFilename() {
-    return _filename;
-}
+using namespace std;
 
-string Zip::getDestination() {
-    return _dest;
-}
+class PasscodeView : public ModalView {
+    public:
+        PasscodeView();
+        ~PasscodeView();
 
-int Zip::getNumberOfFiles() {
-    return _numberOfFiles;
-}
+        void handleButton(u32 buttons, double dTime);
+        void render(SDL_Rect rect, double dTime);
+
+    private:
+        static inline u8 PASSCODE[] = { 0, 3, 1, 2 };
+};

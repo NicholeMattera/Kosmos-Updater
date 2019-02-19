@@ -1,5 +1,5 @@
 // Kosmos Updater
-// Copyright (C) 2018 Steven Mattera
+// Copyright (C) 2019 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -54,7 +54,7 @@ ExFatWarningScene::~ExFatWarningScene() {
         delete _footerTextView;
 }
 
-void ExFatWarningScene::handleButton(u32 buttons) {
+void ExFatWarningScene::handleButton(u32 buttons, double dTime) {
     if (buttons > 0 && _footerVisible) {
         Mix_PlayChannel(-1, AssetManager::enter, 0);
         ConfigManager::setReceivedExFATWarning(true);

@@ -1,5 +1,5 @@
 // Kosmos Updater
-// Copyright (C) 2018 Steven Mattera
+// Copyright (C) 2019 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -23,7 +23,7 @@ Scene::Scene() {
 
 Scene::~Scene() {}
 
-void Scene::handleButton(u32 buttons) {}
+void Scene::handleButton(u32 buttons, double dTime) {}
 
 void Scene::render(SDL_Rect rect, double dTime) {
     for (auto const& view : subviews) {

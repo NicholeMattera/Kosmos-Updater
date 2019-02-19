@@ -1,5 +1,5 @@
 // Kosmos Updater
-// Copyright (C) 2018 Steven Mattera
+// Copyright (C) 2019 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -61,7 +61,7 @@ MultiSelectView::~MultiSelectView() {
         delete _footerView;
 }
 
-void MultiSelectView::handleButton(u32 buttons) {
+void MultiSelectView::handleButton(u32 buttons, double dTime) {
     if (buttons & KEY_A) {
         Mix_PlayChannel(-1, AssetManager::enter, 0);
         dismiss(true);

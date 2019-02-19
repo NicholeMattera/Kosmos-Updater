@@ -1,5 +1,5 @@
 // Kosmos Updater
-// Copyright (C) 2018 Steven Mattera
+// Copyright (C) 2019 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -101,6 +101,11 @@ void FileManager::cleanUpFiles(ThreadObj * status) {
 
 void FileManager::applyNoGC(ThreadObj * status) {
     _createThread(_applyNoGC, status);
+}
+
+bool FileManager::esPatchesExists() {
+    struct stat info;
+    return stat(ES_PATCH_DIR.c_str(), &info) != 0 && info.st_mode & S_IFDIR;
 }
 
 Result FileManager::_createThread(ThreadFunc func, ThreadObj * arg) {

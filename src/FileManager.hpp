@@ -1,5 +1,5 @@
 // Kosmos Updater
-// Copyright (C) 2018 Steven Mattera
+// Copyright (C) 2019 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -35,6 +35,7 @@ class FileManager {
         static void extract(Zip * zip);
         static void cleanUpFiles(ThreadObj * status);
         static void applyNoGC(ThreadObj * status);
+        static bool esPatchesExists();
 
     private:
         static inline vector<Thread> _threads;
@@ -49,4 +50,5 @@ class FileManager {
         static int _extractFile(const char * path, unzFile unz, unz_file_info_s * fileInfo);
 
         static inline const string HEKATE_FILE = "sdmc:/bootloader/hekate_ipl.ini";
+        static inline const string ES_PATCH_DIR = "sdmc:/atmosphere/exefs_patches/es_patches";
 };

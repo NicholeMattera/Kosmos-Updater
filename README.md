@@ -7,9 +7,6 @@ A homebrew application for the Nintendo Switch that will automatically update yo
 | Config option                                                               | Description
 | --------------------------------------------------------------------------- | ---
 | `host = "http://kosmos-updater.teamatlasnx.com";`                           | Which server to connect to. You can host your own server using the files in the [server repository](https://github.com/AtlasNX/Kosmos-Updater-Server).
-| `channel = "stable";`                                                       | Stable (*stable*) will download the latest tag and bleeding edge (*bleeding-edge*) will download the latest commit.
-| `bundle = "kosmos";`                                                        | The bundle to install. (`kosmos`, `hekate`, or `atmosphere`)
-| `version = "";`                                                             | The version of Kosmos that is currently installed on your SD card.
 | `ignore = [ "sdmc://fileToIgnore.nro", "sdmc://anotherFileToIgnore.nro" ];` | Array of files to ignore when extracting.
 | `autoupdate = true;`                                                        | Whether or not to auto update Kosmos Updater.
 | `proxy_enabled = false;`                                                    | Whether or not to use a proxy for network calls.

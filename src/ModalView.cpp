@@ -1,5 +1,5 @@
 // Kosmos Updater
-// Copyright (C) 2018 Steven Mattera
+// Copyright (C) 2019 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 #include "ModalView.hpp"
 #include "SceneDirector.hpp"
 
-void ModalView::handleButton(u32 buttons) {}
+void ModalView::handleButton(u32 buttons, double dTime) {}
 
 void ModalView::show() {
     SceneDirector::modal = this;

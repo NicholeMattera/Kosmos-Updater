@@ -1,5 +1,5 @@
 // Kosmos Updater
-// Copyright (C) 2018 Steven Mattera
+// Copyright (C) 2019 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -29,9 +29,6 @@ class ConfigManager {
         static void dealloc();
 
         static string getHost();
-        static string getChannel();
-        static string getBundle();
-        static string getCurrentVersion();
         static vector<string> getFilesToIgnore();
         static bool shouldAutoUpdate();
         static bool shouldUseProxy();
@@ -39,17 +36,21 @@ class ConfigManager {
         static string getProxyUsername();
         static string getProxyPassword();
 
-        static bool setChannel(string channel);
-        static bool setBundle(string bundle);
-        static bool setCurrentVersion(string version);
-
+        static string getChannel();
+        static string getBundle();
+        static string getCurrentVersion();
         static vector<string> getInstalledFiles();
         static bool getDisabledGameCart();
         static bool getReceivedExFATWarning();
+        static bool getForceESPatches();
 
+        static bool setChannel(string channel);
+        static bool setBundle(string bundle);
+        static bool setCurrentVersion(string version);
         static bool setInstalledFiles(vector<string> files);
         static bool setDisabledGameCart(bool disabled);
         static bool setReceivedExFATWarning(bool received);
+        static bool setForceESPatches(bool enabled);
 
     private:
         static inline config_t _cfg;
@@ -73,15 +74,6 @@ class ConfigManager {
         static inline const string HOST_KEY = "host";
         static inline const string HOST_DEF = "http://kosmos-updater.teamatlasnx.com";
 
-        static inline const string CHANNEL_KEY = "channel";
-        static inline const string CHANNEL_DEF = "stable";
-
-        static inline const string BUNDLE_KEY = "bundle";
-        static inline const string BUNDLE_DEF = "kosmos";
-
-        static inline const string VERSION_KEY = "version";
-        static inline const string VERSION_DEF = "";
-
         static inline const string IGNORE_KEY = "ignore";
 
         static inline const string AUTOUPDATE_KEY = "autoupdate";
@@ -99,6 +91,16 @@ class ConfigManager {
         static inline const string PROXY_PASSWORD_KEY = "proxy_password";
         static inline const string PROXY_PASSWORD_DEF = "";
 
+
+        static inline const string CHANNEL_KEY = "channel";
+        static inline const string CHANNEL_DEF = "stable";
+
+        static inline const string BUNDLE_KEY = "bundle";
+        static inline const string BUNDLE_DEF = "kosmos";
+
+        static inline const string VERSION_KEY = "version";
+        static inline const string VERSION_DEF = "";
+
         static inline const string INSTALLED_FILES_KEY = "installed_files";
 
         static inline const string DISABLED_GAME_CART_KEY = "disabled_game_cart";
@@ -106,4 +108,7 @@ class ConfigManager {
         
         static inline const string RECEIVED_EXFAT_WARNING_KEY = "received_exfat_warning";
         static inline const bool RECEIVED_EXFAT_WARNING_DEF = false;
+
+        static inline const string FORCE_ES_PATCHES_KEY = "force_es_patches";
+        static inline const bool FORCE_ES_PATCHES_DEF = false;
 };

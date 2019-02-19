@@ -1,5 +1,5 @@
 // Kosmos Updater
-// Copyright (C) 2018 Steven Mattera
+// Copyright (C) 2019 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -89,7 +89,7 @@ PackageDownloadScene::~PackageDownloadScene() {
     bpcExit();
 }
 
-void PackageDownloadScene::handleButton(u32 buttons) {
+void PackageDownloadScene::handleButton(u32 buttons, double dTime) {
     if (!_statusView->hidden && buttons & KEY_A) {
         SceneDirector::exitApp = true;
     }

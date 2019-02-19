@@ -1,5 +1,5 @@
 // Kosmos Updater
-// Copyright (C) 2018 Steven Mattera
+// Copyright (C) 2019 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -168,9 +168,9 @@ bool SceneDirector::direct() {
     }
 
     if (modal != NULL) {
-        modal->handleButton(kDown);
+        modal->handleButton(kDown, dTime);
     } else {
-        _currentScene->handleButton(kDown);
+        _currentScene->handleButton(kDown, dTime);
     }
 
     _currentScene->render({ 0, 0, 1280, 720 }, dTime);

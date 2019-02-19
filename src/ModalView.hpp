@@ -1,5 +1,5 @@
 // Kosmos Updater
-// Copyright (C) 2018 Steven Mattera
+// Copyright (C) 2019 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -29,7 +29,7 @@ class ModalView : public View {
     public:
         function<void(ModalView *, bool)> onDismiss;
     
-        virtual void handleButton(u32 buttons);
+        virtual void handleButton(u32 buttons, double dTime);
 
         void show();
         void dismiss(bool success);

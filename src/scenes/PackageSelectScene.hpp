@@ -1,5 +1,5 @@
 // Kosmos Updater
-// Copyright (C) 2018 Steven Mattera
+// Copyright (C) 2019 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <switch.h>
 #include "../Scene.hpp"
 #include "../views/HeaderView.hpp"
 #include "../views/UpdateView.hpp"
@@ -28,13 +29,14 @@
 #include "../views/AlertView.hpp"
 #include "../models/NetRequest.hpp"
 #include "../ModalView.hpp"
+#include "../views/PasscodeView.hpp"
 
 class PackageSelectScene : public Scene {
     public:
         PackageSelectScene();
         ~PackageSelectScene();
 
-        void handleButton(u32 buttons);
+        void handleButton(u32 buttons, double dTime);
         void render(SDL_Rect rect, double dTime);
 
     private:
@@ -45,6 +47,7 @@ class PackageSelectScene : public Scene {
         string _bundleSelected;
         int _focusSelection;
         bool _disabledGameCart;
+        double _passcodeButtonTime;
         
         NetRequest * _versionRequest;
 
@@ -61,6 +64,7 @@ class PackageSelectScene : public Scene {
         MultiSelectView * _channelMultiSelectView;
         MultiSelectView * _bundleMultiSelectView;
         AlertView * _disabledGameCartAlertView;
+        PasscodeView * _passcodeView;
         
         void _updateVersionRequest();
         void _showUpdateView();
@@ -74,4 +78,6 @@ class PackageSelectScene : public Scene {
         void _handleButtonsForChannelMutliSelect(u32 buttons);
         void _handleButtonsForBundleMutliSelect(u32 buttons);
         void _resetVersion(bool channelChange);
+
+        static inline double PASSCODE_DELAY = 2000;
 };

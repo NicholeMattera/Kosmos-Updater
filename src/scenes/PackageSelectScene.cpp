@@ -1,5 +1,5 @@
 // Kosmos Updater
-// Copyright (C) 2018 Steven Mattera
+// Copyright (C) 2019 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -26,6 +26,8 @@ PackageSelectScene::PackageSelectScene() {
     _channelOpen = false;
     _bundleOpen = false;
     _focusSelection = 0;
+    _passcodeButtonTime = 0;
+    _passcodeView = NULL;
 
     _headerView = new HeaderView("Kosmos Updater", true);
     _headerView->frame = { 0, 0, 1280, 88 };
@@ -149,9 +151,26 @@ PackageSelectScene::~PackageSelectScene() {
 
     if (_versionRequest != NULL)
         delete _versionRequest;
+
+    if (_passcodeView != NULL)
+        delete _passcodeView;
 }
 
-void PackageSelectScene::handleButton(u32 buttons) {
+void PackageSelectScene::handleButton(u32 buttons, double dTime) {
+    if (buttons & KEY_X) {
+        _passcodeButtonTime += dTime;
+        if (dTime >= PASSCODE_DELAY) {
+            if (_passcodeView == NULL) {
+                _passcodeView = new PasscodeView();
+            }
+
+            _passcodeView->show();
+            _passcodeButtonTime = 0;
+        }
+    } else {
+        _passcodeButtonTime = 0;
+    }
+
     if (!_statusView->hidden && buttons & KEY_A) {
         Mix_PlayChannel(-1, AssetManager::back, 0);
         SceneDirector::exitApp = true;

@@ -1,5 +1,5 @@
 // Kosmos Updater
-// Copyright (C) 2018 Steven Mattera
+// Copyright (C) 2019 Steven Mattera
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -64,7 +64,7 @@ AlertView::~AlertView() {
     _buttons.clear();
 }
 
-void AlertView::handleButton(u32 buttons) {
+void AlertView::handleButton(u32 buttons, double dTime) {
     if (buttons & KEY_LEFT && _focusSelection > 0) {
         Mix_PlayChannel(-1, AssetManager::select, 0);
         _focusSelection--;

@@ -15,23 +15,31 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <string.h>
-#include "Zip.hpp"
+#include <SDL2/SDL2_gfxPrimitives.h>
+#include "PasscodeView.hpp"
+#include "../AssetManager.hpp"
+#include "../SceneDirector.hpp"
 
-Zip::Zip(string filename, string dest, int numberOfFiles) : ThreadObj() {
-    _filename = filename;
-    _dest = dest;
-    _numberOfFiles = numberOfFiles;
+PasscodeView::PasscodeView() {
 }
 
-string Zip::getFilename() {
-    return _filename;
+PasscodeView::~PasscodeView() {
 }
 
-string Zip::getDestination() {
-    return _dest;
+void PasscodeView::handleButton(u32 buttons, double dTime) {
 }
 
-int Zip::getNumberOfFiles() {
-    return _numberOfFiles;
+void PasscodeView::render(SDL_Rect rect, double dTime) {
+    // Draw background.
+    roundedBoxRGBA(
+        SceneDirector::renderer,
+        255,
+        0,
+        1025,
+        0, 
+        4,
+        AssetManager::background.r, AssetManager::background.g, AssetManager::background.b, AssetManager::background.a);
+
+    // Render any subviews.
+    View::render(rect, dTime);
 }
