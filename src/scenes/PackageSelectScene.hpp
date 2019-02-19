@@ -75,6 +75,7 @@ class PackageSelectScene : public Scene {
 
         void _onMultiSelectDismiss(ModalView * view, bool success);
         void _onAlertViewDismiss(ModalView * view, bool success);
+        void _onPasscodeViewDismiss(ModalView * view, bool success);
         void _handleButtonsForChannelMutliSelect(u32 buttons);
         void _handleButtonsForBundleMutliSelect(u32 buttons);
         void _resetVersion(bool channelChange);

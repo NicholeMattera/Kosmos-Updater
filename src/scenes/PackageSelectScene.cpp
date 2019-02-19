@@ -162,6 +162,7 @@ void PackageSelectScene::handleButton(u32 buttons, double dTime) {
         if (dTime >= PASSCODE_DELAY) {
             if (_passcodeView == NULL) {
                 _passcodeView = new PasscodeView();
+                _passcodeView->onDismiss = bind(&PackageSelectScene::_onPasscodeViewDismiss, this, _1, _2);
             }
 
             _passcodeView->show();
@@ -314,6 +315,7 @@ void PackageSelectScene::_showPackageSelectViews() {
     _footerView->actions.clear();
     _footerView->actions.push_back(new Action(A_BUTTON, "OK"));
     _footerView->actions.push_back(new Action(B_BUTTON, "Quit"));
+    _footerView->actions.push_back(new Action(X_BUTTON, "???"));
 }
 
 void PackageSelectScene::_showStatusView(string text, string subtext) {
@@ -403,6 +405,12 @@ void PackageSelectScene::_onAlertViewDismiss(ModalView * view, bool success) {
         _disabledGameCart = false;
         _disableGCRowView->setSecondaryText("Off");
         ConfigManager::setDisabledGameCart(false);
+    }
+}
+
+void _onPasscodeViewDismiss(ModalView * view, bool success) {
+    if (success) {
+        ConfigManager::setForceESPatches(true);
     }
 }
 

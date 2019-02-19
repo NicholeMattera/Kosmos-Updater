@@ -21,12 +21,48 @@
 #include "../SceneDirector.hpp"
 
 PasscodeView::PasscodeView() {
+    _buttonTimeout = 0;
 }
 
 PasscodeView::~PasscodeView() {
 }
 
 void PasscodeView::handleButton(u32 buttons, double dTime) {
+    if (_buttonTimeout = 0 && _passcode.size() < 4) {
+        if (buttons & KEY_PLUS) {
+            dismiss(false);
+        }
+
+        if (buttons & KEY_A) {
+            _passcode.push_back(KEY_A);
+            _buttonTimeout = 1;
+        }
+        else if (buttons & KEY_B) {
+            _passcode.push_back(KEY_B);
+            _buttonTimeout = 1;
+        }
+        else if (buttons & KEY_X) {
+            _passcode.push_back(KEY_X);
+            _buttonTimeout = 1;
+        }
+        else if (buttons & KEY_Y) {
+            _passcode.push_back(KEY_Y);
+            _buttonTimeout = 1;
+        }
+
+        if (_buttonTimeout == 1 && _passcode.size() == 4) {
+            if (_validatePasscode()) {
+                dismiss(true);
+            } else {
+                _passcode.clear();
+            }
+        }
+    } else {
+        _buttonTimeout += dTime;
+        if (_buttonTimeout >= 500) {
+            _buttonTimeout = 0;
+        }
+    }
 }
 
 void PasscodeView::render(SDL_Rect rect, double dTime) {
@@ -42,4 +78,16 @@ void PasscodeView::render(SDL_Rect rect, double dTime) {
 
     // Render any subviews.
     View::render(rect, dTime);
+}
+
+bool PasscodeView::_validatePasscode() {
+    int i = 0;
+    for (auto const& key : _passcode) {
+        if (key != BIT(PASSCODE[i])) {
+            return false;
+        }
+        i++;
+    }
+
+    return true;
 }
