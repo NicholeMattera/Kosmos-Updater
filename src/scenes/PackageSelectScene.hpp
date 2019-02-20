@@ -47,7 +47,6 @@ class PackageSelectScene : public Scene {
         string _bundleSelected;
         int _focusSelection;
         bool _disabledGameCart;
-        double _passcodeButtonTime;
         
         NetRequest * _versionRequest;
 
@@ -79,6 +78,4 @@ class PackageSelectScene : public Scene {
         void _handleButtonsForChannelMutliSelect(u32 buttons);
         void _handleButtonsForBundleMutliSelect(u32 buttons);
         void _resetVersion(bool channelChange);
-
-        static inline double PASSCODE_DELAY = 2000;
 };

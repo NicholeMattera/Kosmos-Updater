@@ -31,7 +31,6 @@ class PasscodeView : public ModalView {
         void render(SDL_Rect rect, double dTime);
 
     private:
-        double _buttonTimeout;
         vector<u32> _passcode;
 
         bool _validatePasscode();

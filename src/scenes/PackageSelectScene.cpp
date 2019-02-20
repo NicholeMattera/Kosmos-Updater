@@ -26,7 +26,6 @@ PackageSelectScene::PackageSelectScene() {
     _channelOpen = false;
     _bundleOpen = false;
     _focusSelection = 0;
-    _passcodeButtonTime = 0;
     _passcodeView = NULL;
 
     _headerView = new HeaderView("Kosmos Updater", true);
@@ -157,21 +156,6 @@ PackageSelectScene::~PackageSelectScene() {
 }
 
 void PackageSelectScene::handleButton(u32 buttons, double dTime) {
-    if (buttons & KEY_X) {
-        _passcodeButtonTime += dTime;
-        if (dTime >= PASSCODE_DELAY) {
-            if (_passcodeView == NULL) {
-                _passcodeView = new PasscodeView();
-                _passcodeView->onDismiss = bind(&PackageSelectScene::_onPasscodeViewDismiss, this, _1, _2);
-            }
-
-            _passcodeView->show();
-            _passcodeButtonTime = 0;
-        }
-    } else {
-        _passcodeButtonTime = 0;
-    }
-
     if (!_statusView->hidden && buttons & KEY_A) {
         Mix_PlayChannel(-1, AssetManager::back, 0);
         SceneDirector::exitApp = true;
@@ -216,6 +200,15 @@ void PackageSelectScene::handleButton(u32 buttons, double dTime) {
         if (buttons & KEY_B) {
             Mix_PlayChannel(-1, AssetManager::back, 0);
             SceneDirector::exitApp = true;
+        }
+
+        if (buttons & KEY_X) {
+            if (_passcodeView == NULL) {
+                _passcodeView = new PasscodeView();
+                _passcodeView->onDismiss = bind(&PackageSelectScene::_onPasscodeViewDismiss, this, _1, _2);
+            }
+
+            _passcodeView->show();
         }
 
         if (buttons & KEY_UP && _focusSelection != 0) {
@@ -408,7 +401,7 @@ void PackageSelectScene::_onAlertViewDismiss(ModalView * view, bool success) {
     }
 }
 
-void _onPasscodeViewDismiss(ModalView * view, bool success) {
+void PackageSelectScene::_onPasscodeViewDismiss(ModalView * view, bool success) {
     if (success) {
         ConfigManager::setForceESPatches(true);
     }
