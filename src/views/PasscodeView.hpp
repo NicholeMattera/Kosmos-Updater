@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../ModalView.hpp"
+#include "TextView.hpp"
 #include <vector>
 
 using namespace std;
@@ -31,7 +32,18 @@ class PasscodeView : public ModalView {
         void render(SDL_Rect rect, double dTime);
 
     private:
+        int _yPosition;
+        int _height;
         vector<u32> _passcode;
+
+        static inline SDL_Texture * _aButton = NULL;
+        static inline SDL_Texture * _bButton = NULL;
+        static inline SDL_Texture * _xButton = NULL;
+        static inline SDL_Texture * _yButton = NULL;
+        static inline SDL_Texture * _minusButton = NULL;
+
+        TextView * _titleTextView;
+        TextView * _messageTextView;
 
         bool _validatePasscode();
 

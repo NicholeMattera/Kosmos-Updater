@@ -41,8 +41,11 @@ class PackageDownloadScene : public Scene {
         NetRequest * _packageRequest;
         Zip * _packageExtract;
         ThreadObj * _packageDisableGC;
+        NetRequest * _esPatchesRequest;
+        Zip * _esPatchesExtract;
         string _versionNumber;
         int _numberOfFiles;
+        bool _shouldApplyESPatches;
 
         HeaderView * _headerView;
         UpdateView * _updateView;
@@ -55,6 +58,8 @@ class PackageDownloadScene : public Scene {
         void _updatePackageRequest();
         void _updatePackageExtract();
         void _updatePackageDisableGC();
+        void _updateEsPatchesRequest();
+        void _updateEsPatchesExtract();
         void _showStatus(string text, string subtext, bool wasSuccessful);
         void _onAlertViewDismiss(ModalView * view, bool success);
 };

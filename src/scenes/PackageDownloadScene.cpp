@@ -25,6 +25,8 @@ using namespace std::placeholders;
 
 PackageDownloadScene::PackageDownloadScene() {
     bpcInitialize();
+
+    _shouldApplyESPatches = (FileManager::esPatchesExists() || ConfigManager::getForceESPatches());
     
     _headerView = new HeaderView("Kosmos Updater", true);
     _headerView->frame = { 0, 0, 1280, 88 };
@@ -58,6 +60,8 @@ PackageDownloadScene::PackageDownloadScene() {
     _packageRequest = NetManager::getLatestKosmos(bundle, channel);
     _packageDelete = NULL;
     _packageExtract = NULL;
+    _esPatchesRequest = NULL;
+    _esPatchesExtract = NULL;
     _packageDisableGC = NULL;
 }
 
@@ -82,6 +86,12 @@ PackageDownloadScene::~PackageDownloadScene() {
 
     if (_packageExtract != NULL)
         delete _packageExtract;
+
+    if (_esPatchesRequest != NULL)
+        delete _esPatchesRequest;
+
+    if (_esPatchesExtract != NULL)
+        delete _esPatchesExtract;
 
     if (_packageDisableGC != NULL)
         delete _packageDisableGC;
@@ -109,6 +119,12 @@ void PackageDownloadScene::render(SDL_Rect rect, double dTime) {
     }
     else if (_packageExtract != NULL) {
         _updatePackageExtract();
+    }
+    else if (_esPatchesRequest != NULL) {
+        _updateEsPatchesRequest();
+    }
+    else if (_esPatchesExtract != NULL) {
+        _updateEsPatchesExtract();
     }
     else if (_packageDisableGC != NULL) {
         _updatePackageDisableGC();
@@ -176,11 +192,18 @@ void PackageDownloadScene::_updatePackageExtract() {
         FileManager::deleteFile("temp.zip");
         ConfigManager::setCurrentVersion(_versionNumber);
 
-        _updateView->setText("Applying disabled game cart option...");
-        _updateView->setProgress(0);
+        if (_shouldApplyESPatches) {
+            _updateView->setText("Downloading the latest ES Patches...");
+            _updateView->setProgress(0);
 
-        _packageDisableGC = new ThreadObj();
-        FileManager::applyNoGC(_packageDisableGC);
+            _esPatchesRequest = NetManager::getLatestKosmos("es_patches", "stable");
+        } else {
+            _updateView->setText("Applying disabled game cart option...");
+            _updateView->setProgress(0);
+
+            _packageDisableGC = new ThreadObj();
+            FileManager::applyNoGC(_packageDisableGC);
+        }
     }
     else if (_packageExtract->hasError) {
         delete _packageExtract;
@@ -193,6 +216,63 @@ void PackageDownloadScene::_updatePackageExtract() {
 
     if (_packageExtract != NULL)
         mutexUnlock(&_packageExtract->mutexRequest);
+}
+
+void PackageDownloadScene::_updateEsPatchesRequest() {
+    mutexLock(&_esPatchesRequest->mutexRequest);
+
+    _updateView->setProgress(_esPatchesRequest->progress);
+    if (_esPatchesRequest->isComplete) {
+        FileManager::writeFile("temp.zip", _esPatchesRequest);
+        int numberOfFiles = stoi(_esPatchesRequest->getNumberOfFiles());
+
+        delete _esPatchesRequest;
+        _esPatchesRequest = NULL;
+
+       _updateView->setText("Extracting the latest ES Patches...");
+        _updateView->setProgress(0);
+
+        _esPatchesExtract = new Zip("temp.zip", "sdmc:/", numberOfFiles);
+        FileManager::extract(_esPatchesExtract);
+    }
+    else if (_esPatchesRequest->hasError) {
+        _showStatus(_esPatchesRequest->errorMessage, "Please restart the app to try again.", false);
+
+        delete _esPatchesRequest;
+        _esPatchesRequest = NULL;
+    }
+
+    if (_esPatchesRequest != NULL)
+        mutexUnlock(&_esPatchesRequest->mutexRequest);
+}
+
+void PackageDownloadScene::_updateEsPatchesExtract() {
+    mutexLock(&_esPatchesExtract->mutexRequest);
+
+    _updateView->setProgress(_esPatchesExtract->progress);
+    if (_esPatchesExtract->isComplete) {
+        delete _esPatchesExtract;
+        _esPatchesExtract = NULL;
+
+        FileManager::deleteFile("temp.zip");
+
+        _updateView->setText("Applying disabled game cart option...");
+        _updateView->setProgress(0);
+
+        _packageDisableGC = new ThreadObj();
+        FileManager::applyNoGC(_packageDisableGC);
+    }
+    else if (_esPatchesExtract->hasError) {
+        delete _esPatchesExtract;
+        _esPatchesExtract = NULL;
+
+        FileManager::deleteFile("temp.zip");
+
+        _showStatus(_esPatchesExtract->errorMessage, "Please restart the app to try again.", false);
+    }
+
+    if (_esPatchesExtract != NULL)
+        mutexUnlock(&_esPatchesExtract->mutexRequest);
 }
 
 void PackageDownloadScene::_updatePackageDisableGC() {
