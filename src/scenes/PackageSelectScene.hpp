@@ -78,4 +78,5 @@ class PackageSelectScene : public Scene {
         void _handleButtonsForChannelMutliSelect(u32 buttons);
         void _handleButtonsForBundleMutliSelect(u32 buttons);
         void _resetVersion(bool channelChange);
+        string _getVersionNumber(string version);
 };

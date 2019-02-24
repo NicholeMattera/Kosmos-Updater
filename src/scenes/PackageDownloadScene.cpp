@@ -286,7 +286,7 @@ void PackageDownloadScene::_updatePackageDisableGC() {
         FileManager::deleteFile("temp.zip");
         ConfigManager::setCurrentVersion(_versionNumber);
 
-        _showStatus("SD Files has been updated to version " + ((_versionNumber.size() > 7) ? _versionNumber.substr(0, 7) : _versionNumber) + "!", "Please restart your Switch to run the latest SD Files.", true);
+        _showStatus("SD Files has been updated to version " + _getVersionNumber(_versionNumber) + "!", "Please restart your Switch to run the latest SD Files.", true);
     }
 
     if (_packageDisableGC != NULL)
@@ -315,4 +315,8 @@ void PackageDownloadScene::_onAlertViewDismiss(ModalView * view, bool success) {
             SceneDirector::exitApp = true;
         }
     }
+}
+
+string PackageDownloadScene::_getVersionNumber(string version) {
+    return (version.size() > 7 && ConfigManager::getChannel() != "stable") ? version.substr(0, 7) : version;
 }

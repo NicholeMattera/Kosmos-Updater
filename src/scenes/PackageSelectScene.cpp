@@ -288,9 +288,9 @@ void PackageSelectScene::_showPackageSelectViews() {
     }
 
     if (version == "" || version.compare(_latestVersion) == 0) {
-        _installRowView->setSecondaryText("Latest Version is " + ((_latestVersion.size() > 7) ? _latestVersion.substr(0, 7) : _latestVersion));
+        _installRowView->setSecondaryText("Latest Version is " + _getVersionNumber(_latestVersion));
     } else {
-        _installRowView->setSecondaryText("You currently have version " + ((version.size() > 7) ? version.substr(0, 7) : version) + " installed, and the latest version is " + ((_latestVersion.size() > 7) ? _latestVersion.substr(0, 7) : _latestVersion + "."));
+        _installRowView->setSecondaryText("You currently have version " + _getVersionNumber(version) + " installed, and the latest version is " + _getVersionNumber(_latestVersion) + ".");
     }
 
     _settingHeaderView->hidden = false;
@@ -416,4 +416,8 @@ void PackageSelectScene::_resetVersion(bool channelChange) {
         string channel = ConfigManager::getChannel();
         _versionRequest = NetManager::getLatestKosmosVersion(channel);
     }
+}
+
+string PackageSelectScene::_getVersionNumber(string version) {
+    return (version.size() > 7 && ConfigManager::getChannel() != "stable") ? version.substr(0, 7) : version;
 }

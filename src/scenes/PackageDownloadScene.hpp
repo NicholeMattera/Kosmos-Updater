@@ -62,4 +62,5 @@ class PackageDownloadScene : public Scene {
         void _updateEsPatchesExtract();
         void _showStatus(string text, string subtext, bool wasSuccessful);
         void _onAlertViewDismiss(ModalView * view, bool success);
+        string _getVersionNumber(string version);
 };
