@@ -104,8 +104,13 @@ void FileManager::applyNoGC(ThreadObj * status) {
 }
 
 bool FileManager::esPatchesExists() {
-    struct stat info;
-    return stat(ES_PATCH_DIR.c_str(), &info) != 0 && info.st_mode & S_IFDIR;
+    DIR * dir = opendir(ES_PATCH_DIR.c_str());
+    if (dir) {
+        closedir(dir);
+        return true;
+    }
+
+    return false;
 }
 
 Result FileManager::_createThread(ThreadFunc func, ThreadObj * arg) {
@@ -127,7 +132,7 @@ void FileManager::_extract(void * ptr) {
     Zip * zipObj = (Zip *) ptr;
     unzFile unz = unzOpen(zipObj->getFilename().c_str());
     vector<string> filesToIgnore = ConfigManager::getFilesToIgnore();
-    vector<string> filesInstalled;
+    vector<string> filesInstalled = ConfigManager::getInstalledFiles();
     
     int i = 0;
     for (;;) {
@@ -219,6 +224,9 @@ void FileManager::_cleanUpFiles(void * ptr) {
 
         deleteFile(fileName);
     }
+
+    vector<string> blankVector;
+    ConfigManager::setInstalledFiles(blankVector);
 
     mutexLock(&threadObj->mutexRequest);
     threadObj->progress = 1;

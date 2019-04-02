@@ -53,11 +53,8 @@ PackageDownloadScene::PackageDownloadScene() {
     addSubView(_updateView);
     addSubView(_statusView);
     addSubView(_footerView);
-
-    string bundle = ConfigManager::getBundle();
-    string channel = ConfigManager::getChannel();
     
-    _packageRequest = NetManager::getLatestKosmos(bundle, channel);
+    _packageRequest = NetManager::getLatestKosmos(ConfigManager::getBundle(), ConfigManager::getChannel());
     _packageDelete = NULL;
     _packageExtract = NULL;
     _esPatchesRequest = NULL;
@@ -196,7 +193,7 @@ void PackageDownloadScene::_updatePackageExtract() {
             _updateView->setText("Downloading the latest ES Patches...");
             _updateView->setProgress(0);
 
-            _esPatchesRequest = NetManager::getLatestKosmos("es_patches", "stable");
+            _esPatchesRequest = NetManager::getLatestKosmos("es_patches", ConfigManager::getChannel());
         } else {
             _updateView->setText("Applying disabled game cart option...");
             _updateView->setProgress(0);
