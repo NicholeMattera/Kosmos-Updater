@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <dirent.h>
+#include <SimpleIniParser.hpp>
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -24,10 +25,10 @@
 #include "FileManager.hpp"
 
 #include "ConfigManager.hpp"
-#include "models/Ini.hpp"
 
-using namespace std;
 using namespace ku::models;
+using namespace simpleIniParser;
+using namespace std;
 
 namespace ku {
     bool FileManager::writeFile(string filename, NetRequest * request) {
@@ -235,7 +236,7 @@ namespace ku {
 
         Ini * ini = Ini::parseFile(HEKATE_FILE);
         for (auto const& section : ini->sections) {
-            if (section->isCaption() || section->isComment())
+            if (section->type == HEKATE_CAPTION || section->type == HASHTAG_COMMENT || section->type == SEMICOLON_COMMENT)
                 continue;
 
             if (section->value == "config") {
