@@ -18,8 +18,8 @@
 #pragma once
 
 #include <switch.h>
+#include <Swurl.hpp>
 
-#include "../models/NetRequest.hpp"
 #include "../Scene.hpp"
 #include "../views/FooterView.hpp"
 #include "../views/HeaderView.hpp"
@@ -37,19 +37,20 @@ namespace ku::scenes {
             void render(SDL_Rect rect, double dTime);
 
         private:
-            std::string _latestVersion;
-            
-            ku::models::NetRequest * _versionRequest;
+            ku::views::HeaderView * _headerView = NULL;
+            ku::views::UpdateView * _updateView = NULL;
+            ku::views::StatusView * _statusView = NULL;
+            ku::views::ListRowView * _installRowView = NULL;
+            ku::views::FooterView * _footerView = NULL;
 
-            ku::views::HeaderView * _headerView;
-            ku::views::UpdateView * _updateView;
-            ku::views::StatusView * _statusView;
-            ku::views::ListRowView * _installRowView;
-            ku::views::FooterView * _footerView;
+            swurl::WebRequest * _kosmosVersionRequest = NULL;
         
-            void _updateVersionRequest();
             void _showUpdateView();
             void _showPackageSelectViews();
             void _showStatusView(std::string text, std::string subtext);
+
+            void _onProgressUpdate(swurl::WebRequest * request, double progress);
+            void _onCompleted(swurl::WebRequest * request);
+            void _onError(swurl::WebRequest * request, std::string error);
     };
 }

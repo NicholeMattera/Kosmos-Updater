@@ -18,30 +18,43 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <switch.h>
+#include <Swurl.hpp>
 
 #include "AssetManager.hpp"
 #include "ConfigManager.hpp"
-#include "NetManager.hpp"
 #include "SceneDirector.hpp"
 
-using namespace std;
 using namespace ku;
+using namespace std;
+using namespace swurl;
 
 int main(int argc, char **argv)
 {
+    SessionManager::initialize();
+    SessionManager::userAgent = string("kosmos-updater/") + VERSION;
+    SessionManager::requestHeaders.insert(
+        pair<string, string>(
+            "Cache-Control",
+            "no-cache"
+        )
+    );
+
     #ifdef DEBUG
-        socketInitializeDefault();
         nxlinkStdio();
     #endif
 
     ConfigManager::initialize();
-    
+
+    if (ConfigManager::shouldUseProxy()) {
+        SessionManager::proxyUrl = ConfigManager::getProxy();
+        SessionManager::proxyUsername = ConfigManager::getProxyUsername();
+        SessionManager::proxyPassword = ConfigManager::getProxyPassword();
+    }
+
     SceneDirector * sceneDirector = new SceneDirector();
     if (!SceneDirector::renderer || !SceneDirector::window) {
         return -1;
     }
-
-    NetManager::initialize();
 
     if (!AssetManager::initialize()) {
         AssetManager::dealloc();
@@ -56,13 +69,9 @@ int main(int argc, char **argv)
     }
 
     AssetManager::dealloc();
-    NetManager::dealloc();
-    ConfigManager::dealloc();
     delete sceneDirector;
-
-    #ifdef DEBUG
-        socketExit();
-    #endif
+    ConfigManager::dealloc();
+    SessionManager::dealloc();
 
     return 0;
 }

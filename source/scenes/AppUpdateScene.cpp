@@ -17,172 +17,158 @@
 
 #include "AppUpdateScene.hpp"
 
+#include "../ConfigManager.hpp"
 #include "../FileManager.hpp"
-#include "../NetManager.hpp"
 #include "../SceneDirector.hpp"
 
 using namespace ku;
 using namespace ku::models;
 using namespace ku::views;
+using namespace std;
+using namespace std::placeholders;
+using namespace swurl;
 
-AppUpdateScene::AppUpdateScene() {
-    _headerView = new HeaderView("Kosmos Updater", true);
-    _headerView->frame = { 0, 0, 1280, 88 };
+namespace ku::scenes {
+    AppUpdateScene::AppUpdateScene() {
+        SessionManager::onProgressChanged = bind(&AppUpdateScene::_onProgressUpdate, this, _1, _2);
+        SessionManager::onCompleted = bind(&AppUpdateScene::_onCompleted, this, _1);
+        SessionManager::onError = bind(&AppUpdateScene::_onError, this, _1, _2);
 
-    _updateView = new UpdateView("Checking for updates to Kosmos Updater...");
-    _updateView->frame.x = 0;
-    _updateView->frame.y = 200;
+        _headerView = new HeaderView("Kosmos Updater", true);
+        _headerView->frame = { 0, 0, 1280, 88 };
 
-    _statusView = new StatusView("", "");
-    _statusView->frame.x = 0;
-    _statusView->frame.y = 323;
-    _statusView->hidden = true;
+        _updateView = new UpdateView("Checking for updates to Kosmos Updater...");
+        _updateView->frame.x = 0;
+        _updateView->frame.y = 200;
 
-    _footerView = new FooterView();
-    _footerView->frame = { 0, 647, 1280, 73 };
+        _statusView = new StatusView("", "");
+        _statusView->frame.x = 0;
+        _statusView->frame.y = 323;
+        _statusView->hidden = true;
 
-    addSubView(_headerView);
-    addSubView(_updateView);
-    addSubView(_statusView);
-    addSubView(_footerView);
+        _footerView = new FooterView();
+        _footerView->frame = { 0, 647, 1280, 73 };
 
-    _versionRequest = NetManager::getLatestAppVersion();
-    _appRequest = NULL;
-}
+        addSubView(_headerView);
+        addSubView(_updateView);
+        addSubView(_statusView);
+        addSubView(_footerView);
 
-AppUpdateScene::~AppUpdateScene() {
-    if (_versionRequest != NULL)
-        delete _versionRequest;
-
-    if (_appRequest != NULL)
-        delete _appRequest;
-
-    if (_headerView != NULL)
-        delete _headerView;
-
-    if (_updateView != NULL)
-        delete _updateView;
-
-    if (_statusView != NULL)
-        delete _statusView;
-
-    if (_footerView != NULL)
-        delete _footerView;
-}
-
-void AppUpdateScene::handleButton(u32 buttons, double dTime) {
-    if (!_statusView->hidden && buttons & KEY_A) {
-        SceneDirector::exitApp = true;
-    }
-}
-
-void AppUpdateScene::render(SDL_Rect rect, double dTime) {
-    if (_versionRequest != NULL) {
-        _updateVersionRequest();
-    }
-    else if (_appRequest != NULL) {
-        _updateAppRequest();
+        _appVersionRequest = new WebRequest(ConfigManager::getHost() + "/" + API_VERSION + "/app/version-number");
+        SessionManager::makeRequest(_appVersionRequest);
     }
 
-    Scene::render(rect, dTime);
-}
+    AppUpdateScene::~AppUpdateScene() {
+        if (_headerView != NULL)
+            delete _headerView;
 
-void AppUpdateScene::_updateVersionRequest() {
-    mutexLock(&_versionRequest->mutexRequest);
+        if (_updateView != NULL)
+            delete _updateView;
 
-    _updateView->setProgress(_versionRequest->progress);
-    if (_versionRequest->isComplete) {
-        _latestAppVersion = string(_versionRequest->getData());
-        _parseLatestAppVersion();
+        if (_statusView != NULL)
+            delete _statusView;
 
-        // No Update
-        if (
-            VERSION_MAJOR > _latestAppMajorVersion ||
-            (VERSION_MAJOR == _latestAppMajorVersion && VERSION_MINOR > _latestAppMinorVersion) ||
-            (VERSION_MAJOR == _latestAppMajorVersion && VERSION_MINOR == _latestAppMinorVersion && VERSION_PATCH > _latestAppPatchVersion) ||
-            (VERSION_MAJOR == _latestAppMajorVersion && VERSION_MINOR == _latestAppMinorVersion && VERSION_PATCH == _latestAppPatchVersion)
-        ) {
-            SceneDirector::currentScene = SCENE_PACKAGE_SELECT;
-        }
-        // Update
-        else {
-            delete _versionRequest;
-            _versionRequest = NULL;
+        if (_footerView != NULL)
+            delete _footerView;
 
-            _updateView->setProgress(0);
-            _updateView->setText("Getting the latest version of Kosmos Updater...");
+        if (_appVersionRequest != NULL)
+            delete _appVersionRequest;
 
-            _appRequest = NetManager::getLatestApp();
+        if (_appRequest != NULL)
+            delete _appRequest;
+    }
+
+    void AppUpdateScene::handleButton(u32 buttons, double dTime) {
+        if (!_statusView->hidden && buttons & KEY_A) {
+            SceneDirector::exitApp = true;
         }
     }
-    else if (_versionRequest->hasError) {
-        _showStatus(_versionRequest->errorMessage, "Please restart the app to try again.");
 
-        delete _versionRequest;
-        _versionRequest = NULL;
+    void AppUpdateScene::render(SDL_Rect rect, double dTime) {
+        _updateView->setProgress(_downloadProgess);
+        Scene::render(rect, dTime);
     }
 
-    if (_versionRequest != NULL)
-        mutexUnlock(&_versionRequest->mutexRequest);
-}
+    void AppUpdateScene::_showStatus(string text, string subtext) {
+        _statusView->setText(text);
+        _statusView->setSubtext(subtext);
 
-void AppUpdateScene::_updateAppRequest() {
-    mutexLock(&_appRequest->mutexRequest);
-    
-    _updateView->setProgress(_appRequest->progress);
-    if (_appRequest->isComplete) {
-        romfsExit();
-        FileManager::writeFile("KosmosUpdater.nro", _appRequest);
+        _updateView->hidden = true;
+        _statusView->hidden = false;
 
-        delete _appRequest;
-        _appRequest = NULL;
-
-        _showStatus("Kosmos Updater has been updated to version " + _latestAppVersion + "!", "Please restart the app to update your files.");
-    }
-    else if (_appRequest->hasError) {
-        _showStatus(_appRequest->errorMessage, "Please restart the app to try again.");
-
-        delete _appRequest;
-        _appRequest = NULL;
+        _footerView->actions.push_back(new Action(A_BUTTON, "Quit"));
     }
 
-    if (_appRequest != NULL)
-        mutexUnlock(&_appRequest->mutexRequest);
-}
+    tuple<int, int, int> AppUpdateScene::_parseVersion(string version) {
+        size_t pos = 0;
+        int index = 0, major = 0, minor = 0, patch = 0;
 
-void AppUpdateScene::_showStatus(string text, string subtext) {
-    _statusView->setText(text);
-    _statusView->setSubtext(subtext);
+        while (pos != string::npos) {
+            size_t end_pos = version.find(".", pos);
 
-    _updateView->hidden = true;
-    _statusView->hidden = false;
+            int versionNumber = 0;
+            if (end_pos == string::npos) {
+                versionNumber = stoi(version.substr(pos, string::npos));
+                pos = string::npos;
+            } else {
+                versionNumber = stoi(version.substr(pos, end_pos - pos));
+                pos = end_pos + 1;
+            }
 
-    _footerView->actions.push_back(new Action(A_BUTTON, "Quit"));
-}
+            if (index == 0) {
+                major = versionNumber;
+            } else if (index == 1) {
+                minor = versionNumber;
+            } else if (index == 2) {
+                patch = versionNumber;
+                break;
+            }
 
-void AppUpdateScene::_parseLatestAppVersion() {
-    size_t pos = 0;
-    int index = 0;
-    while (pos != string::npos) {
-        size_t end_pos = _latestAppVersion.find(".", pos);
-
-        int versionNumber = 0;
-        if (end_pos == string::npos) {
-            versionNumber = stoi(_latestAppVersion.substr(pos, string::npos));
-            pos = string::npos;
-        } else {
-            versionNumber = stoi(_latestAppVersion.substr(pos, end_pos - pos));
-            pos = end_pos + 1;
+            index++;
         }
 
-        if (index == 0) {
-            _latestAppMajorVersion = versionNumber;
-        } else if (index == 1) {
-            _latestAppMinorVersion = versionNumber;
-        } else if (index == 2) {
-            _latestAppPatchVersion = versionNumber;
-        }
+        return make_tuple(major, minor, patch);
+    }
 
-        index++;
+    // Swurl Callback Methods
+
+    void AppUpdateScene::_onProgressUpdate(WebRequest * request, double progress) {
+        _downloadProgess = progress;
+        // TODO: Force render.
+    }
+
+    void AppUpdateScene::_onCompleted(WebRequest * request) {
+        if (request == _appVersionRequest) {
+            auto latestVersion = _parseVersion(request->response.rawResponseBody);
+
+            // No Update
+            if (
+                VERSION_MAJOR > get<0>(latestVersion) ||
+                (VERSION_MAJOR == get<0>(latestVersion) && VERSION_MINOR > get<1>(latestVersion)) ||
+                (VERSION_MAJOR == get<0>(latestVersion) && VERSION_MINOR == get<1>(latestVersion) && VERSION_PATCH > get<2>(latestVersion)) ||
+                (VERSION_MAJOR == get<0>(latestVersion) && VERSION_MINOR == get<1>(latestVersion) && VERSION_PATCH == get<2>(latestVersion))
+            ) {
+                SessionManager::onProgressChanged = NULL;
+                SessionManager::onCompleted = NULL;
+                SessionManager::onError = NULL;
+
+                SceneDirector::currentScene = SCENE_PACKAGE_SELECT;
+            }
+            // Update
+            else {
+                _updateView->setProgress(0);
+                _updateView->setText("Getting the latest version of Kosmos Updater...");
+
+                _appRequest = new WebRequest(ConfigManager::getHost() + "/" + API_VERSION + "/app");
+                SessionManager::makeRequest(_appRequest);
+            }
+        } else if (request == _appRequest) {
+            FileManager::writeFile("KosmosUpdater.nro", request->response.rawResponseBody);
+            _showStatus("Kosmos Updater has been updated to version " + _appVersionRequest->response.rawResponseBody + "!", "Please restart the app.");
+        }
+    }
+
+    void AppUpdateScene::_onError(WebRequest * request, string error) {
+        _showStatus(error, "Please restart the app to try again.");
     }
 }

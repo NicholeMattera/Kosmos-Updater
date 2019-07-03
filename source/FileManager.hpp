@@ -21,14 +21,13 @@
 #include <string>
 #include <vector>
 
-#include "models/NetRequest.hpp"
 #include "models/ThreadObj.hpp"
 #include "models/Zip.hpp"
 
 namespace ku {
     class FileManager {
         public:
-            static bool writeFile(std::string filename, models::NetRequest * request);
+            static bool writeFile(std::string filename, std::string data);
             static bool deleteFile(std::string filename);
             static bool fileExists(std::string filename);
             static bool createSubfolder(std::string path);

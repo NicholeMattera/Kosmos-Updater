@@ -53,8 +53,8 @@ namespace ku {
 
             Scene * _currentScene;
             scenes::ExFatWarningScene * _exFatWarningScene;
-            AppUpdateScene * _appUpdateScene;
+            scenes::AppUpdateScene * _appUpdateScene;
             scenes::PackageSelectScene * _packageSelectScene;
-            PackageDownloadScene * _packageDownloadScene;
+            scenes::PackageDownloadScene * _packageDownloadScene;
     };
 }

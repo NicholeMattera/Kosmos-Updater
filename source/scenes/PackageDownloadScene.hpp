@@ -18,9 +18,9 @@
 #pragma once
 
 #include <string>
+#include <Swurl.hpp>
 
 #include "../ModalView.hpp"
-#include "../models/NetRequest.hpp"
 #include "../models/ThreadObj.hpp"
 #include "../models/Zip.hpp"
 #include "../Scene.hpp"
@@ -30,34 +30,38 @@
 #include "../views/StatusView.hpp"
 #include "../views/UpdateView.hpp"
 
-class PackageDownloadScene : public ku::Scene {
-    public:
-        PackageDownloadScene();
-        ~PackageDownloadScene();
+namespace ku::scenes {
+    class PackageDownloadScene : public ku::Scene {
+        public:
+            PackageDownloadScene();
+            ~PackageDownloadScene();
 
-        void handleButton(u32 buttons, double dTime);
-        void render(SDL_Rect rect, double dTime);
+            void handleButton(u32 buttons, double dTime);
+            void render(SDL_Rect rect, double dTime);
 
-    private:
-        ku::models::ThreadObj * _packageDelete;
-        ku::models::NetRequest * _packageRequest;
-        ku::models::Zip * _packageExtract;
-        ku::models::ThreadObj * _packageDisableGC;
-        std::string _versionNumber;
-        int _numberOfFiles;
+        private:
+            ku::views::HeaderView * _headerView = NULL;
+            ku::views::UpdateView * _updateView = NULL;
+            ku::views::StatusView * _statusView = NULL;
+            ku::views::FooterView * _footerView = NULL;
+            ku::views::AlertView * _restartAlertView = NULL;
 
-        ku::views::HeaderView * _headerView;
-        ku::views::UpdateView * _updateView;
-        ku::views::StatusView * _statusView;
-        ku::views::FooterView * _footerView;
+            swurl::WebRequest * _kosmosRequest = NULL;
+            ku::models::ThreadObj * _packageDelete = NULL;
+            ku::models::Zip * _packageExtract = NULL;
+            ku::models::ThreadObj * _packageDisableGC = NULL;
+            std::string _versionNumber = "";
+            int _numberOfFiles = 0;
 
-        ku::views::AlertView * _restartAlertView;
+            void _updatePackageDelete();
+            void _updatePackageExtract();
+            void _updatePackageDisableGC();
+            void _showStatus(std::string text, std::string subtext, bool wasSuccessful);
+            void _onAlertViewDismiss(ku::ModalView * view, bool success);
+            std::string _getVersionNumber(std::string version);
 
-        void _updatePackageDelete();
-        void _updatePackageRequest();
-        void _updatePackageExtract();
-        void _updatePackageDisableGC();
-        void _showStatus(std::string text, std::string subtext, bool wasSuccessful);
-        void _onAlertViewDismiss(ku::ModalView * view, bool success);
-        std::string _getVersionNumber(std::string version);
-};
+            void _onProgressUpdate(swurl::WebRequest * request, double progress);
+            void _onCompleted(swurl::WebRequest * request);
+            void _onError(swurl::WebRequest * request, std::string error);
+    };
+}

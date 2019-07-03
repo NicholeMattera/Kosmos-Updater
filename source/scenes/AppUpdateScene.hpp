@@ -18,40 +18,39 @@
 #pragma once
 
 #include <string>
+#include <Swurl.hpp>
+#include <tuple>
 
-#include "../models/NetRequest.hpp"
 #include "../Scene.hpp"
 #include "../views/FooterView.hpp"
 #include "../views/HeaderView.hpp"
 #include "../views/StatusView.hpp"
 #include "../views/UpdateView.hpp"
 
-using namespace std;
+namespace ku::scenes {
+    class AppUpdateScene : public ku::Scene {
+        public:
+            AppUpdateScene();
+            ~AppUpdateScene();
+            
+            void handleButton(u32 buttons, double dTime);
+            void render(SDL_Rect rect, double dTime);
 
-class AppUpdateScene : public ku::Scene {
-    public:
-        AppUpdateScene();
-        ~AppUpdateScene();
-        
-        void handleButton(u32 buttons, double dTime);
-        void render(SDL_Rect rect, double dTime);
+        private:
+            ku::views::HeaderView * _headerView = NULL;
+            ku::views::UpdateView * _updateView = NULL;
+            ku::views::StatusView * _statusView = NULL;
+            ku::views::FooterView * _footerView = NULL;
 
-    private:
-        string _latestAppVersion;
-        int _latestAppMajorVersion;
-        int _latestAppMinorVersion;
-        int _latestAppPatchVersion;
+            swurl::WebRequest * _appVersionRequest = NULL;
+            swurl::WebRequest * _appRequest = NULL;
+            double _downloadProgess = 0;
+            
+            void _showStatus(std::string text, std::string subtext);
+            std::tuple<int, int, int> _parseVersion(std::string version);
 
-        ku::models::NetRequest * _versionRequest;
-        ku::models::NetRequest * _appRequest;
-        
-        ku::views::HeaderView * _headerView;
-        ku::views::UpdateView * _updateView;
-        ku::views::StatusView * _statusView;
-        ku::views::FooterView * _footerView;
-        
-        void _updateVersionRequest();
-        void _updateAppRequest();
-        void _showStatus(string text, string subtext);
-        void _parseLatestAppVersion();
-};
+            void _onProgressUpdate(swurl::WebRequest * request, double progress);
+            void _onCompleted(swurl::WebRequest * request);
+            void _onError(swurl::WebRequest * request, std::string error);
+    };
+}

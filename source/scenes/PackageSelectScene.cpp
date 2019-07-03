@@ -18,7 +18,6 @@
 #include "PackageSelectScene.hpp"
 
 #include "../ConfigManager.hpp"
-#include "../NetManager.hpp"
 #include "../SceneDirector.hpp"
 
 using namespace ku;
@@ -26,9 +25,14 @@ using namespace ku::models;
 using namespace ku::views;
 using namespace std;
 using namespace std::placeholders;
+using namespace swurl;
 
 namespace ku::scenes {
     PackageSelectScene::PackageSelectScene() {
+        SessionManager::onProgressChanged = bind(&PackageSelectScene::_onProgressUpdate, this, _1, _2);
+        SessionManager::onCompleted = bind(&PackageSelectScene::_onCompleted, this, _1);
+        SessionManager::onError = bind(&PackageSelectScene::_onError, this, _1, _2);
+
         _headerView = new HeaderView("Kosmos Updater", true);
         _headerView->frame = { 0, 0, 1280, 88 };
 
@@ -56,7 +60,9 @@ namespace ku::scenes {
         addSubView(_footerView);
 
         _showUpdateView();
-        _versionRequest = NetManager::getLatestKosmosVersion();
+
+        _kosmosVersionRequest = new WebRequest(ConfigManager::getHost() + "/" + API_VERSION + "/package/version-number");
+        SessionManager::makeRequest(_kosmosVersionRequest);
     }
 
     PackageSelectScene::~PackageSelectScene() {
@@ -75,8 +81,8 @@ namespace ku::scenes {
         if (_footerView != NULL)
             delete _footerView;
 
-        if (_versionRequest != NULL)
-            delete _versionRequest;
+        if (_kosmosVersionRequest != NULL)
+            delete _kosmosVersionRequest;
     }
 
     void PackageSelectScene::handleButton(u32 buttons, double dTime) {
@@ -95,34 +101,7 @@ namespace ku::scenes {
     }
 
     void PackageSelectScene::render(SDL_Rect rect, double dTime) {
-        if (_versionRequest != NULL) {
-            _updateVersionRequest();
-        }
-
         Scene::render(rect, dTime);
-    }
-
-    void PackageSelectScene::_updateVersionRequest() {
-        mutexLock(&_versionRequest->mutexRequest);
-
-        _updateView->setProgress(_versionRequest->progress);
-        if (_versionRequest->isComplete) {
-            _latestVersion = string(_versionRequest->getData());
-
-            _showPackageSelectViews();
-
-            delete _versionRequest;
-            _versionRequest = NULL;
-        }
-        else if (_versionRequest->hasError) {
-            _showStatusView(_versionRequest->errorMessage, "Please restart the app to try again.");
-
-            delete _versionRequest;
-            _versionRequest = NULL;
-        }
-
-        if (_versionRequest != NULL)
-            mutexUnlock(&_versionRequest->mutexRequest);
     }
 
     void PackageSelectScene::_showUpdateView() {
@@ -145,16 +124,17 @@ namespace ku::scenes {
         _installRowView->hasFocus = true;
 
         string version = ConfigManager::getCurrentVersion();
-        if (version.compare(_latestVersion) == 0) {
+        string latestVersion = (_kosmosVersionRequest != NULL) ? _kosmosVersionRequest->response.rawResponseBody : "";
+        if (version.compare(latestVersion) == 0) {
             _installRowView->setPrimaryText("Reinstall Kosmos");
         } else {
             _installRowView->setPrimaryText("Install Latest Kosmos");
         }
 
-        if (version == "" || version.compare(_latestVersion) == 0) {
-            _installRowView->setSecondaryText("Latest Version is " + _latestVersion);
+        if (version == "" || version.compare(latestVersion) == 0) {
+            _installRowView->setSecondaryText("Latest Version is " + latestVersion);
         } else {
-            _installRowView->setSecondaryText("You currently have version " + version + " installed, and the latest version is " + _latestVersion + ".");
+            _installRowView->setSecondaryText("You currently have version " + version + " installed, and the latest version is " + latestVersion + ".");
         }
 
         for (auto const& action : _footerView->actions) {
@@ -178,5 +158,20 @@ namespace ku::scenes {
         }
         _footerView->actions.clear();
         _footerView->actions.push_back(new Action(A_BUTTON, "Quit"));
+    }
+
+    // Swurl Callback Methods
+
+    void PackageSelectScene::_onProgressUpdate(WebRequest * request, double progress) {
+        _updateView->setProgress(progress);
+        // TODO: Force render.
+    }
+
+    void PackageSelectScene::_onCompleted(WebRequest * request) {
+        _showPackageSelectViews();
+    }
+
+    void PackageSelectScene::_onError(WebRequest * request, string error) {
+        _showStatusView(error, "Please restart the app to try again.");
     }
 }

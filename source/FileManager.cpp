@@ -31,7 +31,7 @@ using namespace simpleIniParser;
 using namespace std;
 
 namespace ku {
-    bool FileManager::writeFile(string filename, NetRequest * request) {
+    bool FileManager::writeFile(string filename, string data) {
         deleteFile(filename);
 
         FILE * file = fopen(filename.c_str(), "wb");
@@ -39,12 +39,12 @@ namespace ku {
             return false;
         }
 
-        size_t result = fwrite(request->getData(), sizeof(char), request->getSize(), file);
+        size_t result = fwrite(data.c_str(), sizeof(char), data.size(), file);
 
         fflush(file);
         fclose(file);
 
-        return (result == request->getSize());
+        return (result == data.size());
     }
 
     bool FileManager::deleteFile(string filename) {
