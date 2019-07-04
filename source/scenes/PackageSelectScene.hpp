@@ -26,6 +26,7 @@
 #include "../views/ListRowView.hpp"
 #include "../views/StatusView.hpp"
 #include "../views/UpdateView.hpp"
+#include "../views/AlertView.hpp"
 
 namespace ku::scenes {
     class PackageSelectScene : public ku::Scene {
@@ -42,12 +43,15 @@ namespace ku::scenes {
             ku::views::StatusView * _statusView = NULL;
             ku::views::ListRowView * _installRowView = NULL;
             ku::views::FooterView * _footerView = NULL;
+            ku::views::AlertView * _ignoreConfigsAlertView = NULL;
 
             swurl::WebRequest * _kosmosVersionRequest = NULL;
         
             void _showUpdateView();
             void _showPackageSelectViews();
             void _showStatusView(std::string text, std::string subtext);
+
+            void _onAlertViewDismiss(ku::ModalView * view, bool success);
 
             void _onProgressUpdate(swurl::WebRequest * request, double progress);
             void _onCompleted(swurl::WebRequest * request);

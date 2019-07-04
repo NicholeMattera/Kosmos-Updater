@@ -53,6 +53,12 @@ namespace ku::scenes {
         _footerView = new FooterView();
         _footerView->frame = { 0, 647, 1280, 73 };
 
+        vector<string> buttons;
+        buttons.push_back("Yes");
+        buttons.push_back("No");
+        _ignoreConfigsAlertView = new AlertView("Ignore Config Files?", "Would you like for Kosmos Updater to ignore config\nfiles? This will prevent Kosmos Updater from overwriting\nall config files except for Hekate's main config file.", buttons);
+        _ignoreConfigsAlertView->onDismiss = bind(&PackageSelectScene::_onAlertViewDismiss, this, _1, _2);
+
         addSubView(_headerView);
         addSubView(_updateView);
         addSubView(_statusView);
@@ -119,6 +125,10 @@ namespace ku::scenes {
     }
 
     void PackageSelectScene::_showPackageSelectViews() {
+        if (!ConfigManager::getReceivedIgnoreConfigWarning()) {
+            _ignoreConfigsAlertView->show();
+        }
+
         _updateView->hidden = true;
         _statusView->hidden = true;
 
@@ -160,6 +170,27 @@ namespace ku::scenes {
         }
         _footerView->actions.clear();
         _footerView->actions.push_back(new Action(A_BUTTON, "Quit"));
+    }
+
+    // Alert View Callback Method
+
+    void PackageSelectScene::_onAlertViewDismiss(ModalView * view, bool success) {
+        if (success && _ignoreConfigsAlertView->getSelectedOption() == 0) {
+            vector<string> files;
+            files.push_back("sdmc:/atmosphere/BCT.ini");
+            files.push_back("sdmc:/atmosphere/loader.ini");
+            files.push_back("sdmc:/atmosphere/system_settings.ini");
+            files.push_back("sdmc:/bootloader/patches.ini");
+            files.push_back("sdmc:/config/hid_mitm/config.ini");
+            files.push_back("sdmc:/config/sys-clk/config.ini");
+            files.push_back("sdmc:/ftpd/config.ini");
+            files.push_back("sdmc:/switch/KosmosToolbox/config.json");
+            files.push_back("sdmc:/switch/KosmosUpdater/internal.db");
+            files.push_back("sdmc:/switch/KosmosUpdater/settings.cfg");
+            ConfigManager::setFilesToIgnore(files);
+        }
+
+        ConfigManager::setReceivedIgnoreConfigWarning(true);
     }
 
     // Swurl Callback Methods

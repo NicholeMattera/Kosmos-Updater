@@ -123,7 +123,6 @@ namespace ku {
             unz_file_info_s * fileInfo = _getFileInfo(unz);
 
             string fileName = destination;
-            fileName += '/';
             fileName += _getFullFileName(unz, fileInfo);
 
             if (find(begin(filesToIgnore), end(filesToIgnore), fileName) != end(filesToIgnore)) {

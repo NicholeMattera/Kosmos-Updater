@@ -62,6 +62,9 @@ namespace ku {
             
             setting = config_setting_add(root, RECEIVED_EXFAT_WARNING_KEY.c_str(), CONFIG_TYPE_BOOL);
             config_setting_set_bool(setting, RECEIVED_EXFAT_WARNING_DEF);
+
+            setting = config_setting_add(root, RECEIVED_IGNORE_CONFIG_WARNING_KEY.c_str(), CONFIG_TYPE_BOOL);
+            config_setting_set_bool(setting, RECEIVED_IGNORE_CONFIG_WARNING_DEF);
             
             config_write_file(&_internalDb, INTERNAL_FILENAME.c_str());
         }
@@ -106,6 +109,11 @@ namespace ku {
     }
 
 
+    bool ConfigManager::setFilesToIgnore(vector<string> files) {
+        return _appendArrayOfStrings(IGNORE_KEY, files, _cfg, CONFIG_FILENAME);
+    }
+
+
     string ConfigManager::getCurrentVersion() {
         return _readString(VERSION_KEY, VERSION_DEF, _internalDb);
     }
@@ -119,6 +127,11 @@ namespace ku {
         return _readBoolean(RECEIVED_EXFAT_WARNING_KEY, RECEIVED_EXFAT_WARNING_DEF, _internalDb);
     }
 
+    bool ConfigManager::getReceivedIgnoreConfigWarning() {
+        return _readBoolean(RECEIVED_IGNORE_CONFIG_WARNING_KEY, RECEIVED_IGNORE_CONFIG_WARNING_DEF, _internalDb);
+    }
+
+
     bool ConfigManager::setCurrentVersion(string version) {
         return _writeString(VERSION_KEY, version, _internalDb, INTERNAL_FILENAME);
     }
@@ -129,6 +142,10 @@ namespace ku {
 
     bool ConfigManager::setReceivedExFATWarning(bool received) {
         return _writeBoolean(RECEIVED_EXFAT_WARNING_KEY, received, _internalDb, INTERNAL_FILENAME);
+    }
+
+    bool ConfigManager::setReceivedIgnoreConfigWarning(bool received) {
+        return _writeBoolean(RECEIVED_IGNORE_CONFIG_WARNING_KEY, received, _internalDb, INTERNAL_FILENAME);
     }
 
     // Private Methods
@@ -160,7 +177,17 @@ namespace ku {
 
         int count = config_setting_length(array);
         for (int i = 0; i < count; i++) {
-            result.push_back(string(config_setting_get_string_elem(array, i)));
+            auto file = string(config_setting_get_string_elem(array, i));
+            
+            if (file.substr(0,1) == "/") {
+                result.push_back("sdmc:" + file);
+            }
+            else if (file.substr(0,7) == "sdmc://") {
+                result.push_back("sdmc:/" + file.substr(7, file.length() - 7));
+            }
+            else {
+                result.push_back(file);
+            }
         }
 
         return result;
@@ -199,6 +226,20 @@ namespace ku {
         config_setting_remove(root, key.c_str());
 
         config_setting_t * array = config_setting_add(root, key.c_str(), CONFIG_TYPE_ARRAY);
+        for (auto const& value : values) {
+            config_setting_set_string_elem(array, -1, value.c_str());
+        }
+
+        return config_write_file(&config, filename.c_str());
+    }
+
+    bool ConfigManager::_appendArrayOfStrings(string key, vector<string> values, config_t config, string filename) {
+        config_setting_t * root = config_root_setting(&config);
+
+        config_setting_t * array = config_lookup(&config, key.c_str());
+        if (array == NULL)
+            array = config_setting_add(root, key.c_str(), CONFIG_TYPE_ARRAY);
+
         for (auto const& value : values) {
             config_setting_set_string_elem(array, -1, value.c_str());
         }

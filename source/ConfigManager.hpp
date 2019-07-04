@@ -35,13 +35,17 @@ namespace ku {
             static std::string getProxyUsername();
             static std::string getProxyPassword();
 
+            static bool setFilesToIgnore(std::vector<std::string> files);
+
             static std::string getCurrentVersion();
             static std::vector<std::string> getInstalledFiles();
             static bool getReceivedExFATWarning();
+            static bool getReceivedIgnoreConfigWarning();
 
             static bool setCurrentVersion(std::string version);
             static bool setInstalledFiles(std::vector<std::string> files);
             static bool setReceivedExFATWarning(bool received);
+            static bool setReceivedIgnoreConfigWarning(bool received);
 
         private:
             static inline config_t _cfg;
@@ -54,6 +58,7 @@ namespace ku {
             static bool _writeBoolean(std::string key, bool value, config_t config, std::string filename);
             static bool _writeString(std::string key, std::string value, config_t config, std::string filename);
             static bool _writeArrayOfStrings(std::string key, std::vector<std::string> values, config_t config, std::string filename);
+            static bool _appendArrayOfStrings(std::string key, std::vector<std::string> values, config_t config, std::string filename);
 
             static bool _removeSetting(std::string key, config_t config, std::string filename);
 
@@ -88,5 +93,8 @@ namespace ku {
 
             static inline const std::string RECEIVED_EXFAT_WARNING_KEY = "received_exfat_warning";
             static inline const bool RECEIVED_EXFAT_WARNING_DEF = false;
+
+            static inline const std::string RECEIVED_IGNORE_CONFIG_WARNING_KEY = "received_ignore_config_warning";
+            static inline const bool RECEIVED_IGNORE_CONFIG_WARNING_DEF = false;
     };
 }
