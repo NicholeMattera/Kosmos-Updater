@@ -33,6 +33,7 @@ namespace ku::views {
             void render(SDL_Rect rect, double dTime);
             void setProgress(double progress);
             void setText(std::string text);
+            void setProgressBarHidden(bool hidden);
 
         private:
             ImageView * _downloadImageView;

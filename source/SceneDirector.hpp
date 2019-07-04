@@ -36,6 +36,7 @@ namespace ku {
 
     class SceneDirector {
         public:
+            static inline SceneDirector * currentSceneDirector = NULL;
             static inline SDL_Window * window = NULL;
             static inline SDL_Renderer * renderer = NULL;
             static inline ModalView * modal = NULL;
@@ -46,6 +47,7 @@ namespace ku {
             ~SceneDirector();
 
             bool direct();
+            void render();
 
         private:
             Uint64 _now;
@@ -56,5 +58,8 @@ namespace ku {
             scenes::AppUpdateScene * _appUpdateScene;
             scenes::PackageSelectScene * _packageSelectScene;
             scenes::PackageDownloadScene * _packageDownloadScene;
+
+            double _getDeltaTime();
+            void _render(double dTime);
     };
 }

@@ -19,6 +19,7 @@
 #include <dirent.h>
 #include <SimpleIniParser.hpp>
 #include <string.h>
+#include <switch.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -26,7 +27,6 @@
 
 #include "ConfigManager.hpp"
 
-using namespace ku::models;
 using namespace simpleIniParser;
 using namespace std;
 
@@ -98,36 +98,8 @@ namespace ku {
         return bSuccess;
     }
 
-    void FileManager::extract(Zip * zip) {
-        _createThread(_extract, zip);
-    }
-
-    void FileManager::cleanUpFiles(ThreadObj * status) {
-        _createThread(_cleanUpFiles, status);
-    }
-
-    void FileManager::applyNoGC(ThreadObj * status) {
-        _createThread(_applyNoGC, status);
-    }
-
-    Result FileManager::_createThread(ThreadFunc func, ThreadObj * arg) {
-        Thread thread;
-        Result res;
-
-        if (R_FAILED( res = threadCreate(&thread, func, (void *) arg, 0x2000, 0x2B, -2)))
-            return res;
-        if (R_FAILED( res = threadStart(&thread)))
-            return res;
-
-        arg->thread = thread;
-        _threads.push_back(thread);
-
-        return 0;
-    }
-
-    void FileManager::_extract(void * ptr) {
-        Zip * zipObj = (Zip *) ptr;
-        unzFile unz = unzOpen(zipObj->getFilename().c_str());
+    bool FileManager::extract(string filename, string destination) {
+        unzFile unz = unzOpen(filename.c_str());
         vector<string> filesToIgnore = ConfigManager::getFilesToIgnore();
         vector<string> filesInstalled = ConfigManager::getInstalledFiles();
         
@@ -146,15 +118,11 @@ namespace ku {
             } else {
                 unz_file_pos pos;
                 unzGetFilePos(unz, &pos);
-
-                mutexLock(&zipObj->mutexRequest);
-                zipObj->progress = (double) i / (double) zipObj->getNumberOfFiles();
-                mutexUnlock(&zipObj->mutexRequest);
             }
 
             unz_file_info_s * fileInfo = _getFileInfo(unz);
 
-            std::string fileName(zipObj->getDestination());
+            string fileName = destination;
             fileName += '/';
             fileName += _getFullFileName(unz, fileInfo);
 
@@ -167,54 +135,31 @@ namespace ku {
                 filesInstalled.push_back(fileName);
 
                 int result = _extractFile(fileName.c_str(), unz, fileInfo);
-
                 if (result < 0) {
-                    mutexLock(&zipObj->mutexRequest);
-                    zipObj->progress = 1;
-                    zipObj->isComplete = false;
-                    zipObj->hasError = true;
-                    zipObj->errorMessage = "There was an error while trying to extract files.";
-                    mutexUnlock(&zipObj->mutexRequest);
-
                     free(fileInfo);
-
-                    return;
+                    unzClose(unz);
+                    return false;
                 }
             }
 
             free(fileInfo);
         }
 
-        mutexLock(&zipObj->mutexRequest);
-        zipObj->progress = 1;
-        zipObj->isComplete = (i >= 1);
-        zipObj->hasError = (i <= 0);
-
         if (i <= 0) {
-            zipObj->errorMessage = "There was no files to extract.";
-        } else {
-            ConfigManager::setInstalledFiles(filesInstalled);
+            unzClose(unz);
+            return false;
         }
 
-        mutexUnlock(&zipObj->mutexRequest);
-
+        ConfigManager::setInstalledFiles(filesInstalled);
         unzClose(unz);
+        return true;
     }
 
-    void FileManager::_cleanUpFiles(void * ptr) {
-        ThreadObj * threadObj = (ThreadObj *) ptr;
+    void FileManager::cleanUpFiles() {
         vector<string> installedFiles = ConfigManager::getInstalledFiles();
         vector<string> filesToIgnore = ConfigManager::getFilesToIgnore();
 
-        int i = 0;
         for (auto const& fileName : installedFiles) {
-            i++;
-
-            mutexLock(&threadObj->mutexRequest);
-            threadObj->progress = (double) i / (double) installedFiles.size();
-            threadObj->isComplete = false;
-            mutexUnlock(&threadObj->mutexRequest);
-
             if (find(begin(filesToIgnore), end(filesToIgnore), fileName) != end(filesToIgnore)) {
                 continue;
             }
@@ -224,16 +169,9 @@ namespace ku {
 
         vector<string> blankVector;
         ConfigManager::setInstalledFiles(blankVector);
-
-        mutexLock(&threadObj->mutexRequest);
-        threadObj->progress = 1;
-        threadObj->isComplete = true;
-        mutexUnlock(&threadObj->mutexRequest);
     }
 
-    void FileManager::_applyNoGC(void * ptr) {
-        ThreadObj * threadObj = (ThreadObj *) ptr;
-
+    void FileManager::applyNoGC() {
         Ini * ini = Ini::parseFile(HEKATE_FILE);
         for (auto const& section : ini->sections) {
             if (section->type == HEKATE_CAPTION || section->type == HASHTAG_COMMENT || section->type == SEMICOLON_COMMENT)
@@ -259,11 +197,6 @@ namespace ku {
 
         ini->writeToFile(HEKATE_FILE);
         delete ini;
-
-        mutexLock(&threadObj->mutexRequest);
-        threadObj->progress = 1;
-        threadObj->isComplete = true;
-        mutexUnlock(&threadObj->mutexRequest);
     }
 
     unz_file_info_s * FileManager::_getFileInfo(unzFile unz) {

@@ -21,8 +21,6 @@
 #include <Swurl.hpp>
 
 #include "../ModalView.hpp"
-#include "../models/ThreadObj.hpp"
-#include "../models/Zip.hpp"
 #include "../Scene.hpp"
 #include "../views/AlertView.hpp"
 #include "../views/FooterView.hpp"
@@ -47,15 +45,7 @@ namespace ku::scenes {
             ku::views::AlertView * _restartAlertView = NULL;
 
             swurl::WebRequest * _kosmosRequest = NULL;
-            ku::models::ThreadObj * _packageDelete = NULL;
-            ku::models::Zip * _packageExtract = NULL;
-            ku::models::ThreadObj * _packageDisableGC = NULL;
-            std::string _versionNumber = "";
-            int _numberOfFiles = 0;
 
-            void _updatePackageDelete();
-            void _updatePackageExtract();
-            void _updatePackageDisableGC();
             void _showStatus(std::string text, std::string subtext, bool wasSuccessful);
             void _onAlertViewDismiss(ku::ModalView * view, bool success);
             std::string _getVersionNumber(std::string version);

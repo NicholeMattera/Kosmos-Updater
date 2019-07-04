@@ -60,9 +60,6 @@ namespace ku::scenes {
         addSubView(_footerView);
 
         _showUpdateView();
-
-        _kosmosVersionRequest = new WebRequest(ConfigManager::getHost() + "/" + API_VERSION + "/package/version-number");
-        SessionManager::makeRequest(_kosmosVersionRequest);
     }
 
     PackageSelectScene::~PackageSelectScene() {
@@ -101,6 +98,11 @@ namespace ku::scenes {
     }
 
     void PackageSelectScene::render(SDL_Rect rect, double dTime) {
+        if (_kosmosVersionRequest == NULL) {
+            _kosmosVersionRequest = new WebRequest(ConfigManager::getHost() + "/" + API_VERSION + "/package/version-number");
+            SessionManager::makeRequest(_kosmosVersionRequest);
+        }
+
         Scene::render(rect, dTime);
     }
 
@@ -164,7 +166,7 @@ namespace ku::scenes {
 
     void PackageSelectScene::_onProgressUpdate(WebRequest * request, double progress) {
         _updateView->setProgress(progress);
-        // TODO: Force render.
+        SceneDirector::currentSceneDirector->render();
     }
 
     void PackageSelectScene::_onCompleted(WebRequest * request) {

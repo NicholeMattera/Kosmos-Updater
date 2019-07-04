@@ -21,9 +21,6 @@
 #include <string>
 #include <vector>
 
-#include "models/ThreadObj.hpp"
-#include "models/Zip.hpp"
-
 namespace ku {
     class FileManager {
         public:
@@ -31,17 +28,11 @@ namespace ku {
             static bool deleteFile(std::string filename);
             static bool fileExists(std::string filename);
             static bool createSubfolder(std::string path);
-            static void extract(models::Zip * zip);
-            static void cleanUpFiles(models::ThreadObj * status);
-            static void applyNoGC(models::ThreadObj * status);
+            static bool extract(std::string filename, std::string destination);
+            static void cleanUpFiles();
+            static void applyNoGC();
 
         private:
-            static inline std::vector<Thread> _threads;
-
-            static Result _createThread(ThreadFunc func, models::ThreadObj * arg);
-            static void _extract(void * ptr);
-            static void _cleanUpFiles(void * ptr);
-            static void _applyNoGC(void * ptr);
             static unz_file_info_s * _getFileInfo(unzFile unz);
             static std::string _getFullFileName(unzFile unz, unz_file_info_s * fileInfo);
             static bool _makeDirectoryParents(std::string path);

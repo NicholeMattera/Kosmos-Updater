@@ -75,16 +75,16 @@ LDFLAGS		=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) \
 				-Wl,-Map,$(notdir $*.map)
 
 LIBS		:=	-lSDL2_ttf -lSDL2_image -lSDL2_gfx \
-						-lfreetype \
-						-lwebp -lpng -ljpeg \
-						-lSwurl -lcurl -lz -lmbedtls -lmbedcrypto -lmbedx509 \
-						-lSimpleIniParser -lminizip -lconfig -lnx `sdl2-config --libs` `freetype-config --libs`
+				-lfreetype \
+				-lwebp -lpng -ljpeg \
+				-lSwurl -lcurl -lz -lmbedtls -lmbedcrypto -lmbedx509 \
+				-lSimpleIniParser -lminizip -lconfig -lnx `sdl2-config --libs` `freetype-config --libs`
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= $(PORTLIBS) $(LIBNX) SimpleIniParser Swurl
+LIBDIRS	:= $(PORTLIBS) $(LIBNX) $(CURDIR)/SimpleIniParser $(CURDIR)/Swurl
 
 
 #---------------------------------------------------------------------------------
@@ -98,7 +98,7 @@ export OUTPUT	:=	$(CURDIR)/$(TARGET)
 export TOPDIR	:=	$(CURDIR)
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
-			$(foreach dir,$(DATA),$(CURDIR)/$(dir))
+					$(foreach dir,$(DATA),$(CURDIR)/$(dir))
 
 export DEPSDIR	:=	$(CURDIR)/$(BUILD)
 
@@ -127,8 +127,8 @@ export OFILES 	:=	$(OFILES_BIN) $(OFILES_SRC)
 export HFILES_BIN	:=	$(addsuffix .h,$(subst .,_,$(BINFILES)))
 
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
-			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
-			-I$(CURDIR)/$(BUILD)
+					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
+					-I$(CURDIR)/$(BUILD)
 
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 

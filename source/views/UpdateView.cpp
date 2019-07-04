@@ -67,4 +67,8 @@ namespace ku::views {
     void UpdateView::setText(string text) {
         _statusTextView->setText(text);
     }
+
+    void UpdateView::setProgressBarHidden(bool hidden) {
+        _progressBarView->hidden = hidden;
+    }
 }

@@ -53,9 +53,6 @@ namespace ku::scenes {
         addSubView(_updateView);
         addSubView(_statusView);
         addSubView(_footerView);
-
-        _appVersionRequest = new WebRequest(ConfigManager::getHost() + "/" + API_VERSION + "/app/version-number");
-        SessionManager::makeRequest(_appVersionRequest);
     }
 
     AppUpdateScene::~AppUpdateScene() {
@@ -85,6 +82,11 @@ namespace ku::scenes {
     }
 
     void AppUpdateScene::render(SDL_Rect rect, double dTime) {
+        if (_appVersionRequest == NULL) {
+            _appVersionRequest = new WebRequest(ConfigManager::getHost() + "/" + API_VERSION + "/app/version-number");
+            SessionManager::makeRequest(_appVersionRequest);
+        }
+
         _updateView->setProgress(_downloadProgess);
         Scene::render(rect, dTime);
     }
@@ -134,7 +136,7 @@ namespace ku::scenes {
 
     void AppUpdateScene::_onProgressUpdate(WebRequest * request, double progress) {
         _downloadProgess = progress;
-        // TODO: Force render.
+        SceneDirector::currentSceneDirector->render();
     }
 
     void AppUpdateScene::_onCompleted(WebRequest * request) {

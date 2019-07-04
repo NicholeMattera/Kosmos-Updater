@@ -25,6 +25,8 @@ using namespace ku::scenes;
 
 namespace ku {
     SceneDirector::SceneDirector() {
+        currentSceneDirector = this;
+
         romfsInit();
         setsysInitialize();
         plInitialize();
@@ -90,17 +92,12 @@ namespace ku {
     }
 
     bool SceneDirector::direct() {
-        _last = _now;
-        _now = SDL_GetPerformanceCounter();
-        double dTime = (double) ((_now - _last) * 1000 / SDL_GetPerformanceFrequency());
+        double dTime = _getDeltaTime();
 
         hidScanInput();
         u32 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
 
         // TODO: Handle touch controls
-
-        AssetManager::setRenderColor(AssetManager::background);
-        SDL_RenderClear(SceneDirector::renderer);
 
         // Unload previous scenes
         switch(SceneDirector::currentScene) {
@@ -172,6 +169,26 @@ namespace ku {
             _currentScene->handleButton(kDown, dTime);
         }
 
+        _render(dTime);
+        
+        return !SceneDirector::exitApp;
+    }
+
+    void SceneDirector::render() {
+        double dTime = _getDeltaTime();
+        _render(dTime);
+    }
+
+    double SceneDirector::_getDeltaTime() {
+        _last = _now;
+        _now = SDL_GetPerformanceCounter();
+        return (double) ((_now - _last) * 1000 / SDL_GetPerformanceFrequency());
+    }
+
+    void SceneDirector::_render(double dTime) {
+        AssetManager::setRenderColor(AssetManager::background);
+        SDL_RenderClear(SceneDirector::renderer);
+
         _currentScene->render({ 0, 0, 1280, 720 }, dTime);
 
         if (modal != NULL) {
@@ -185,7 +202,5 @@ namespace ku {
         }
 
         SDL_RenderPresent(SceneDirector::renderer);
-
-        return !SceneDirector::exitApp;
     }
 }

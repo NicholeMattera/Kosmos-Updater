@@ -15,6 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include <Trim.hpp>
+
 #include "PackageDownloadScene.hpp"
 
 #include "../ConfigManager.hpp"
@@ -61,9 +63,6 @@ namespace ku::scenes {
         addSubView(_updateView);
         addSubView(_statusView);
         addSubView(_footerView);
-        
-        _kosmosRequest = new WebRequest(ConfigManager::getHost() + "/" + API_VERSION + "/package");
-        SessionManager::makeRequest(_kosmosRequest);
     }
 
     PackageDownloadScene::~PackageDownloadScene() {
@@ -82,15 +81,6 @@ namespace ku::scenes {
         if (_kosmosRequest != NULL)
             delete _kosmosRequest;
 
-        if (_packageDelete != NULL)
-            delete _packageDelete;
-
-        if (_packageExtract != NULL)
-            delete _packageExtract;
-
-        if (_packageDisableGC != NULL)
-            delete _packageDisableGC;
-
         bpcExit();
     }
 
@@ -106,84 +96,12 @@ namespace ku::scenes {
     }
 
     void PackageDownloadScene::render(SDL_Rect rect, double dTime) {
-        if (_packageDelete != NULL) {
-            _updatePackageDelete();
-        }
-        else if (_packageExtract != NULL) {
-            _updatePackageExtract();
-        }
-        else if (_packageDisableGC != NULL) {
-            _updatePackageDisableGC();
+        if (_kosmosRequest == NULL) {
+            _kosmosRequest = new WebRequest(ConfigManager::getHost() + "/" + API_VERSION + "/package");
+            SessionManager::makeRequest(_kosmosRequest);
         }
 
         Scene::render(rect, dTime);
-    }
-
-    void PackageDownloadScene::_updatePackageDelete() {
-        mutexLock(&_packageDelete->mutexRequest);
-
-        _updateView->setProgress(_packageDelete->progress);
-        if (_packageDelete->isComplete) {
-            delete _packageDelete;
-            _packageDelete = NULL;
-
-            _updateView->setText("Extracting the latest package...");
-            _updateView->setProgress(0);
-
-            _packageExtract = new Zip("temp.zip", "sdmc:/", _numberOfFiles);
-            FileManager::extract(_packageExtract);
-        }
-
-        if (_packageDelete != NULL)
-            mutexUnlock(&_packageDelete->mutexRequest);
-    }
-
-    void PackageDownloadScene::_updatePackageExtract() {
-        mutexLock(&_packageExtract->mutexRequest);
-
-        _updateView->setProgress(_packageExtract->progress);
-        if (_packageExtract->isComplete) {
-            delete _packageExtract;
-            _packageExtract = NULL;
-
-            FileManager::deleteFile("temp.zip");
-            ConfigManager::setCurrentVersion(_versionNumber);
-
-            _updateView->setText("Applying disabled game cart option...");
-            _updateView->setProgress(0);
-
-            _packageDisableGC = new ThreadObj();
-            FileManager::applyNoGC(_packageDisableGC);
-        }
-        else if (_packageExtract->hasError) {
-            delete _packageExtract;
-            _packageExtract = NULL;
-
-            FileManager::deleteFile("temp.zip");
-
-            _showStatus(_packageExtract->errorMessage, "Please restart the app to try again.", false);
-        }
-
-        if (_packageExtract != NULL)
-            mutexUnlock(&_packageExtract->mutexRequest);
-    }
-
-    void PackageDownloadScene::_updatePackageDisableGC() {
-        mutexLock(&_packageDisableGC->mutexRequest);
-
-        _updateView->setProgress(_packageDisableGC->progress);
-        if (_packageDisableGC->isComplete) {
-            delete _packageDisableGC;
-            _packageDisableGC = NULL;
-
-            FileManager::deleteFile("temp.zip");
-            ConfigManager::setCurrentVersion(_versionNumber);
-
-            _showStatus("Kosmos has been updated to version " + _versionNumber + "!", "Please restart your Switch to finish the update.", true);
-        }
-
-        if (_packageDisableGC != NULL)
-            mutexUnlock(&_packageDisableGC->mutexRequest);
     }
 
     void PackageDownloadScene::_showStatus(string text, string subtext, bool wasSuccessful) {
@@ -212,19 +130,38 @@ namespace ku::scenes {
 
     void PackageDownloadScene::_onProgressUpdate(WebRequest * request, double progress) {
         _updateView->setProgress(progress);
-        // TODO: Force render.
+        SceneDirector::currentSceneDirector->render();
     }
 
     void PackageDownloadScene::_onCompleted(WebRequest * request) {
         FileManager::writeFile("temp.zip", request->response.rawResponseBody);
-        _versionNumber = request->response.headers.find("X-Version-Number")->second;
-        _numberOfFiles = stoi(request->response.headers.find("X-Number-Of-Files")->second);
+        auto versionNumber = request->response.headers.find("X-Version-Number")->second;
+        rtrim(versionNumber);
 
         _updateView->setText("Removing old package...");
-        _updateView->setProgress(0);
+        _updateView->setProgressBarHidden(true);
+        SceneDirector::currentSceneDirector->render();
 
-        _packageDelete = new ThreadObj();
-        FileManager::cleanUpFiles(_packageDelete);
+        FileManager::cleanUpFiles();
+
+        _updateView->setText("Extracting the latest package...");
+        SceneDirector::currentSceneDirector->render();
+
+        if (!FileManager::extract("temp.zip", "sdmc:/")) {
+            FileManager::deleteFile("temp.zip");
+            _showStatus("There was an error while trying to extract files.", "Please restart the app to try again.", false);
+            return;
+        }
+
+        FileManager::deleteFile("temp.zip");
+        ConfigManager::setCurrentVersion(versionNumber);
+
+        _updateView->setText("Applying disabled game cart option...");
+        SceneDirector::currentSceneDirector->render();
+
+        FileManager::applyNoGC();
+
+        _showStatus("Kosmos has been updated to version " + versionNumber.substr() + "!", "Please restart your Switch to finish the update.", true);
     }
 
     void PackageDownloadScene::_onError(WebRequest * request, string error) {
