@@ -34,6 +34,7 @@ namespace ku {
             static std::string getProxy();
             static std::string getProxyUsername();
             static std::string getProxyPassword();
+            static int getConfigVersion();
 
             static bool setFilesToIgnore(std::vector<std::string> files);
 
@@ -41,17 +42,20 @@ namespace ku {
             static std::vector<std::string> getInstalledFiles();
             static bool getReceivedExFATWarning();
             static bool getReceivedIgnoreConfigWarning();
+            static bool getIgnoreConfigFiles();
 
             static bool setCurrentVersion(std::string version);
             static bool setInstalledFiles(std::vector<std::string> files);
             static bool setReceivedExFATWarning(bool received);
             static bool setReceivedIgnoreConfigWarning(bool received);
+            static bool setIgnoreConfigFiles(bool ignore);
 
         private:
             static inline config_t _cfg;
             static inline config_t _internalDb;
 
             static bool _readBoolean(std::string key, bool def, config_t config);
+            static int _readInt(std::string key, int def, config_t config);
             static std::string _readString(std::string key, std::string def, config_t config);
             static std::vector<std::string> _readArrayOfStrings(std::string key, std::vector<std::string> def, config_t config);
 
@@ -62,11 +66,13 @@ namespace ku {
 
             static bool _removeSetting(std::string key, config_t config, std::string filename);
 
+            static void _migrateConfigFile(int currentVersion);
+
             static inline const std::string CONFIG_FILENAME = "settings.cfg";
             static inline const std::string INTERNAL_FILENAME = "internal.db";
 
             static inline const std::string HOST_KEY = "host";
-            static inline const std::string HOST_DEF = "http://kosmos-updater.teamatlasnx.com";
+            static inline const std::string HOST_DEF = "https://kosmos-updater.teamatlasnx.com";
 
             static inline const std::string IGNORE_KEY = "ignore";
 
@@ -85,6 +91,9 @@ namespace ku {
             static inline const std::string PROXY_PASSWORD_KEY = "proxy_password";
             static inline const std::string PROXY_PASSWORD_DEF = "";
 
+            static inline const std::string CONFIG_VERSION_KEY = "config_version";
+            static inline const int CONFIG_VERSION_DEF = 0;
+
 
             static inline const std::string VERSION_KEY = "version";
             static inline const std::string VERSION_DEF = "";
@@ -96,5 +105,8 @@ namespace ku {
 
             static inline const std::string RECEIVED_IGNORE_CONFIG_WARNING_KEY = "received_ignore_config_warning";
             static inline const bool RECEIVED_IGNORE_CONFIG_WARNING_DEF = false;
+
+            static inline const std::string IGNORE_CONFIG_FILES_KEY = "ignore_config_files";
+            static inline const bool IGNORE_CONFIG_FILES_DEF = false;
     };
 }

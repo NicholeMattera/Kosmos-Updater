@@ -183,12 +183,13 @@ namespace ku::scenes {
             files.push_back("sdmc:/bootloader/patches.ini");
             files.push_back("sdmc:/config/hid_mitm/config.ini");
             files.push_back("sdmc:/config/sys-clk/config.ini");
-            files.push_back("sdmc:/config/ftpd/config.ini");
+            files.push_back("sdmc:/config/sys-ftpd/config.ini");
             files.push_back("sdmc:/ftpd/config.ini");
             files.push_back("sdmc:/switch/KosmosToolbox/config.json");
             files.push_back("sdmc:/switch/KosmosUpdater/internal.db");
             files.push_back("sdmc:/switch/KosmosUpdater/settings.cfg");
             ConfigManager::setFilesToIgnore(files);
+            ConfigManager::setIgnoreConfigFiles(true);
         }
 
         ConfigManager::setReceivedIgnoreConfigWarning(true);

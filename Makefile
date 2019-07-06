@@ -47,11 +47,12 @@ ROMFS		:=	romfs
 APP_TITLE	:=	Kosmos Updater
 APP_AUTHOR	:=	Steven Mattera
 
-APP_VERSION 		:= 3.0.5
+APP_VERSION 		:= 3.0.6
 APP_VERSION_MAJOR	:= 3
 APP_VERSION_MINOR	:= 0
-APP_VERSION_PATCH	:= 5
+APP_VERSION_PATCH	:= 6
 API_VERSION			:= v4
+CONFIG_VERSION		:= 1
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -63,7 +64,8 @@ DEFINES		+=	-D__SWITCH__ \
 				-DVERSION_MAJOR=$(APP_VERSION_MAJOR) \
 				-DVERSION_MINOR=$(APP_VERSION_MINOR) \
 				-DVERSION_PATCH=$(APP_VERSION_PATCH) \
-				-DAPI_VERSION=\"$(API_VERSION)\"
+				-DAPI_VERSION=\"$(API_VERSION)\" \
+				-DCONFIG_VERSION=$(CONFIG_VERSION)
 
 CFLAGS		:=	-g -Wall -O2 -ffunction-sections \
 				$(ARCH) $(DEFINES) $(INCLUDE) 
