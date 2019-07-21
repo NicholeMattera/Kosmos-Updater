@@ -82,8 +82,10 @@ LIBS		:=	-lSDL2_ttf -lSDL2_image -lSDL2_gfx \
 				-lSwurl -lcurl -lz -lmbedtls -lmbedcrypto -lmbedx509 \
 				-lSimpleIniParser -lminizip -lconfig -lnx `sdl2-config --libs` `freetype-config --libs`
 
-CXX		:= `which ccache` $(CXX)
-CC		:= `which ccache` $(CC)
+ifneq (,$(shell which ccache))
+	CXX		:=	$(shell which ccache) $(CXX)
+	CC		:=	$(shell which ccache) $(CC)
+endif
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
