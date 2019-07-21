@@ -82,7 +82,7 @@ LIBS		:=	-lSDL2_ttf -lSDL2_image -lSDL2_gfx \
 				-lSwurl -lcurl -lz -lmbedtls -lmbedcrypto -lmbedx509 \
 				-lSimpleIniParser -lminizip -lconfig -lnx `sdl2-config --libs` `freetype-config --libs`
 
-ifneq (,$(shell which ccache))
+ifneq ($(shell which ccache),)
 	CXX		:=	$(shell which ccache) $(CXX)
 	CC		:=	$(shell which ccache) $(CC)
 endif
@@ -187,7 +187,15 @@ endif
 all: $(BUILD)
 
 $(BUILD):
+ifeq ($(wildcard $(CURDIR)/SimpleIniParser/LICENSE),)
+	@$(error "Please run 'git submodule update --init' before running 'make'")
+endif
+ifeq ($(wildcard $(CURDIR)/Swurl/LICENSE),)
+	@$(error "Please run 'git submodule update --init' before running 'make'")
+endif
 	@[ -d $@ ] || mkdir -p $@
+	@$(MAKE) -C $(CURDIR)/SimpleIniParser -f $(CURDIR)/SimpleIniParser/Makefile
+	@$(MAKE) -C $(CURDIR)/Swurl -f $(CURDIR)/Swurl/Makefile
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 #---------------------------------------------------------------------------------
