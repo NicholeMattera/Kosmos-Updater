@@ -165,6 +165,7 @@ namespace ku::scenes {
                 SessionManager::makeRequest(_appRequest);
             }
         } else if (request == _appRequest) {
+            romfsExit();
             FileManager::writeFile("KosmosUpdater.nro", request->response.rawResponseBody);
             _showStatus("Kosmos Updater has been updated to version " + _appVersionRequest->response.rawResponseBody + "!", "Please restart the app.");
         }

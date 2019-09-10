@@ -34,7 +34,7 @@ namespace ku {
             static std::string getProxy();
             static std::string getProxyUsername();
             static std::string getProxyPassword();
-            static int getConfigVersion();
+            static int getSettingsConfigVersion();
 
             static bool setFilesToIgnore(std::vector<std::string> files);
 
@@ -43,6 +43,7 @@ namespace ku {
             static bool getReceivedExFATWarning();
             static bool getReceivedIgnoreConfigWarning();
             static bool getIgnoreConfigFiles();
+            static int getInternalConfigVersion();
 
             static bool setCurrentVersion(std::string version);
             static bool setInstalledFiles(std::vector<std::string> files);
@@ -66,7 +67,9 @@ namespace ku {
 
             static bool _removeSetting(std::string key, config_t config, std::string filename);
 
-            static void _migrateConfigFile(int currentVersion);
+            static void _migrateConfigFiles();
+            static void _migrateSettingsConfigFiles(int currentVersion);
+            static void _migrateInternalConfigFiles(int currentVersion);
 
             static inline const std::string CONFIG_FILENAME = "settings.cfg";
             static inline const std::string INTERNAL_FILENAME = "internal.db";
@@ -91,9 +94,6 @@ namespace ku {
             static inline const std::string PROXY_PASSWORD_KEY = "proxy_password";
             static inline const std::string PROXY_PASSWORD_DEF = "";
 
-            static inline const std::string CONFIG_VERSION_KEY = "config_version";
-            static inline const int CONFIG_VERSION_DEF = 0;
-
 
             static inline const std::string VERSION_KEY = "version";
             static inline const std::string VERSION_DEF = "";
@@ -108,5 +108,9 @@ namespace ku {
 
             static inline const std::string IGNORE_CONFIG_FILES_KEY = "ignore_config_files";
             static inline const bool IGNORE_CONFIG_FILES_DEF = false;
+
+
+            static inline const std::string CONFIG_VERSION_KEY = "config_version";
+            static inline const int CONFIG_VERSION_DEF = 0;
     };
 }

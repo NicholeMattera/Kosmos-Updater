@@ -42,6 +42,7 @@ namespace ku {
         size_t result = fwrite(data.c_str(), sizeof(char), data.size(), file);
 
         fflush(file);
+        fsync(fileno(file));
         fclose(file);
 
         return (result == data.size());
@@ -60,6 +61,7 @@ namespace ku {
 
         if (file) {
             fflush(file);
+            fsync(fileno(file));
             fclose(file);
             return true;
         }
@@ -173,7 +175,7 @@ namespace ku {
     void FileManager::applyNoGC() {
         Ini * ini = Ini::parseFile(HEKATE_FILE);
         for (auto const& section : ini->sections) {
-            if (section->type == HEKATE_CAPTION || section->type == HASHTAG_COMMENT || section->type == SEMICOLON_COMMENT)
+            if (section->type != IniSectionType::Section)
                 continue;
 
             if (section->value == "config") {
@@ -187,7 +189,7 @@ namespace ku {
                 }
 
                 if (!patchApplied) {
-                    section->options.push_back(new IniOption("autonogc", "1"));
+                    section->options.push_back(new IniOption(IniOptionType::Option, "autonogc", "1"));
                 }
 
                 break;

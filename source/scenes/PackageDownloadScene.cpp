@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <Trim.hpp>
+#include <SimpleIniParser.hpp>
 
 #include "PackageDownloadScene.hpp"
 
@@ -26,6 +26,7 @@
 using namespace ku;
 using namespace ku::models;
 using namespace ku::views;
+using namespace simpleIniParser;
 using namespace std;
 using namespace std::placeholders;
 using namespace swurl;
@@ -136,7 +137,7 @@ namespace ku::scenes {
     void PackageDownloadScene::_onCompleted(WebRequest * request) {
         FileManager::writeFile("temp.zip", request->response.rawResponseBody);
         auto versionNumber = request->response.headers.find("X-Version-Number")->second;
-        rtrim(versionNumber);
+        IniStringHelper::rtrim(versionNumber);
 
         _updateView->setText("Removing old package...");
         _updateView->setProgressBarHidden(true);

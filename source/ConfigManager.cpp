@@ -23,6 +23,7 @@ namespace ku {
     void ConfigManager::initialize() {
         config_init(&_cfg);
         config_init(&_internalDb);
+        printf("%s %d\n", __FILE__, __LINE__);
 
         if(!config_read_file(&_internalDb, INTERNAL_FILENAME.c_str())) {
             config_setting_t * root, * setting;
@@ -41,6 +42,9 @@ namespace ku {
 
             setting = config_setting_add(root, IGNORE_CONFIG_FILES_KEY.c_str(), CONFIG_TYPE_BOOL);
             config_setting_set_bool(setting, IGNORE_CONFIG_FILES_DEF);
+
+            setting = config_setting_add(root, CONFIG_VERSION_KEY.c_str(), CONFIG_TYPE_INT);
+            config_setting_set_int(setting, INTERNAL_CONFIG_VERSION);
             
             config_write_file(&_internalDb, INTERNAL_FILENAME.c_str());
         }
@@ -70,15 +74,12 @@ namespace ku {
             config_setting_set_string(setting, PROXY_PASSWORD_DEF.c_str());
 
             setting = config_setting_add(root, CONFIG_VERSION_KEY.c_str(), CONFIG_TYPE_INT);
-            config_setting_set_int(setting, CONFIG_VERSION);
+            config_setting_set_int(setting, SETTING_CONFIG_VERSION);
 
             config_write_file(&_cfg, CONFIG_FILENAME.c_str());
-        } else {
-            int configVersion = getConfigVersion();
-            if (configVersion < CONFIG_VERSION) {
-                _migrateConfigFile(configVersion);
-            }
         }
+
+        _migrateConfigFiles();
     }
 
     void ConfigManager::dealloc() {
@@ -119,7 +120,7 @@ namespace ku {
         return _readString(PROXY_PASSWORD_KEY, PROXY_PASSWORD_DEF, _cfg);
     }
 
-    int ConfigManager::getConfigVersion() {
+    int ConfigManager::getSettingsConfigVersion() {
         return _readInt(CONFIG_VERSION_KEY, CONFIG_VERSION_DEF, _cfg);
     }
 
@@ -148,6 +149,10 @@ namespace ku {
 
     bool ConfigManager::getIgnoreConfigFiles() {
         return _readBoolean(IGNORE_CONFIG_FILES_KEY, IGNORE_CONFIG_FILES_DEF, _internalDb);
+    }
+
+    int ConfigManager::getInternalConfigVersion() {
+        return _readInt(CONFIG_VERSION_KEY, CONFIG_VERSION_DEF, _internalDb);
     }
 
 
@@ -285,18 +290,25 @@ namespace ku {
         return config_write_file(&config, filename.c_str());
     }
 
-    void ConfigManager::_migrateConfigFile(int currentVersion) {
+    void ConfigManager::_migrateConfigFiles() {
+        auto settingsVersion = getSettingsConfigVersion();
+        auto internalVersion = getInternalConfigVersion();
+
+        if (internalVersion < INTERNAL_CONFIG_VERSION) {
+            _migrateInternalConfigFiles(internalVersion);
+        }
+
+        if (settingsVersion < SETTING_CONFIG_VERSION) {
+            _migrateSettingsConfigFiles(settingsVersion);
+        }
+    }
+
+    void ConfigManager::_migrateSettingsConfigFiles(int currentVersion) {
         bool configChanged = false;
-        config_setting_t * internalRoot = config_root_setting(&_internalDb);
         config_setting_t * root = config_root_setting(&_cfg);
 
         if (currentVersion < 1) {
             configChanged = true;
-
-            // Added setting in internal to keep track of if the user is ignoring config files.
-            config_setting_t * ignoreConfigFiles = config_setting_add(internalRoot, IGNORE_CONFIG_FILES_KEY.c_str(), CONFIG_TYPE_BOOL);
-            config_setting_set_bool(ignoreConfigFiles, IGNORE_CONFIG_FILES_DEF);
-
             // Migrate from HTTP to HTTPS.
             if (getHost() == "http://kosmos-updater.teamatlasnx.com") {
                 config_setting_t * host = config_setting_get_member(root, HOST_KEY.c_str());
@@ -311,10 +323,7 @@ namespace ku {
                     auto file = string(config_setting_get_string_elem(ignoredFiles, i));
                     if (file == "sdmc:/config/ftpd/config.ini") {
                         config_setting_set_string_elem(ignoredFiles, i, "sdmc:/config/sys-ftpd/config.ini");
-
-                        // If this is present then the user is ignoring config files.
-                        config_setting_set_bool(ignoreConfigFiles, true);
-
+                        setIgnoreConfigFiles(true);
                         break;
                     }
                 }
@@ -326,8 +335,38 @@ namespace ku {
         }
 
         if (configChanged) {
-            config_write_file(&_internalDb, INTERNAL_FILENAME.c_str());
             config_write_file(&_cfg, CONFIG_FILENAME.c_str());
+        }
+    }
+
+    void ConfigManager::_migrateInternalConfigFiles(int currentVersion) {
+        bool configChanged = false;
+        config_setting_t * root = config_root_setting(&_internalDb);
+
+        if (currentVersion < 1 && config_lookup(&_internalDb, IGNORE_CONFIG_FILES_KEY.c_str()) == NULL) {
+            configChanged = true;
+
+            // Added setting in internal to keep track of if the user is ignoring config files.
+            config_setting_t * ignoreConfigFiles = config_setting_add(root, IGNORE_CONFIG_FILES_KEY.c_str(), CONFIG_TYPE_BOOL);
+            config_setting_set_bool(ignoreConfigFiles, IGNORE_CONFIG_FILES_DEF);
+        }
+
+        if (currentVersion < 2) {
+            configChanged = true;
+
+            if (config_lookup(&_internalDb, CONFIG_VERSION_KEY.c_str()) == NULL) {
+                // Added separate config version to internal db.
+                config_setting_t * configVersion = config_setting_add(root, CONFIG_VERSION_KEY.c_str(), CONFIG_TYPE_INT);
+                config_setting_set_int(configVersion, 2);
+            } else {
+                // How???
+                config_setting_t * configVersion = config_lookup(&_internalDb, CONFIG_VERSION_KEY.c_str());
+                config_setting_set_int(configVersion, 2);
+            }
+        }
+
+        if (configChanged) {
+            config_write_file(&_internalDb, INTERNAL_FILENAME.c_str());
         }
     }
 }
