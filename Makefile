@@ -37,64 +37,37 @@ include $(DEVKITPRO)/libnx/switch_rules
 #   of a homebrew executable (.nro). This is intended to be used for sysmodules.
 #   NACP building is skipped as well.
 #---------------------------------------------------------------------------------
-TARGET		:=	$(notdir $(CURDIR))
+TARGET		:=	KosmosUpdater
 BUILD		:=	build
-SOURCES		:=	source source/models source/scenes source/views
-DATA		:=	data
-INCLUDES	:=	include
-ROMFS		:=	romfs
+SOURCES		:=	Source Source/Managers Source/Scenes Source/Views
+ROMFS		:=	RomFS
 
 APP_TITLE	:=	Kosmos Updater
 APP_AUTHOR	:=	Nichole Mattera
-
-APP_VERSION 		:= 3.0.9
-APP_VERSION_MAJOR	:= 3
-APP_VERSION_MINOR	:= 0
-APP_VERSION_PATCH	:= 9
-API_VERSION			:= v4
-
-SETTING_CONFIG_VERSION	:= 1
-INTERNAL_CONFIG_VERSION	:= 2
+APP_VERSION	:=	4.0.0
 
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
-ARCH		:=	-march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIE
+ARCH		:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
-DEFINES		+=	-D__SWITCH__ \
-				-DVERSION=\"$(APP_VERSION)\" \
-				-DVERSION_MAJOR=$(APP_VERSION_MAJOR) \
-				-DVERSION_MINOR=$(APP_VERSION_MINOR) \
-				-DVERSION_PATCH=$(APP_VERSION_PATCH) \
-				-DAPI_VERSION=\"$(API_VERSION)\" \
-				-DSETTING_CONFIG_VERSION=$(SETTING_CONFIG_VERSION) \
-				-DINTERNAL_CONFIG_VERSION=$(INTERNAL_CONFIG_VERSION)
+DEFINES		+=	-D__SWITCH__ -DDEBUG -DVERSION=\"$(APP_VERSION)\"
 
 CFLAGS		:=	-g -Wall -O2 -ffunction-sections \
 				$(ARCH) $(DEFINES) $(INCLUDE) 
 
-CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fexceptions -std=gnu++17
+CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++17
 
 ASFLAGS		:=	-g $(ARCH)
-LDFLAGS		=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) \
-				-Wl,-Map,$(notdir $*.map)
+LDFLAGS		=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS		:=	-lSDL2_ttf -lSDL2_image -lSDL2_gfx \
-				-lfreetype \
-				-lwebp -lpng -ljpeg \
-				-lSwurl -lcurl -lz -lmbedtls -lmbedcrypto -lmbedx509 \
-				-lSimpleIniParser -lminizip -lconfig -lnx `sdl2-config --libs` `freetype-config --libs`
-
-ifneq ($(shell which ccache),)
-	CXX		:=	$(shell which ccache) $(CXX)
-	CC		:=	$(shell which ccache) $(CC)
-endif
+LIBS		:= -lpng -lcurl -lz -lmbedtls -lmbedx509 -lmbedcrypto -ljansson -lnx
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= $(PORTLIBS) $(LIBNX) $(CURDIR)/SimpleIniParser $(CURDIR)/Swurl
+LIBDIRS	:= $(PORTLIBS) $(LIBNX)
 
 
 #---------------------------------------------------------------------------------
@@ -108,7 +81,7 @@ export OUTPUT	:=	$(CURDIR)/$(TARGET)
 export TOPDIR	:=	$(CURDIR)
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
-					$(foreach dir,$(DATA),$(CURDIR)/$(dir))
+			$(foreach dir,$(DATA),$(CURDIR)/$(dir))
 
 export DEPSDIR	:=	$(CURDIR)/$(BUILD)
 
@@ -137,8 +110,8 @@ export OFILES 	:=	$(OFILES_BIN) $(OFILES_SRC)
 export HFILES_BIN	:=	$(addsuffix .h,$(subst .,_,$(BINFILES)))
 
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
-					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
-					-I$(CURDIR)/$(BUILD)
+			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
+			-I$(CURDIR)/$(BUILD)
 
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
@@ -190,15 +163,7 @@ endif
 all: $(BUILD)
 
 $(BUILD):
-ifeq ($(wildcard $(CURDIR)/SimpleIniParser/LICENSE),)
-	@$(error "Please run 'git submodule update --init' before running 'make'")
-endif
-ifeq ($(wildcard $(CURDIR)/Swurl/LICENSE),)
-	@$(error "Please run 'git submodule update --init' before running 'make'")
-endif
 	@[ -d $@ ] || mkdir -p $@
-	@$(MAKE) -C $(CURDIR)/SimpleIniParser -f $(CURDIR)/SimpleIniParser/Makefile
-	@$(MAKE) -C $(CURDIR)/Swurl -f $(CURDIR)/Swurl/Makefile
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 #---------------------------------------------------------------------------------
