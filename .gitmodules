@@ -1,6 +1,3 @@
 [submodule "SimpleIniParser"]
 	path = SimpleIniParser
 	url = https://github.com/AtlasNX/SimpleIniParser.git
-[submodule "Swurl"]
-	path = Swurl
-	url = https://github.com/AtlasNX/Swurl.git
