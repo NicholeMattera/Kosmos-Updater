@@ -88,7 +88,7 @@ namespace ku {
                 case EEXIST:
                     //Done!
                     bSuccess = true;
-                    break;std::string getHost();
+                    break;
                 default:
                     bSuccess = false;
                     break;
@@ -100,8 +100,8 @@ namespace ku {
         return bSuccess;
     }
 
-    bool FileManager::extract(string filename, string destination) {
-        unzFile unz = unzOpen(filename.c_str());
+    bool FileManager::extract(string zipFilename, string destination) {
+        unzFile unz = unzOpen(zipFilename.c_str());
         vector<string> filesToIgnore = ConfigManager::getFilesToIgnore();
         vector<string> filesInstalled = ConfigManager::getInstalledFiles();
         
@@ -124,18 +124,30 @@ namespace ku {
 
             unz_file_info_s * fileInfo = _getFileInfo(unz);
 
-            string fileName = destination;
-            fileName += _getFullFileName(unz, fileInfo);
+            string filename = destination;
+            filename += _getFullFileName(unz, fileInfo);
 
-            if (find(begin(filesToIgnore), end(filesToIgnore), fileName) != end(filesToIgnore)) {
+            if (find(begin(filesToIgnore), end(filesToIgnore), filename) != end(filesToIgnore)) {
                 free(fileInfo);
                 continue;
             }
 
-            if (fileName.back() != '/') {
-                filesInstalled.push_back(fileName);
+            // No need to extract Hekate's payload.
+            if (filename.compare(0, 12, "sdmc:/hekate") == 0 && filename.compare(filename.length() - 4, 4, ".bin") == 0) {
+                free(fileInfo);
+                continue;
+            }
 
-                int result = _extractFile(fileName.c_str(), unz, fileInfo);
+            // No need to extract Kosmos Updater.
+            if (filename.compare(0, 27, "sdmc:/switch/KosmosUpdater/") == 0) {
+                free(fileInfo);
+                continue;
+            }
+
+            if (filename.back() != '/') {
+                filesInstalled.push_back(filename);
+
+                int result = _extractFile(filename.c_str(), unz, fileInfo);
                 if (result < 0) {
                     free(fileInfo);
                     unzClose(unz);
@@ -237,7 +249,7 @@ namespace ku {
                 case EEXIST:
                     //Done!
                     bSuccess = true;
-                    break;std::string getHost();
+                    break;
                 default:
                     bSuccess = false;
                     break;

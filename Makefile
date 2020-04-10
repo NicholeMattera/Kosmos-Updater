@@ -47,13 +47,12 @@ ROMFS		:=	romfs
 APP_TITLE	:=	Kosmos Updater
 APP_AUTHOR	:=	Nichole Mattera
 
-APP_VERSION 		:= 3.0.9
+APP_VERSION 		:= 3.1.0
 APP_VERSION_MAJOR	:= 3
-APP_VERSION_MINOR	:= 0
-APP_VERSION_PATCH	:= 9
-API_VERSION			:= v4
+APP_VERSION_MINOR	:= 1
+APP_VERSION_PATCH	:= 0
 
-SETTING_CONFIG_VERSION	:= 1
+SETTING_CONFIG_VERSION	:= 2
 INTERNAL_CONFIG_VERSION	:= 2
 
 #---------------------------------------------------------------------------------
@@ -66,7 +65,6 @@ DEFINES		+=	-D__SWITCH__ \
 				-DVERSION_MAJOR=$(APP_VERSION_MAJOR) \
 				-DVERSION_MINOR=$(APP_VERSION_MINOR) \
 				-DVERSION_PATCH=$(APP_VERSION_PATCH) \
-				-DAPI_VERSION=\"$(API_VERSION)\" \
 				-DSETTING_CONFIG_VERSION=$(SETTING_CONFIG_VERSION) \
 				-DINTERNAL_CONFIG_VERSION=$(INTERNAL_CONFIG_VERSION)
 
@@ -79,16 +77,10 @@ ASFLAGS		:=	-g $(ARCH)
 LDFLAGS		=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) \
 				-Wl,-Map,$(notdir $*.map)
 
-LIBS		:=	-lSDL2_ttf -lSDL2_image -lSDL2_gfx \
-				-lfreetype \
-				-lwebp -lpng -ljpeg \
-				-lSwurl -lcurl -lz -lmbedtls -lmbedcrypto -lmbedx509 \
-				-lSimpleIniParser -lminizip -lconfig -lnx `sdl2-config --libs` `freetype-config --libs`
-
-ifneq ($(shell which ccache),)
-	CXX		:=	$(shell which ccache) $(CXX)
-	CC		:=	$(shell which ccache) $(CC)
-endif
+LIBS		:=	-lSDL2_ttf -lSDL2_image -lSDL2_gfx -lfreetype -lwebp -lpng -ljpeg \
+				-ljansson -lSwurl -lcurl -lz -lmbedtls -lmbedcrypto -lmbedx509 \
+				-lSimpleIniParser -lminizip -lconfig -lnx `sdl2-config --libs` \
+				`freetype-config --libs`
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

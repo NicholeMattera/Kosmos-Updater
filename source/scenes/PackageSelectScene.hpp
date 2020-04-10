@@ -48,7 +48,7 @@ namespace ku::scenes {
             swurl::WebRequest * _kosmosVersionRequest = NULL;
         
             void _showUpdateView();
-            void _showPackageSelectViews();
+            void _showPackageSelectViews(std::string kosmosVersion);
             void _showStatusView(std::string text, std::string subtext);
 
             void _onAlertViewDismiss(ku::ModalView * view, bool success);

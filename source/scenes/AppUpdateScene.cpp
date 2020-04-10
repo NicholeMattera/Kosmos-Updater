@@ -15,6 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include <jansson.h>
+
 #include "AppUpdateScene.hpp"
 
 #include "../ConfigManager.hpp"
@@ -83,7 +85,7 @@ namespace ku::scenes {
 
     void AppUpdateScene::render(SDL_Rect rect, double dTime) {
         if (_appVersionRequest == NULL) {
-            _appVersionRequest = new WebRequest(ConfigManager::getHost() + "/" + API_VERSION + "/app/version-number");
+            _appVersionRequest = new WebRequest("https://api.github.com/repos/AtlasNX/Kosmos-Updater/releases");
             SessionManager::makeRequest(_appVersionRequest);
         }
 
@@ -99,6 +101,18 @@ namespace ku::scenes {
         _statusView->hidden = false;
 
         _footerView->actions.push_back(new Action(A_BUTTON, "Quit"));
+    }
+
+    std::string AppUpdateScene::_sanitizeVersion(std::string version) {
+        std::string result = "";
+
+        for (char& c : version) {
+            if ((c >= '0' && c <= '9') || c == '.') {
+                result += c;
+            }
+        }
+
+        return result;
     }
 
     tuple<int, int, int> AppUpdateScene::_parseVersion(string version) {
@@ -141,7 +155,25 @@ namespace ku::scenes {
 
     void AppUpdateScene::_onCompleted(WebRequest * request) {
         if (request == _appVersionRequest) {
-            auto latestVersion = _parseVersion(request->response.rawResponseBody);
+            json_t * root = json_loads(request->response.rawResponseBody.c_str(), 0, NULL);
+            if (!root || !json_is_array(root) || json_array_size(root) < 1) {
+                _showStatus("Unable to parse response from GitHub API.", "Please restart the app to try again.");
+                return;
+            }
+
+            json_t * release = json_array_get(root, 0);
+            if (!release || !json_is_object(release)) {
+                _showStatus("Unable to parse response from GitHub API.", "Please restart the app to try again.");
+                return;
+            }
+
+            json_t * tagName = json_object_get(release, "tag_name");
+            if (!tagName || !json_is_string(tagName)) {
+                _showStatus("Unable to parse response from GitHub API.", "Please restart the app to try again.");
+                return;
+            }
+
+            auto latestVersion = _parseVersion(_sanitizeVersion(json_string_value(tagName)));
 
             // No Update
             if (
@@ -150,6 +182,8 @@ namespace ku::scenes {
                 (VERSION_MAJOR == get<0>(latestVersion) && VERSION_MINOR == get<1>(latestVersion) && VERSION_PATCH > get<2>(latestVersion)) ||
                 (VERSION_MAJOR == get<0>(latestVersion) && VERSION_MINOR == get<1>(latestVersion) && VERSION_PATCH == get<2>(latestVersion))
             ) {
+                json_decref(root);
+
                 SessionManager::onProgressChanged = NULL;
                 SessionManager::onCompleted = NULL;
                 SessionManager::onError = NULL;
@@ -158,10 +192,49 @@ namespace ku::scenes {
             }
             // Update
             else {
+                json_t * assets = json_object_get(release, "assets");
+                if (!assets || !json_is_array(assets) || json_array_size(assets) < 1) {
+                    _showStatus("Unable to parse response from GitHub API.", "Please restart the app to try again.");
+                    return;
+                }
+
+                std::string downloadUrl = "";
+                for(size_t i = 0; i < json_array_size(assets); i++) {
+                    json_t * asset = json_array_get(assets, i);
+                    if (!asset || !json_is_object(asset)) {
+                        continue;
+                    }
+
+                    json_t * name = json_object_get(asset, "name");
+                    if (!name || !json_is_string(name)) {
+                        continue;
+                    }
+
+                    std::string assetName(json_string_value(name));
+                    if (assetName.compare(assetName.length() - 4, 4, ".nro") != 0) {
+                        continue;
+                    }
+
+                    json_t * browserDownloadUrl = json_object_get(asset, "browser_download_url");
+                    if (!browserDownloadUrl || !json_is_string(browserDownloadUrl)) {
+                        continue;
+                    }
+
+                    downloadUrl = std::string(json_string_value(browserDownloadUrl));
+                    break;
+                }
+
+                json_decref(root);
+
+                if (downloadUrl.length() == 0) {
+                    _showStatus("Unable to find the latest release assets.", "Please restart the app to try again.");
+                    return;
+                }
+
                 _updateView->setProgress(0);
                 _updateView->setText("Getting the latest version of Kosmos Updater...");
 
-                _appRequest = new WebRequest(ConfigManager::getHost() + "/" + API_VERSION + "/app");
+                _appRequest = new WebRequest(downloadUrl);
                 SessionManager::makeRequest(_appRequest);
             }
         } else if (request == _appRequest) {

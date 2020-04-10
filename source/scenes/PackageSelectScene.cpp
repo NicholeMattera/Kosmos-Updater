@@ -15,6 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include <jansson.h>
+
 #include "PackageSelectScene.hpp"
 
 #include "../ConfigManager.hpp"
@@ -105,7 +107,8 @@ namespace ku::scenes {
 
     void PackageSelectScene::render(SDL_Rect rect, double dTime) {
         if (_kosmosVersionRequest == NULL) {
-            _kosmosVersionRequest = new WebRequest(ConfigManager::getHost() + "/" + API_VERSION + "/package/version-number");
+            _kosmosVersionRequest = new WebRequest("https://api.github.com/repos/AtlasNX/Kosmos/releases");
+            SceneDirector::currentSceneDirector->render();
             SessionManager::makeRequest(_kosmosVersionRequest);
         }
 
@@ -124,7 +127,7 @@ namespace ku::scenes {
         _footerView->actions.clear();
     }
 
-    void PackageSelectScene::_showPackageSelectViews() {
+    void PackageSelectScene::_showPackageSelectViews(std::string kosmosVersion) {
         if (!ConfigManager::getReceivedIgnoreConfigWarning()) {
             _ignoreConfigsAlertView->show();
         }
@@ -136,17 +139,16 @@ namespace ku::scenes {
         _installRowView->hasFocus = true;
 
         string version = ConfigManager::getCurrentVersion();
-        string latestVersion = (_kosmosVersionRequest != NULL) ? _kosmosVersionRequest->response.rawResponseBody : "";
-        if (version.compare(latestVersion) == 0) {
+        if (version.compare(kosmosVersion) == 0) {
             _installRowView->setPrimaryText("Reinstall Kosmos");
         } else {
             _installRowView->setPrimaryText("Install Latest Kosmos");
         }
 
-        if (version == "" || version.compare(latestVersion) == 0) {
-            _installRowView->setSecondaryText("Latest Version is " + latestVersion);
+        if (version == "" || version.compare(kosmosVersion) == 0) {
+            _installRowView->setSecondaryText("Latest Version is " + kosmosVersion);
         } else {
-            _installRowView->setSecondaryText("You currently have version " + version + " installed, and the latest version is " + latestVersion + ".");
+            _installRowView->setSecondaryText("You currently have version " + version + " installed, and the latest version is " + kosmosVersion + ".");
         }
 
         for (auto const& action : _footerView->actions) {
@@ -203,7 +205,31 @@ namespace ku::scenes {
     }
 
     void PackageSelectScene::_onCompleted(WebRequest * request) {
-        _showPackageSelectViews();
+        json_t * root = json_loads(request->response.rawResponseBody.c_str(), 0, NULL);
+        if (!root || !json_is_array(root) || json_array_size(root) < 1) {
+            _showStatusView("Unable to parse response from GitHub API.", "Please restart the app to try again.");
+            return;
+        }
+
+        json_t * release = json_array_get(root, 0);
+        if (!release || !json_is_object(release)) {
+            _showStatusView("Unable to parse response from GitHub API.", "Please restart the app to try again.");
+            return;
+        }
+
+        json_t * tagName = json_object_get(release, "tag_name");
+        if (!tagName || !json_is_string(tagName)) {
+            _showStatusView("Unable to parse response from GitHub API.", "Please restart the app to try again.");
+            return;
+        }
+
+        _showPackageSelectViews(json_string_value(tagName));
+
+        json_decref(root);
+
+        SessionManager::onProgressChanged = NULL;
+        SessionManager::onCompleted = NULL;
+        SessionManager::onError = NULL;
     }
 
     void PackageSelectScene::_onError(WebRequest * request, string error) {

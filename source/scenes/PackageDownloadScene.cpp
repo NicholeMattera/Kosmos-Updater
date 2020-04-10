@@ -15,6 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include <jansson.h>
 #include <SimpleIniParser.hpp>
 
 #include "PackageDownloadScene.hpp"
@@ -79,6 +80,9 @@ namespace ku::scenes {
         if (_footerView != NULL)
             delete _footerView;
 
+        if (_kosmosUrlRequest != NULL)
+            delete _kosmosUrlRequest;
+
         if (_kosmosRequest != NULL)
             delete _kosmosRequest;
 
@@ -97,9 +101,9 @@ namespace ku::scenes {
     }
 
     void PackageDownloadScene::render(SDL_Rect rect, double dTime) {
-        if (_kosmosRequest == NULL) {
-            _kosmosRequest = new WebRequest(ConfigManager::getHost() + "/" + API_VERSION + "/package");
-            SessionManager::makeRequest(_kosmosRequest);
+        if (_kosmosUrlRequest == NULL) {
+            _kosmosUrlRequest = new WebRequest("https://api.github.com/repos/AtlasNX/Kosmos/releases");
+            SessionManager::makeRequest(_kosmosUrlRequest);
         }
 
         Scene::render(rect, dTime);
@@ -135,34 +139,103 @@ namespace ku::scenes {
     }
 
     void PackageDownloadScene::_onCompleted(WebRequest * request) {
-        FileManager::writeFile("temp.zip", request->response.rawResponseBody);
-        auto versionNumber = request->response.headers.find("X-Version-Number")->second;
-        IniStringHelper::rtrim(versionNumber);
+        if (request == _kosmosUrlRequest) {
+            json_t * root = json_loads(request->response.rawResponseBody.c_str(), 0, NULL);
+            if (!root || !json_is_array(root) || json_array_size(root) < 1) {
+                if (root) {
+                    json_decref(root);
+                }
 
-        _updateView->setText("Removing old package...");
-        _updateView->setProgressBarHidden(true);
-        SceneDirector::currentSceneDirector->render();
+                _showStatus("Unable to parse response from GitHub API.", "Please restart the app to try again.", false);
+                return;
+            }
 
-        FileManager::cleanUpFiles();
+            json_t * release = json_array_get(root, 0);
+            if (!release || !json_is_object(release)) {
+                json_decref(root);
+                _showStatus("Unable to parse response from GitHub API.", "Please restart the app to try again.", false);
+                return;
+            }
 
-        _updateView->setText("Extracting the latest package...");
-        SceneDirector::currentSceneDirector->render();
+            json_t * tagName = json_object_get(release, "tag_name");
+            if (!tagName || !json_is_string(tagName)) {
+                json_decref(root);
+                _showStatus("Unable to parse response from GitHub API.", "Please restart the app to try again.", false);
+                return;
+            }
 
-        if (!FileManager::extract("temp.zip", "sdmc:/")) {
+            _kosmosVersion = json_string_value(tagName);
+
+            json_t * assets = json_object_get(release, "assets");
+            if (!assets || !json_is_array(assets) || json_array_size(assets) < 1) {
+                json_decref(root);
+                _showStatus("Unable to parse response from GitHub API.", "Please restart the app to try again.", false);
+                return;
+            }
+
+            std::string downloadUrl = "";
+            for(size_t i = 0; i < json_array_size(assets); i++) {
+                json_t * asset = json_array_get(assets, i);
+                if (!asset || !json_is_object(asset)) {
+                    continue;
+                }
+
+                json_t * name = json_object_get(asset, "name");
+                if (!name || !json_is_string(name)) {
+                    continue;
+                }
+
+                std::string assetName(json_string_value(name));
+                if (assetName.compare(0, 6, "Kosmos") != 0 || assetName.compare(assetName.length() - 4, 4, ".zip") != 0) {
+                    continue;
+                }
+
+                json_t * browserDownloadUrl = json_object_get(asset, "browser_download_url");
+                if (!browserDownloadUrl || !json_is_string(browserDownloadUrl)) {
+                    continue;
+                }
+
+                downloadUrl = std::string(json_string_value(browserDownloadUrl));
+                break;
+            }
+
+            json_decref(root);
+
+            if (downloadUrl.length() == 0) {
+                _showStatus("Unable to find the latest release assets.", "Please restart the app to try again.", false);
+                return;
+            }
+
+            _kosmosRequest = new WebRequest(downloadUrl);
+            SessionManager::makeRequest(_kosmosRequest);
+        } else {
+            FileManager::writeFile("temp.zip", request->response.rawResponseBody);
+
+            _updateView->setText("Removing old package...");
+            _updateView->setProgressBarHidden(true);
+            SceneDirector::currentSceneDirector->render();
+
+            FileManager::cleanUpFiles();
+
+            _updateView->setText("Extracting the latest package...");
+            SceneDirector::currentSceneDirector->render();
+
+            if (!FileManager::extract("temp.zip", "sdmc:/")) {
+                FileManager::deleteFile("temp.zip");
+                _showStatus("There was an error while trying to extract files.", "Please restart the app to try again.", false);
+                return;
+            }
+
             FileManager::deleteFile("temp.zip");
-            _showStatus("There was an error while trying to extract files.", "Please restart the app to try again.", false);
-            return;
+            ConfigManager::setCurrentVersion(_kosmosVersion);
+
+            _updateView->setText("Applying disabled game cart option...");
+            SceneDirector::currentSceneDirector->render();
+
+            FileManager::applyNoGC();
+
+            _showStatus("Kosmos has been updated to version " + _kosmosVersion + "!", "Please restart your Switch to finish the update.", true);
         }
-
-        FileManager::deleteFile("temp.zip");
-        ConfigManager::setCurrentVersion(versionNumber);
-
-        _updateView->setText("Applying disabled game cart option...");
-        SceneDirector::currentSceneDirector->render();
-
-        FileManager::applyNoGC();
-
-        _showStatus("Kosmos has been updated to version " + versionNumber.substr() + "!", "Please restart your Switch to finish the update.", true);
     }
 
     void PackageDownloadScene::_onError(WebRequest * request, string error) {

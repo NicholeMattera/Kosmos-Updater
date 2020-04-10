@@ -47,6 +47,7 @@ namespace ku::scenes {
             double _downloadProgess = 0;
             
             void _showStatus(std::string text, std::string subtext);
+            std::string _sanitizeVersion(std::string version);
             std::tuple<int, int, int> _parseVersion(std::string version);
 
             void _onProgressUpdate(swurl::WebRequest * request, double progress);

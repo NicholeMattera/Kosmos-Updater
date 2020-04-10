@@ -44,6 +44,9 @@ namespace ku::scenes {
             ku::views::FooterView * _footerView = NULL;
             ku::views::AlertView * _restartAlertView = NULL;
 
+            std::string _kosmosVersion = "";
+
+            swurl::WebRequest * _kosmosUrlRequest = NULL;
             swurl::WebRequest * _kosmosRequest = NULL;
 
             void _showStatus(std::string text, std::string subtext, bool wasSuccessful);

@@ -27,7 +27,6 @@ namespace ku {
             static void initialize();
             static void dealloc();
 
-            static std::string getHost();
             static std::vector<std::string> getFilesToIgnore();
             static bool shouldAutoUpdate();
             static bool shouldUseProxy();
@@ -73,9 +72,6 @@ namespace ku {
 
             static inline const std::string CONFIG_FILENAME = "settings.cfg";
             static inline const std::string INTERNAL_FILENAME = "internal.db";
-
-            static inline const std::string HOST_KEY = "host";
-            static inline const std::string HOST_DEF = "https://kosmos-updater.teamatlasnx.com";
 
             static inline const std::string IGNORE_KEY = "ignore";
 

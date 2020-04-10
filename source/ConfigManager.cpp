@@ -23,7 +23,6 @@ namespace ku {
     void ConfigManager::initialize() {
         config_init(&_cfg);
         config_init(&_internalDb);
-        printf("%s %d\n", __FILE__, __LINE__);
 
         if(!config_read_file(&_internalDb, INTERNAL_FILENAME.c_str())) {
             config_setting_t * root, * setting;
@@ -52,9 +51,6 @@ namespace ku {
         if(!config_read_file(&_cfg, CONFIG_FILENAME.c_str())) {
             config_setting_t * root, * setting;
             root = config_root_setting(&_cfg);
-
-            setting = config_setting_add(root, HOST_KEY.c_str(), CONFIG_TYPE_STRING);
-            config_setting_set_string(setting, HOST_DEF.c_str());
 
             setting = config_setting_add(root, IGNORE_KEY.c_str(), CONFIG_TYPE_ARRAY);
 
@@ -85,10 +81,6 @@ namespace ku {
     void ConfigManager::dealloc() {
         config_destroy(&_cfg);
         config_destroy(&_internalDb);
-    }
-
-    string ConfigManager::getHost() {
-        return _readString(HOST_KEY, HOST_DEF, _cfg);
     }
 
     vector<string> ConfigManager::getFilesToIgnore() {
@@ -307,13 +299,10 @@ namespace ku {
         bool configChanged = false;
         config_setting_t * root = config_root_setting(&_cfg);
 
-        if (currentVersion < 1) {
+        if (currentVersion < 2) {
             configChanged = true;
-            // Migrate from HTTP to HTTPS.
-            if (getHost() == "http://kosmos-updater.teamatlasnx.com") {
-                config_setting_t * host = config_setting_get_member(root, HOST_KEY.c_str());
-                config_setting_set_string(host, "https://kosmos-updater.teamatlasnx.com");
-            }
+
+            config_setting_remove(root, "host");
 
             // Migrate sys-ftp path.
             config_setting_t * ignoredFiles = config_lookup(&_cfg, IGNORE_KEY.c_str());
@@ -330,8 +319,13 @@ namespace ku {
             }
 
             // Added config version for future migrations
-            config_setting_t * configVersion = config_setting_add(root, CONFIG_VERSION_KEY.c_str(), CONFIG_TYPE_INT);
-            config_setting_set_int(configVersion, 1);
+            if (currentVersion < 1) {
+                config_setting_t * configVersion = config_setting_add(root, CONFIG_VERSION_KEY.c_str(), CONFIG_TYPE_INT);
+                config_setting_set_int(configVersion, 2);
+            } else {
+                config_setting_t * configVersion = config_setting_get_member(root, CONFIG_VERSION_KEY.c_str());
+                config_setting_set_int(configVersion, 2);
+            }
         }
 
         if (configChanged) {

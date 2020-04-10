@@ -32,12 +32,6 @@ int main(int argc, char **argv)
 {
     SessionManager::initialize();
     SessionManager::userAgent = string("kosmos-updater/") + VERSION;
-    SessionManager::requestHeaders.insert(
-        pair<string, string>(
-            "Cache-Control",
-            "no-cache"
-        )
-    );
 
     #ifdef DEBUG
         nxlinkStdio();
