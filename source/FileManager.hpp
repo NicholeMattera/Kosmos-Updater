@@ -24,6 +24,7 @@
 namespace ku {
     class FileManager {
         public:
+            static std::vector<char> readFile(std::string path);
             static bool writeFile(std::string filename, std::string data);
             static bool deleteFile(std::string filename);
             static bool fileExists(std::string filename);

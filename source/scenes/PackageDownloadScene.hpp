@@ -49,6 +49,9 @@ namespace ku::scenes {
             swurl::WebRequest * _kosmosUrlRequest = NULL;
             swurl::WebRequest * _kosmosRequest = NULL;
 
+            void _copyToIram(uintptr_t iram_addr, void *buf, size_t size);
+            void _clearIram();
+
             void _showStatus(std::string text, std::string subtext, bool wasSuccessful);
             void _onAlertViewDismiss(ku::ModalView * view, bool success);
             std::string _getVersionNumber(std::string version);

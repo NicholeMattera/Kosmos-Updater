@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <dirent.h>
+#include <fstream>
 #include <SimpleIniParser.hpp>
 #include <string.h>
 #include <switch.h>
@@ -31,6 +32,20 @@ using namespace simpleIniParser;
 using namespace std;
 
 namespace ku {
+    std::vector<char> FileManager::readFile(std::string path) {
+        std::ifstream file;
+        file.open(path, std::ios::in | std::ios::binary | std::ios::ate);
+
+        auto size = file.tellg();
+        file.seekg(0, std::ios::beg);
+
+        std::vector<char> buffer(size);
+        file.read(buffer.data(), size);
+        file.close();
+
+        return buffer;
+    }
+
     bool FileManager::writeFile(string filename, string data) {
         deleteFile(filename);
 

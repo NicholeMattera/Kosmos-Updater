@@ -15,6 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include <cstring>
 #include <jansson.h>
 #include <SimpleIniParser.hpp>
 
@@ -23,6 +24,12 @@
 #include "../ConfigManager.hpp"
 #include "../FileManager.hpp"
 #include "../SceneDirector.hpp"
+
+#define IRAM_PAYLOAD_MAX_SIZE 0x2F000
+#define IRAM_PAYLOAD_BASE 0x40010000
+
+static __attribute__((aligned(0x1000))) u8 g_ff_page[0x1000];
+static __attribute__((aligned(0x1000))) u8 g_work_page[0x1000];
 
 using namespace ku;
 using namespace ku::models;
@@ -109,6 +116,27 @@ namespace ku::scenes {
         Scene::render(rect, dTime);
     }
 
+    void PackageDownloadScene::_copyToIram(uintptr_t iram_addr, void *buf, size_t size) {
+        memcpy(g_work_page, buf, size);
+
+        SecmonArgs args = {0};
+        args.X[0] = 0xF0000201;             /* smcAmsIramCopy */
+        args.X[1] = (uintptr_t)g_work_page; /* DRAM Address */
+        args.X[2] = iram_addr;              /* IRAM Address */
+        args.X[3] = size;                   /* Copy size */
+        args.X[4] = 1;
+        svcCallSecureMonitor(&args);
+
+        memcpy(buf, g_work_page, size);
+    }
+
+    void PackageDownloadScene::_clearIram() {
+        memset(g_ff_page, 0xFF, sizeof(g_ff_page));
+        for(size_t i = 0; i < IRAM_PAYLOAD_MAX_SIZE; i += sizeof(g_ff_page)) {
+            this->_copyToIram(IRAM_PAYLOAD_BASE + i, g_ff_page, sizeof(g_ff_page));
+        }
+    }
+
     void PackageDownloadScene::_showStatus(string text, string subtext, bool wasSuccessful) {
         _statusView->setText(text);
         _statusView->setSubtext(subtext);
@@ -125,7 +153,26 @@ namespace ku::scenes {
     void PackageDownloadScene::_onAlertViewDismiss(ModalView * view, bool success) {
         if (success) {
             if (_restartAlertView->getSelectedOption() == 0) {
-                bpcRebootSystem();
+                auto payload = FileManager::readFile("sdmc:/bootloader/update.bin");
+                if (payload.size() == 0) {
+                    SceneDirector::exitApp = true;
+                    return;
+                }
+
+                Result rc = splInitialize();
+                if (R_FAILED(rc)) {
+                    SceneDirector::exitApp = true;
+                    return;
+                }
+
+                this->_clearIram();
+
+                for (size_t i = 0; i < IRAM_PAYLOAD_MAX_SIZE; i += 0x1000) {
+                    this->_copyToIram(IRAM_PAYLOAD_BASE + i, &payload[i], 0x1000);
+                }
+
+                splSetConfig((SplConfigItem) 65001, 2);
+                splExit();
             }
             else {
                 SceneDirector::exitApp = true;
