@@ -78,9 +78,8 @@ LDFLAGS		=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) \
 				-Wl,-Map,$(notdir $*.map)
 
 LIBS		:=	-lSDL2_ttf -lSDL2_image -lSDL2_gfx -lfreetype -lwebp -lpng -ljpeg \
-				-ljansson -lSwurl -lcurl -lz -lmbedtls -lmbedcrypto -lmbedx509 \
-				-lSimpleIniParser -lminizip -lconfig -lnx `sdl2-config --libs` \
-				`freetype-config --libs`
+				-ljansson -lSwurl -lcurl -lz -lSimpleIniParser -lminizip -lconfig \
+				-lnx `sdl2-config --libs` `freetype-config --libs`
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
